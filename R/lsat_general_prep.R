@@ -11,9 +11,10 @@
 lsat_general_prep <- function(dt){
   require(data.table)
   require(dplyr)
+  require(stringr)
   
   # type cast
-  dt <- dat.table(dt)
+  dt <- data.table(dt)
   
   # change colunm names to lower case with conjoined words seperated by '.'
   colnames(dt) <- tolower(colnames(dt))
@@ -28,6 +29,12 @@ lsat_general_prep <- function(dt){
   dt$year <- dates$year+1900
   dt$doy <- dates$yday
   # dt[,c("landsat.id","id","time"):=NULL] # remove several unnecessary colunms
+  
+  # parse coords
+  coords <- stringr::str_extract(string = dt$.geo, pattern = "(?<=\\[).*(?=\\])")
+  coords <- matrix(unlist(str_split(coords, ',')), ncol = 2, byrow = T)
+  dt$latitude <- as.numeric(coords[,2])
+  dt$longitude <- as.numeric(coords[,1])
   
   # seperate lsat 5 and 7 from lsat 8
   setkey(dt, 'satellite')
@@ -53,10 +60,12 @@ lsat_general_prep <- function(dt){
   # merge back together  
   dt <- rbind(lsat57.dt, lsat8.dt, fill=T)
   
-  # order cols and rows, then return data table
+  # select and reorder cols to keep
   dt <- setnames(dt, "max.extent", "jrc.water")
-  dt <- setcolorder(dt, c('site','latitude','longitude','jrc.water','satellite','year','doy','collection','solar.zenith.angle','pixel.qa','radsat.qa','cloud.cover',
-                          'geometric.rmse.model','ublue','blue','green','red','nir','swir1','swir2','tir'))
+  keep.cols <- c('site','latitude','longitude','jrc.water','satellite','year','doy','collection','solar.zenith.angle','pixel.qa','radsat.qa','cloud.cover',
+                 'geometric.rmse.model','ublue','blue','green','red','nir','swir1','swir2','tir')
+  
+  dt <- dt[, keep.cols, with=F]
   dt <- dt[order(site, year, doy, satellite)]
   dt
 }
