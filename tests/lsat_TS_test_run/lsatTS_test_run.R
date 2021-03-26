@@ -1,4 +1,4 @@
-# This R script 
+# This R script
 # Author: Logan Berner, NAU
 # Date: 2021-03-19
 rm(list=ls())
@@ -6,7 +6,7 @@ require(data.table)
 setwd('C:/Users/Logan/Google Drive/research/code/lsatTS/')
 
 # source R functions in lsatTS package
-lsatTS.fun.files = list.files('C:/Users/Logan/Google Drive/research/code/lsatTS/R/', full.names = T)
+lsatTS.fun.files = list.files('R/', full.names = T)
 sapply(lsatTS.fun.files, source)
 
 # Read in and combine files containing Landsat data extracted from GEE using lsat_download_ts()
@@ -20,7 +20,7 @@ lsat.dt <- lsat_general_prep(lsat.dt)
 # Clean the data, filtering out clouds, snow, water, radiometric and geometric errors
 lsat.dt <- lsat_clean_data(lsat.dt, geom.max = 15, cloud.max = 80, sza.max = 60, filter.snow = T, filter.water = T)
 
-# Optional: 
+# Optional:
 # lsat.dt <- lsat_ngb_mean(lsat.dt)
 
 # Compute NDVI
@@ -43,7 +43,7 @@ lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs =
 # Summarize vegetation index for the "growing season", including estimating annual max vegetation index
 lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, vi = 'ndvi', min.frac.of.max = 0.75)
 
-# Optional: Evaluate 
+# Optional: Evaluate
 lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 10, min.frac.of.max = 0.75)
 
 # Write out data.table with growing season summaries
