@@ -19,6 +19,15 @@
 #'
 lsat_get_pixel_centers <- function(polygon_sfc, buffer = 15,
                                    lsat_WRS2_scene_bounds = NULL){
+  # Test polygon used for function building
+  polygon_sfc <- st_polygon(x = list(matrix(c(69.58630431239703, -138.90079471017262,
+                                              69.58352270419293, -138.86266117080206,
+                                              69.57759763297376, -138.86730488907006,
+                                              69.57739454194817, -138.9068533804639,
+                                              69.58630431239703, -138.90079471017262), ncol = 2, byrow = T)[,c(2,1)])) %>%
+    st_sfc(crs = 4326)
+
+
   # @JAKOB INSERT CODE FROM HiLDEN's "make_landsat8_grid.R" HERE
   #  & adapt for generality!
 
@@ -51,14 +60,9 @@ lsat_get_pixel_centers <- function(polygon_sfc, buffer = 15,
   # Load WRS2 scene bounds
   ls8_scene_footprints <- read_sf(lsat_WRS2_scene_bounds)
 
-  # if
+  # Calculate distance to tile-centres
+  distance_to_ls8_tile_centres <- st_distance(st_centroid(site_sf_polar),
+                                              st_centroid(site_ls8_tiles))
   return(NULL)
 }
 
-polygon_sfc <- st_polygon(x = list(matrix(c(69.58630431239703, -138.90079471017262,
-                                  69.58352270419293, -138.86266117080206,
-                                  69.57759763297376, -138.86730488907006,
-                                  69.57739454194817, -138.9068533804639,
-                                  69.58630431239703, -138.90079471017262), ncol = 2, byrow = T)[,c(2,1)])) %>%
-  st_sfc(crs = 4326)
-plot(polygon_sfc)
