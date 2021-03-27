@@ -12,9 +12,10 @@
 #' Again, consider processing smaller polygons.
 #'
 #'
-#' @param polygon_sfc Polygon geometry of the sfc_POLYGON.
+#' @param polygon_sf Simple feature with a simple feature collection of type "sfc_POLYGON" containing a single polygon geometry.
 #' @param buffer Buffer surrounding the geometry to be included. Specified in m.
 #' @param pixel_prefix Optional prefix for the generated pixel ids. Defaults to "pixel".
+#' @param pixel_prefix_from Optional, column name in simple feature to specify pixel_prefix. Overrides "pixel_prefix".
 #' @param plot_map Optional. If TRUE the retrieved pixel centers and the polygon are plotted on a mid-season Landsat 8 image (grey-scale red band) in the mapview. If a character is supplied an addtional output to a file is generated (png, pdf, and jpg supported, see mapview::mapshot). Both slow down the execution of this funciton dramatically, especially for large polygons.
 #' @param lsat_WRS2_scene_bounds File path to the Landsat WRS2 path row scene boundaries. If not specified these are downloaded to a temporary file. To speed up this function consider downloading the file manually and specifiying the file path in this argument. The file can be found here: https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml
 #'
@@ -25,20 +26,37 @@
 #'
 #' # Specify a region to retrieve pixel centers for
 #' test_poly <- st_polygon(
-#' list(matrix(c(69.58413326844578, -138.90125985326782,
-#'               69.58358009075835, -138.88988547014793,
-#'               69.5809560122973, -138.89147182732913,
-#'               69.57986505201093, -138.90298010997816,
-#'               69.58413326844578, -138.90125985326782),
-#'             ncol = 2, byrow = T)[,c(2,1)]))
+#' list(matrix(c(-138.90125, 69.58413,
+#'               -138.88988, 69.58358,
+#'               -138.89147, 69.58095,
+#'               -138.90298, 69.57986,
+#'               -138.90125, 69.58413),
+#'             ncol = 2, byrow = T)))
 #' test_poly2_sfc <- st_sfc(test_poly2, crs = 4326)
 #'
 #' # Retrieve pixel centers and plot to mapview
 #' pixels <- lsat_get_pixel_centers(test_poly2_sfc, plot_map = T)
 #'
-lsat_get_pixel_centers <- function(polygon_sfc,
+#'
+#' ## Ge pixel centers for multiple regions
+#' # Create multi-polygon sf
+#' ellesmere <- st_polygon(list(matrix(c(-75.78526, 78.86973, -75.78526, 78.87246, -75.77116, 78.87246, -75.77116, 78.86973, -75.78526, 78.86973), ncol = 2, byrow = T)))
+#' yamal <- st_polygon(list(matrix(c(68.54580, 70.18874, 68.54580, 70.19145, 68.55379, 70.19145, 68.55379, 70.18874, 68.54580, 70.18874), ncol = 2, byrow = T)))
+#' toolik <- st_polygon(list(matrix(c(-149.60686, 68.62364, -149.60686, 68.62644, -149.59918, 68.62644, -149.59918, 68.62364, -149.60686, 68.62364), ncol = 2, byrow = T)))
+#' test_regions_sf <- st_sfc(ellesmere, yamal, toolik, crs = 4326) %>% st_sf() %>%
+#'   mutate(region = c("ellesmere", "yamal", "toolik"))
+#'
+#' # Split and map lsat_get_pixel_centers using dplyr and purrr
+#' pixel_list <- test_regions_sf %>%
+#'    split(.$region) %>%
+#'    map(lsat_get_pixel_centers,
+#'        pixel_prefix_from = "region") %>%
+#'    bind_rows()
+#'
+lsat_get_pixel_centers <- function(polygon_sf,
+                                   pixel_prefix = "pixel",
+                                   pixel_prefix_from = NULL,
                                    buffer = 15,
-                                   region_name = "pixel",
                                    plot_map = F,
                                    lsat_WRS2_scene_bounds = NULL){
   ## Preparations
@@ -47,8 +65,15 @@ lsat_get_pixel_centers <- function(polygon_sfc,
   tryCatch(ee_user_info(quiet = T), error = function(e) stop("rgee not initialized!\nPlease install and intialize rgee. See: https://r-spatial.github.io/rgee/index.html"))
 
   # Check function arguments
-  # confirm polygon_sfc is an sfc
-  if(class(polygon_sfc)[1] != "sfc_POLYGON") stop("Invalid argument supplied for polygon_sfc!\nPlease supply an object of type 'sfc_POLYGON'.")
+  # confirm polygon_sf is an sfc
+  if(!("sfc_POLYGON" %in% class(st_geometry(polygon_sf))) | length(st_geometry(polygon_sf)) != 1) stop("Invalid argument supplied for polygon_sf!\nPlease supply an object of type 'sfc_POLYGON'.")
+  # confirm pixel prefix is a valid character
+  if(!is.character(pixel_prefix)) stop("Invalid argument supplied for pixel_prefix, please supplly a character or do not specify.")
+  # confirm whether pixel_prefix_from was specified and if so assign to pixel_prefix
+  if(!is.null(pixel_prefix_from)){
+    if(pixel_prefix_from %in% colnames(polygon_sf)) pixel_prefix <- st_drop_geometry(polygon_sf)[, pixel_prefix_from][1]
+    else stop("Invalid column name specified for pixel_prefix_from.")
+  }
   # confirm buffer is a number
   if(!is.numeric(buffer)) stop("Invalid argument supplied for buffer.\nPlease supplay an object of type 'numeric'.")
 
@@ -76,19 +101,19 @@ lsat_get_pixel_centers <- function(polygon_sfc,
   cat(paste0("Determining Landsat WRS tile closest to the polygon centre...\n"))
 
   # Identify overlapping tiles with polygon
-  lsat_overlapping_tiles <- lsat_scene_footprints[st_intersects(polygon_sfc, lsat_scene_footprints, quiet = T)[[1]],]
+  lsat_overlapping_tiles <- lsat_scene_footprints[st_intersects(polygon_sf, lsat_scene_footprints, quiet = T)[[1]],]
 
   # Identify EPSG for UTM zone of centroid (southern hemisphere landsat tiles use northern hemispher UTM )
-  polygon_centroid <- suppressWarnings(st_centroid(polygon_sfc, silent = T))
+  polygon_centroid <- suppressWarnings(st_centroid(polygon_sf, silent = T))
   polygon_centroid_utm_crs <- floor((st_coordinates(polygon_centroid)[1] + 180) / 6) + 1 + 32600
 
   # Transform geometries to local UTM
-  polygon_sfc_utm <-  st_transform(polygon_sfc, crs = polygon_centroid_utm_crs)
+  polygon_sf_utm <-  st_transform(polygon_sf, crs = polygon_centroid_utm_crs)
   lsat_overlapping_tiles_utm <- st_transform(lsat_overlapping_tiles, crs = polygon_centroid_utm_crs)
 
   # Identify closest landsat tile to site centroid
   distance_to_tiles <- suppressWarnings(
-    st_distance(st_centroid(polygon_sfc_utm),
+    st_distance(st_centroid(polygon_sf_utm),
                 st_centroid(lsat_overlapping_tiles_utm)))
   min_distance_tile_index <- which(distance_to_tiles == min(distance_to_tiles))
   wrs_tile_id <- lsat_overlapping_tiles_utm[min_distance_tile_index,]$Name
@@ -112,23 +137,23 @@ lsat_get_pixel_centers <- function(polygon_sfc,
     as.numeric()
 
   # Compare with previously determined crs and if different change projection of polygon
-  if(polygon_centroid_utm_crs != lsat_tile_crs) polygon_sfc_utm <-  st_transform(polygon_sfc, crs = lsat_tile_crs)
+  if(polygon_centroid_utm_crs != lsat_tile_crs) polygon_sf_utm <-  st_transform(polygon_sf, crs = lsat_tile_crs)
 
   # Check whether polygon is fully covered by tile
-  is_covered <- as.numeric(st_covers(lsat_overlapping_tiles_utm[min_distance_tile_index,], polygon_sfc_utm))
+  is_covered <- as.numeric(st_covers(lsat_overlapping_tiles_utm[min_distance_tile_index,], polygon_sf_utm))
   if(is.na(is_covered)){
     warning("Polygon exceeds boundaries of closest Landsat WRS tile!\n",
             "Clipping polygon to footprint of Landsat WRS tile ", wrs_tile_id, ". ",
             "Any regions outwidth the tile will be ignored. ",
             "Consider splliting polygon into smaller chuncks!")
-    polygon_sfc_utm <- st_intersection(polygon_sfc_utm, lsat_overlapping_tiles_utm[min_distance_tile_index,])
+    polygon_sf_utm <- st_intersection(polygon_sf_utm, lsat_overlapping_tiles_utm[min_distance_tile_index,])
   }
 
   # Status
   cat(paste0("Retrieving pixel centres based on WRS tile '", wrs_tile_id, "'...\n"))
 
   # Add buffer to sf if specified and transform to lat long
-  polygon_sfc_buffered <- polygon_sfc_utm %>% st_buffer(buffer) %>% st_transform(4326)
+  polygon_sf_buffered <- polygon_sf_utm %>% st_buffer(buffer) %>% st_transform(4326)
 
   # Retrieve first landsat 8 tile for summer 2019 from GEE
   ls8_image <- ls8IC$
@@ -141,7 +166,7 @@ lsat_get_pixel_centers <- function(polygon_sfc,
   ls8_pixels <- ls8_image$pixelLonLat()$
     select(c("longitude", "latitude"))$
     reduceRegion(reducer = ee$Reducer$toList(),
-                 geometry = sf_as_ee(polygon_sfc_buffered),
+                 geometry = sf_as_ee(polygon_sf_buffered),
                  crs = ls8_image$projection(),
                  scale = 30L)
 
@@ -154,7 +179,7 @@ lsat_get_pixel_centers <- function(polygon_sfc,
       crs = 4326)
 
   # Add pixel and site ID
-  ls8_pixels_sf$pixel_id <- paste0(region_name, "_",
+  ls8_pixels_sf$pixel_id <- paste0(pixel_prefix, "_",
                                    1:nrow(ls8_pixels_sf))
 
   # Visusalise grid using the mapview if requested
@@ -163,10 +188,10 @@ lsat_get_pixel_centers <- function(polygon_sfc,
     cat("Plotting grid...\n")
     # make map
     region_map <- Map$addLayer(ls8_image$select("B4")) +
-      Map$addLayer(sf_as_ee(polygon_sfc_utm), list(color = "darkred")) +
+      Map$addLayer(sf_as_ee(polygon_sf_utm), list(color = "darkred")) +
       Map$addLayer(sf_as_ee(ls8_pixels_sf), list(color = "black"))
     # center view
-    Map$centerObject(sf_as_ee(polygon_sfc_utm))
+    Map$centerObject(sf_as_ee(polygon_sf_utm))
 
     # display map
     print(region_map)
@@ -187,3 +212,4 @@ lsat_get_pixel_centers <- function(polygon_sfc,
   # Return pixel centers as sfc
   return(ls8_pixels_sf)
 }
+
