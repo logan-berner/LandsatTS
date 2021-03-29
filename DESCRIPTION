@@ -23,4 +23,5 @@ Imports:
     rgee,
     sf,
     crayon,
-    mapview
+    mapview,
+    purrr
