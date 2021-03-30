@@ -87,7 +87,7 @@ Next, we assume you have no point coordinates ready yet, but would like to extra
 
 **Please note:** It is not advisable to determine pixel centers for very large polygons. See `?lsat_get_pixel_centers` for more on this.
 
-*First*, a single polygon:
+**First**, a single polygon:
 
 ``` r
 # Specify a region 
@@ -109,7 +109,7 @@ Here is a capture of what you would see in the map view port of R Studio:
 
 ![](man/figures/lsat_get_pixel_centers.png)
 
-*Second*, for multiple polygons:
+**Second**, multiple polygons:
 
 ```
 

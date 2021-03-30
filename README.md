@@ -106,7 +106,7 @@ function is called. See `?lsat_get_pixel_centers` for more info.*
 **Please note:** It is not advisable to determine pixel centers for very
 large polygons. See `?lsat_get_pixel_centers` for more on this.
 
-*First*, a single polygon:
+**First**, a single polygon:
 
 ``` r
 # Specify a region 
@@ -129,7 +129,7 @@ Studio:
 
 ![](man/figures/lsat_get_pixel_centers.png)
 
-*Second*, for multiple polygons:
+**Second**, multiple polygons:
 
 ``` 
 
