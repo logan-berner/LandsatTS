@@ -61,13 +61,12 @@ data for point coordinates or for a polygon area.
 Please note, the time-series extraction from the Google Earth Engine
 *only* work on a point coordinate basis. For each coordinate supplied
 `lsat_extract_ts()` the function will pull down all Landsat pixels that
-overlap with this coordinate.
-
-If you don’t have point coordinates, but rather an area of interest you
-would like to retrieve the time-series for, you can determine all pixel
-centers from a Landsat 8 scene that fall within your polygon using the
-`lsat_get_pixel_centres()` function. See flow chart below. This section
-shows examples for using both functions.
+overlap with this coordinate. If you don’t have point coordinates, but
+rather an area of interest you would like to retrieve the time-series
+for, you can determine all pixel centers from a Landsat 8 scene that
+fall within your polygon using the `lsat_get_pixel_centres()` function.
+See flow chart below. This section shows examples for using both
+functions.
 
 ![](man/figures/Landsat%20R%20Package%20-%20Preparation%20and%20Extraction.jpg)
 
@@ -172,9 +171,10 @@ pixel_list
 lsat\_extract\_ts()**
 
 Now that we have point coordinates ready we can use `lsat_extract_ts()`
-to extract the Landsat time-series from the Earth Engine. See below for
-how it is done. To speed things up for this tutorial we define a small
-number of points grabbed from the `pixel_list` defined above.
+to extract the Landsat time-series from the Earth Engine. See the code
+examples below for how this is done. Please note, that for this tutorial
+we only use a small number of points grabbed from the `pixel_list`
+defined above to speed things up a bit.
 
 The `lsat_extract_ts()` function will accept any sf pbject that has got
 a point feature collection. It also requires one column with unique
