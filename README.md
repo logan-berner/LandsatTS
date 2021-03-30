@@ -49,8 +49,6 @@ sure you have the `rgee` package installed, fully configured and the
 Earth Engine initalized for the current R session. You can find out how
 to do that on the [rgee website](https://r-spatial.github.io/rgee/).
 
------
-
 [\[to top\]](#content)
 
 ## 2\. Preparation and extraction
