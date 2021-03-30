@@ -91,6 +91,8 @@ source("R/lsat_export_ts.R") # @Logan this will eventually be done by just loadi
 ee_Initialize()
 ```
 
+**Getting pixel centers using lsat\_get\_pixel\_centers()**
+
 Next, we assume you have no point coordinates ready yet, but would like
 to extract the Landsat time-series for a polygon. So we start with
 `lsat_get_pixel_centers()`. This function is a convenience helper
@@ -102,8 +104,8 @@ how it works.
 specify it in the function call to avoid downloading it every time the
 function is called. See `?lsat_get_pixel_centers` for more info.*
 
-\*\*Please note\*:\*\* It is not advisable to determine pixel centers
-for very large polygons. See `?lsat_get_pixel_centers` for more on this.
+**Please note:** It is not advisable to determine pixel centers for very
+large polygons. See `?lsat_get_pixel_centers` for more on this.
 
 *First*, a single polygon:
 
@@ -165,6 +167,9 @@ pixel_list <- test_regions_sf %>%
 # Let's look at the returned sf object:
 pixel_list
 ```
+
+**Exporting time-series from the Earth Engine using
+lsat\_extract\_ts()**
 
 Now that we have point coordinates ready we can use `lsat_extract_ts()`
 to extract the Landsat time-series from the Earth Engine. See below for
