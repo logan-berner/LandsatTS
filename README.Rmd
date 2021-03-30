@@ -26,7 +26,7 @@ Building upon the workflow developed for [Berner et al. 2020](https://www.nature
 
 ## Content
 1. [Installation](#1-Installation)
-2. [Preparation and Extraction](#2-Preparation-and-extraction])
+2. [Preparation and extraction](#2-Preparation-and-extraction])
 3. [Cross calibration of time-series](#3-Cross-calibration-of-time-series)
 4. [Defining growing season characteristics](#4-Defining-growing-season-characteristics)
 5. [Citation](#5-Citation)
@@ -39,12 +39,13 @@ Building upon the workflow developed for [Berner et al. 2020](https://www.nature
 
 ## 1. Installation
 
-You can install the package via `devtools` as follows:
+You can install the package using `devtools` as follows:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("jakobjassmann/lsatTS")
 ```
+
 ## 2. Preparation and extraction
 
 ## 3. Cross-calibration of time-series
@@ -69,9 +70,12 @@ Thank you to all the testers: Tester A, Tester B and Tester C.
 
 
 ## 8. References
+
 **rgee**
+
 C Aybar, Q Wu, L Bautista, R Yali and A Barja (2020) rgee: An R package for interacting with Google Earth Engine
   Journal of Open Source Software URL https://github.com/r-spatial/rgee/.
   
 ## 9. License
+
 [MIT LICENSE](LICENSE)

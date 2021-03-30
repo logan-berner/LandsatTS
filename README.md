@@ -24,7 +24,7 @@ al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
 ## Content
 
 1.  [Installation](#1-Installation)
-2.  [Preparation and Extraction](#2-Preparation-and-extraction%5D)
+2.  [Preparation and extraction](#2-Preparation-and-extraction%5D)
 3.  [Cross calibration of
     time-series](#3-Cross-calibration-of-time-series)
 4.  [Defining growing season
@@ -39,7 +39,7 @@ al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
 
 ## 1\. Installation
 
-You can install the package via `devtools` as follows:
+You can install the package using `devtools` as follows:
 
 ``` r
 # install.packages("devtools")
@@ -82,9 +82,11 @@ Thank you to all the testers: Tester A, Tester B and Tester C.
 
 ## 8\. References
 
-**rgee** C Aybar, Q Wu, L Bautista, R Yali and A Barja (2020) rgee: An R
-package for interacting with Google Earth Engine Journal of Open Source
-Software URL <https://github.com/r-spatial/rgee/>.
+**rgee**
+
+C Aybar, Q Wu, L Bautista, R Yali and A Barja (2020) rgee: An R package
+for interacting with Google Earth Engine Journal of Open Source Software
+URL <https://github.com/r-spatial/rgee/>.
 
 ## 9\. License
 
