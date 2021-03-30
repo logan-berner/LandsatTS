@@ -23,17 +23,17 @@ al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
 
 ## Content
 
-1.  [Installation](#1-Installation)
-2.  [Preparation and extraction](#2-Preparation-and-extraction%5D)
+1.  [Installation](#1-installation)
+2.  [Preparation and extraction](#2-preparation-and-extraction%5D)
 3.  [Cross calibration of
-    time-series](#3-Cross-calibration-of-time-series)
+    time-series](#3-cross-calibration-of-time-series)
 4.  [Defining growing season
-    characteristics](#4-Defining-growing-season-characteristics)
-5.  [Citation](#5-Citation)
-6.  [Contact](#6-Contact)
-7.  [Contributions](#7-Contributions)
-8.  [References](#8-References)
-9.  [License](#9-License)
+    characteristics](#4-defining-growing-season-characteristics)
+5.  [Citation](#5-citation)
+6.  [Contact](#6-contact)
+7.  [Contributions](#7-contributions)
+8.  [References](#8-references)
+9.  [License](#9-license)
 
 [To top](#Content)
 
@@ -46,11 +46,25 @@ You can install the package using `devtools` as follows:
 devtools::install_github("jakobjassmann/lsatTS")
 ```
 
+[To top](#Content)
+
 ## 2\. Preparation and extraction
+
+![](man/figures/Landsat%20R%20Package%20-%20Preparation%20and%20Extraction.jpg)
+
+[To top](#Content)
 
 ## 3\. Cross-calibration of time-series
 
+![](man/figures/Landsat%20R%20Package%20-%20Cross-calibration%20of%20time-series.jpg)
+
+[To top](#Content)
+
 ## 4\. Defining growing season characteristics
+
+![](man/figures/Landsat%20R%20Package%20-%20Defining%20growing%20season%20characteristics.jpg)
+
+[To top](#Content)
 
 ## 5\. Citation
 
@@ -62,10 +76,14 @@ Warming Explains Widespread but Not Uniform Greening in the Arctic
 Tundra Biome. Nature Communications 11, no. 1: 4621.
 <https://doi.org/10.1038/s41467-020-18479-5>.
 
+[To top](#Content)
+
 ## 6\. Contact
 
 Logan T. Berner and Jakob J. Assmann Email Logan at:
 <Logan.Berner@nau.edu> Email Jakob at: <j.assmann@bio.au.dk>
+
+[To top](#Content)
 
 ## 7\. Contributions
 
@@ -79,6 +97,8 @@ development. Logan T Berner and Jakob J. Assmann prepared the code for
 publication and wrote the documnetation.
 
 Thank you to all the testers: Tester A, Tester B and Tester C.
+
+[To top](#Content)
 
 ## 8\. References
 

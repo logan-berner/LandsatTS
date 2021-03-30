@@ -25,15 +25,15 @@ Building upon the workflow developed for [Berner et al. 2020](https://www.nature
 - The definition of growing season characteristics such as the maximum NDVI.
 
 ## Content
-1. [Installation](#1-Installation)
-2. [Preparation and extraction](#2-Preparation-and-extraction])
-3. [Cross calibration of time-series](#3-Cross-calibration-of-time-series)
-4. [Defining growing season characteristics](#4-Defining-growing-season-characteristics)
-5. [Citation](#5-Citation)
-6. [Contact](#6-Contact)
-7. [Contributions](#7-Contributions)
-8. [References](#8-References)
-9. [License](#9-License)
+1. [Installation](#1-installation)
+2. [Preparation and extraction](#2-preparation-and-extraction])
+3. [Cross calibration of time-series](#3-cross-calibration-of-time-series)
+4. [Defining growing season characteristics](#4-defining-growing-season-characteristics)
+5. [Citation](#5-citation)
+6. [Contact](#6-contact)
+7. [Contributions](#7-contributions)
+8. [References](#8-references)
+9. [License](#9-license)
 
 [To top](#Content)
 
@@ -46,21 +46,40 @@ You can install the package using `devtools` as follows:
 devtools::install_github("jakobjassmann/lsatTS")
 ```
 
+[To top](#Content)
+
 ## 2. Preparation and extraction
+
+![](man/figures/Landsat R Package - Preparation and Extraction.jpg)
+
+[To top](#Content)
 
 ## 3. Cross-calibration of time-series
 
+![](man/figures/Landsat R Package - Cross-calibration of time-series.jpg)
+
+[To top](#Content)
+
 ## 4. Defining growing season characteristics
+
+![](man/figures/Landsat R Package - Defining growing season characteristics.jpg)
+
+[To top](#Content)
 
 ## 5. Citation 
 When using this package please citing:
 
 Berner, Logan T., Richard Massey, Patrick Jantz, Bruce C. Forbes, Marc Macias-Fauria, Isla Myers-Smith, Timo Kumpula, et al. 2020. Summer Warming Explains Widespread but Not Uniform Greening in the Arctic Tundra Biome. Nature Communications 11, no. 1: 4621. [https://doi.org/10.1038/s41467-020-18479-5](https://doi.org/10.1038/s41467-020-18479-5).
 
+
+[To top](#Content)
+
 ## 6. Contact
 Logan T. Berner and Jakob J. Assmann
 Email Logan at: [Logan.Berner@nau.edu](mailto:Logan.Berner@nau.edu)
 Email Jakob at: [j.assmann@bio.au.dk](mailto:j.assmann@bio.au.dk)
+
+[To top](#Content)
 
 ## 7. Contributions
 
@@ -68,6 +87,7 @@ Logatn T. Berner wrote the analysis functions (items 3 and 4). Jakob J. Assmann 
 
 Thank you to all the testers: Tester A, Tester B and Tester C.
 
+[To top](#Content)
 
 ## 8. References
 
