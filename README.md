@@ -24,7 +24,7 @@ al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
 ## Content
 
 1.  [Installation](#1-installation)
-2.  [Preparation and extraction](#2-preparation-and-extraction%5D)
+2.  [Preparation and extraction](#2-preparation-and-extraction)
 3.  [Cross calibration of
     time-series](#3-cross-calibration-of-time-series)
 4.  [Defining growing season
