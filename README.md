@@ -23,16 +23,16 @@ al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
 
 ## Content
 
-1.  [Installation](#1.-Installation)
-2.  [Preparation and Extraction](#2.-Preparation-and-extraction%5D)
+1.  [Installation](#1-Installation)
+2.  [Preparation and Extraction](#2-Preparation-and-extraction%5D)
 3.  [Cross calibration of
-    time-series](#3.-Cross-calibration-of-time-series)
+    time-series](#3-Cross-calibration-of-time-series)
 4.  [Defining growing season
-    characteristics](#4.-Defining-growing-season-characteristics)
-5.  [Citation](#5.-Citation)
-6.  [Contact](#6.-Contact)
-7.  [Contributions](#7.-Contributions)
-8.  [References](#8.-References)
+    characteristics](#4-Defining-growing-season-characteristics)
+5.  [Citation](#5-Citation)
+6.  [Contact](#6-Contact)
+7.  [Contributions](#7-Contributions)
+8.  [References](#8-References)
 9.  [License](#9-License)
 
 [To top](#Content)
@@ -84,5 +84,8 @@ Thank you to all the testers: Tester A, Tester B and Tester C.
 
 **rgee** C Aybar, Q Wu, L Bautista, R Yali and A Barja (2020) rgee: An R
 package for interacting with Google Earth Engine Journal of Open Source
-Software URL <https://github.com/r-spatial/rgee/>. \#\# 9. License [MIT
-LICENSE](LICENSE)
+Software URL <https://github.com/r-spatial/rgee/>.
+
+## 9\. License
+
+[MIT LICENSE](LICENSE)
