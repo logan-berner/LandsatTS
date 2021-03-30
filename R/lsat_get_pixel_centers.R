@@ -200,7 +200,7 @@ lsat_get_pixel_centers <- function(polygon_sf,
     rgee::Map$centerObject(rgee::sf_as_ee(polygon_sf_utm))
 
     # display map
-    region_map
+    print(region_map)
 
     # Export to snapshot to file if requested
     if(is.character(plot_map)){
