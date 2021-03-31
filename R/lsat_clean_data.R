@@ -21,8 +21,7 @@
 #' @examples lsat.dt <- lsat_clean_dt(lsat.dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T)
 
 lsat_clean_data <- function(dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T){
-  require(data.table)
-  dt <- data.table(dt)
+  dt <- data.table::data.table(dt)
   n.orig <- nrow(dt)
   
   # pixel flags for clear sky

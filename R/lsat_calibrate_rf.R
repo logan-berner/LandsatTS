@@ -48,8 +48,9 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
   require(R.utils)
   require(zoo)
   require(dplyr)
-  mkdirs(outdir)
-  dt <- data.table(dt)
+  R.utils::mkdirs(outdir)
+  
+  dt <- data.table::data.table(dt)
   sats <- dt[,unique(satellite)] # which satellites are in the data set? 
   sats <- sats[-which(sats %in% 'LE07')]
   dt$xcal <- numeric() # populate this field later in script
@@ -65,25 +66,25 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
     
     # identify and subset years for which scenes are available from both sensors at each site
     site.yr.dt <- xcal.dt[,.(year = unique(year)), by = .(site, satellite)]
-    site.yr.dt <- dcast.data.table(site.yr.dt, site + year ~ satellite, value.var = 'year')
+    site.yr.dt <- data.table::dcast.data.table(site.yr.dt, site + year ~ satellite, value.var = 'year')
     site.yr.dt <- na.omit(site.yr.dt)
-    site.yr.dt <- melt.data.table(site.yr.dt, id = "site", measure = c("LE07",i), variable.name = "satellite", value.name = "year")
+    site.yr.dt <- data.table::melt.data.table(site.yr.dt, id = "site", measure = c("LE07",i), variable.name = "satellite", value.name = "year")
     xcal.dt <- xcal.dt[site.yr.dt, on = c('site','year','satellite')]
     
     # identify and subset random 15-day seasonal windows for which obs are available from both sensors at each site
     site.doy.dt <- xcal.dt[, .(n.obs=.N), by = c('site','satellite','doy')]
-    full.fac <- data.table(expand.grid('site' = unique(xcal.dt$site), 'satellite' = unique(xcal.dt$satellite), 'doy' = doy.rng))
+    full.fac <- data.table::data.table(expand.grid('site' = unique(xcal.dt$site), 'satellite' = unique(xcal.dt$satellite), 'doy' = doy.rng))
     site.doy.dt <- site.doy.dt[full.fac, on = c('site','satellite','doy')] # expand to include all possible summer DOYs for each site x satellite 
-    site.doy.dt <- setorderv(site.doy.dt, c('site', 'satellite', 'doy'))    
+    site.doy.dt <- data.table::setorderv(site.doy.dt, c('site', 'satellite', 'doy'))    
     site.doy.dt <- site.doy.dt[is.na(n.obs), n.obs := 0]
-    site.doy.dt <- site.doy.dt[, n.obs.15days := rollapplyr(n.obs, FUN='sum', align = 'center', width=15, partial = T), by = c('site','satellite')] # compute N obs w/in +-7 days of each DOY
-    site.doy.dt <- dcast.data.table(site.doy.dt, site + doy ~ satellite, value.var = 'n.obs.15days')
+    site.doy.dt <- site.doy.dt[, n.obs.15days := zoo::rollapplyr(n.obs, FUN='sum', align = 'center', width=15, partial = T), by = c('site','satellite')] # compute N obs w/in +-7 days of each DOY
+    site.doy.dt <- data.table::dcast.data.table(site.doy.dt, site + doy ~ satellite, value.var = 'n.obs.15days')
     site.doy.dt <- site.doy.dt[LE07 >= min.obs][get(i) >= min.obs]
     site.doy.dt <- site.doy.dt[, .SD[sample(.N, 1)], by = 'site']  # randomly select one observational period per site 
     site.doy.dt <- site.doy.dt[, c('LE07',i):= NULL]
-    site.doy.dt <- setnames(site.doy.dt, 'doy','focal.doy')
-    site.doy.win.dt <- data.table(site = site.doy.dt$site, matrix(unlist(lapply(site.doy.dt$focal.doy, function(x){x-seq(-7,7,1)})), ncol = 15, byrow = T)) # create dt with DOYs of 15-day windows for each site
-    site.doy.win.dt <- melt.data.table(site.doy.win.dt, id.vars = 'site', value.name = 'doy')
+    site.doy.dt <- data.table::setnames(site.doy.dt, 'doy','focal.doy')
+    site.doy.win.dt <- data.table::data.table(site = site.doy.dt$site, matrix(unlist(lapply(site.doy.dt$focal.doy, function(x){x-seq(-7,7,1)})), ncol = 15, byrow = T)) # create dt with DOYs of 15-day windows for each site
+    site.doy.win.dt <- data.table::melt.data.table(site.doy.win.dt, id.vars = 'site', value.name = 'doy')
     site.doy.win.dt <- site.doy.win.dt[,variable := NULL]
     xcal.dt <- site.doy.win.dt[xcal.dt, on = c('site','doy'), nomatch=0]
     xcal.dt <- xcal.dt[site.doy.dt, on = 'site']
@@ -91,9 +92,9 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
     # compute median band / VI value for the 15-day seasonal window at each site
     coord.dt <- xcal.dt[, .(latitude = mean(latitude, na.rm=T), longitude = mean(longitude, na.rm=T)), by = 'site']
     rf.dat <- xcal.dt[, .(mov.med=median(get(band), na.rm=T)), by = c('site','satellite','focal.doy')]
-    rf.dat <- setnames(rf.dat, 'focal.doy','doy')
-    rf.dat <- dcast.data.table(rf.dat, site + doy ~ satellite, value.var = 'mov.med')
-    rf.dat <- setnames(rf.dat, c('LE07',i), c(paste('LE07',band,sep='.'), band))
+    rf.dat <- data.table::setnames(rf.dat, 'focal.doy','doy')
+    rf.dat <- data.table::dcast.data.table(rf.dat, site + doy ~ satellite, value.var = 'mov.med')
+    rf.dat <- data.table::setnames(rf.dat, c('LE07',i), c(paste('LE07',band,sep='.'), band))
     rf.dat <- rf.dat[coord.dt, on = 'site']
     
     # subset training and evaluation data
@@ -107,12 +108,12 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
     # fit random forest
     form.rhs <- paste(eval(band), 'doy', 'latitude', 'longitude', sep = ' + ')
     form.lhs <- paste('LE07.', band, ' ~ ', sep='')
-    rf.form <- formula(paste(form.lhs, form.rhs, sep=''))
-    rf.xcal <- ranger(rf.form, rf.dat.train, importance = 'impurity')
+    rf.form <- stats::formula(paste(form.lhs, form.rhs, sep=''))
+    rf.xcal <- ranger::ranger(rf.form, rf.dat.train, importance = 'impurity')
     
     # apply random forest to cross-calibrate satellites
     sat.dt <- dt[satellite == i]
-    rf.pred <- predict(rf.xcal, sat.dt)
+    rf.pred <- stats::predict(rf.xcal, sat.dt)
     dt <- dt[satellite == i, xcal := rf.pred$predictions]
     
     # save model to disk
@@ -120,12 +121,12 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
     saveRDS(rf.xcal, outname)
     
     # evaluate model using cross-validation and internal rf metrics, saving summaries to data table
-    rf.dat.eval[, eval(paste("LE07", band, 'pred', sep='.')) := predict(rf.xcal, rf.dat.eval)$predictions]
+    rf.dat.eval[, eval(paste("LE07", band, 'pred', sep='.')) := stats::predict(rf.xcal, rf.dat.eval)$predictions]
     file.name <- paste(outdir, '/', outfile.id,'_', i, '_xcal_rf_eval_data.csv', sep='')
-    fwrite(rf.dat.eval, file.name)
+    data.table::fwrite(rf.dat.eval, file.name)
     
-    lm.form <- formula(paste("LE07.", band, ' ~ LE07.', band,'.pred', sep=''))
-    xval.lm.smry <- summary(lm(lm.form, rf.dat.eval))
+    lm.form <- stats::formula(paste("LE07.", band, ' ~ LE07.', band,'.pred', sep=''))
+    xval.lm.smry <- summary(stats::lm(lm.form, rf.dat.eval))
     xval.rmse <- as.numeric(rf.dat.eval[, .(rmse = round(sqrt(mean((get(paste('LE07.', band, sep='')) - get(paste('LE07.', band, '.pred', sep='')))^2)),4))])
     xval.bias <- round(sum(rf.dat.eval[[paste('LE07.',band,sep='')]] - rf.dat.eval[[paste('LE07.',band,'.pred', sep='')]]) / nrow(rf.dat.eval),5)
     
@@ -158,28 +159,26 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
     obs <- paste('LE07',band,'pred',sep='.')
     
     # raw figure
-    fig.raw <- ggplot(rf.dat.eval, aes_string(x = band, y = obs))
-    fig.raw <- fig.raw + geom_bin2d(binwidth=c(0.01,0.01)) + geom_abline(color='orange') + scale_fill_viridis_c()
-    fig.raw <- fig.raw + theme_bw() + labs(y=lsat7.ylab, x=uncal.xlab) + coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
-    fig.raw <- fig.raw + theme(legend.position="right", 
-                               axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold")) 
+    fig.raw <- ggplot2::ggplot(rf.dat.eval, aes_string(x = band, y = obs))
+    fig.raw <- fig.raw + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange') + ggplot2::scale_fill_viridis_c()
+    fig.raw <- fig.raw + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=uncal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
+    fig.raw <- fig.raw + ggplot2::theme(legend.position="right", axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold")) 
     
     # cal figure
-    fig.cal <- ggplot(rf.dat.eval, aes_string(x = pred, y = obs))
-    fig.cal <- fig.cal + geom_bin2d(binwidth=c(0.01,0.01)) + geom_abline(color='orange') + scale_fill_viridis_c()
-    fig.cal <- fig.cal + theme_bw() + labs(y=lsat7.ylab, x=cal.xlab) + coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
-    fig.cal <- fig.cal + theme(legend.position="right", 
-                               axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold")) 
+    fig.cal <- ggplot2::ggplot(rf.dat.eval, aes_string(x = pred, y = obs))
+    fig.cal <- fig.cal + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange') + ggplot2::scale_fill_viridis_c()
+    fig.cal <- fig.cal + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=cal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
+    fig.cal <- fig.cal + ggplot2::theme(legend.position="right", axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold")) 
     
     # combine figures
-    fig <- ggarrange(fig.raw, fig.cal, ncol = 2)
+    fig <- ggpubr::ggarrange(fig.raw, fig.cal, ncol = 2)
     
     # write out fig or save to list to write later if calibrating more than one satellite
     if (length(sats) == 1){
       fig.name <- paste(outdir, '/', outfile.id, '_', i, '_xval_pred_vs_obs.jpg', sep='')
-      jpeg(fig.name, 4.5, 4, units = 'in', res=400)
+      grDevices::jpeg(fig.name, 4.5, 4, units = 'in', res=400)
       print(fig)
-      dev.off()
+      grDevices::dev.off()
     } else {
       fig.lst[[i]] <- fig
     }
@@ -187,11 +186,11 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
   
   # write out composite figure
   if (length(sats) == 2){
-    fig <- ggarrange(fig.lst[[1]], fig.lst[[2]], ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9)
+    fig <- ggpubr::ggarrange(fig.lst[[1]], fig.lst[[2]], ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9)
     fig.name <- paste(outdir, '/', outfile.id,'_xval_pred_vs_obs.jpg', sep='')
-    jpeg(fig.name, 9, 7.5, units = 'in', res=400)
+    grDevices::jpeg(fig.name, 9, 7.5, units = 'in', res=400)
     print(fig)
-    dev.off()
+    grDevices::dev.off()
   } else {
     print('modify to accommodate plotting more satellites!')
   }
@@ -202,6 +201,6 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
   
   # output rf models and updated data table
   dt[satellite == 'LE07', xcal:= get(band)]
-  setnames(dt, 'xcal', eval(paste(band, 'xcal', sep='.')))
+  data.table::setnames(dt, 'xcal', eval(paste(band, 'xcal', sep='.')))
   dt
 }

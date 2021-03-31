@@ -9,8 +9,7 @@
 #' @examples ngb.avg.dt <- lsat_ngb_mean(my.dt)
 
 lsat_neighborhood_mean <- function(dt){
-  require(data.table)
-  dt <- data.table(dt)
+  dt <- data.table::data.table(dt)
   dt <- dt[, .(latitude = mean(latitude, na.rm=T),
                longitude = mean(longitude, na.rm=T),
                ublue = mean(ublue, na.rm=T),

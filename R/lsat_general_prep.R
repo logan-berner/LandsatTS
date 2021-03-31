@@ -9,12 +9,9 @@
 #' @examples parsed.dt <- lsat_general_prep(gee.dt)
 
 lsat_general_prep <- function(dt){
-  require(data.table)
-  require(dplyr)
-  require(stringr)
   
   # type cast
-  dt <- data.table(dt)
+  dt <- data.table::data.table(dt)
   
   # change colunm names to lower case with conjoined words seperated by '.'
   colnames(dt) <- tolower(colnames(dt))
@@ -61,7 +58,7 @@ lsat_general_prep <- function(dt){
   dt <- rbind(lsat57.dt, lsat8.dt, fill=T)
   
   # select and reorder cols to keep
-  dt <- setnames(dt, "max.extent", "jrc.water")
+  dt <- data.table::setnames(dt, "max.extent", "jrc.water")
   keep.cols <- c('site','latitude','longitude','jrc.water','satellite','year','doy','collection','solar.zenith.angle','pixel.qa','radsat.qa','cloud.cover',
                  'geometric.rmse.model','ublue','blue','green','red','nir','swir1','swir2','tir')
   
