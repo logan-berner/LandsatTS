@@ -244,7 +244,15 @@ Once the tasks are completed, open your Google Drive and check the
 data to process it in steps 3 and 4 below. Please note that you can use
 the Google Drive Backup tool as well as rgee’s `ee_drive_to_local()`
 [function](https://r-spatial.github.io/rgee/reference/ee_drive_to_local.html)
-to copy the data automatically to a local drive.
+to copy the data automatically to a local drive:
+
+``` r
+# Monitor export progress, waiting for last export to have finished
+map(task_list, ee_monitoring)
+
+# Copy exported file(s) to tempfolder in R using ee_drive_to_local()
+temp_files <- map(task_list, ee_drive_to_local)
+```
 
 [\[to top\]](#content)
 
