@@ -29,8 +29,8 @@ check()
 use_testthat()
 
 # Initialize test for functions
-use_test("lsat_retrieve_pixels")
-use_test("lsat_download_ts")
+use_test("lsat_get_pixel_centers")
+use_test("lsat_export_ts")
 
 # add required packages for import
 # USE: use_package("package_name")
