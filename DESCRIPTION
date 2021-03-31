@@ -24,4 +24,8 @@ Imports:
     sf,
     crayon,
     mapview,
-    purrr
+    purrr,
+    data.table,
+    ggplot2,
+    R.utils,
+    stats
