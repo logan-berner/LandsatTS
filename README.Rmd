@@ -277,7 +277,7 @@ lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', mi
 ## 5. Citation 
 When using this package please cite:
 
-Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz. 2021. lsatTS - an R package for deriving vegetation greenness time series from the Landsat satellites. https://github.com/logan-berner/lsatTS
+Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz. 2021. lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data. https://github.com/logan-berner/lsatTS
 
 
 Also please consider citing the peer-reviewed publication for which much of this code was developed:
