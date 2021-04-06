@@ -18,8 +18,7 @@ al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
     coordinates (“sites”).
   - Cross-calibration of Landsat VI time-series to account for sparse
     observations and sensor differences.
-  - Define growing season characteristics that describe greenness
-    time-series such as the maximum NDVI.
+  - Define growing season characteristics that such as the maximum NDVI.
 
 ## Content
 
