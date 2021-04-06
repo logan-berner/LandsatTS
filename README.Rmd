@@ -22,7 +22,7 @@ Building upon the workflow developed for [Berner et al. 2020](https://www.nature
 
 - Export time-series for the whole Landsat record based on point coordinates ("sites").
 - Cross-calibration of Landsat VI time-series to account for sparse observations and sensor differences. 
-- Define growing season characteristics that such as the maximum NDVI.
+- Define growing season characteristics such as the maximum NDVI.
 
 ## Content
 1. [Installation](#1-installation)
