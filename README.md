@@ -328,7 +328,7 @@ lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', mi
 
 ## 5\. Citation
 
-When using this package please citing:
+When using this package please cite:
 
 Berner, Logan T., Richard Massey, Patrick Jantz, Bruce C. Forbes, Marc
 Macias-Fauria, Isla Myers-Smith, Timo Kumpula, et al. 2020. Summer

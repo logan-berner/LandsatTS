@@ -275,7 +275,7 @@ lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', mi
 [\[to top\]](#content)
 
 ## 5. Citation 
-When using this package please citing:
+When using this package please cite:
 
 Berner, Logan T., Richard Massey, Patrick Jantz, Bruce C. Forbes, Marc Macias-Fauria, Isla Myers-Smith, Timo Kumpula, et al. 2020. Summer Warming Explains Widespread but Not Uniform Greening in the Arctic Tundra Biome. Nature Communications 11, no. 1: 4621. [https://doi.org/10.1038/s41467-020-18479-5](https://doi.org/10.1038/s41467-020-18479-5).
 
