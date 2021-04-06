@@ -1,0 +1,16 @@
+citHeader("To cite lsatTS in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "Summer Warming Explains Widespread but Not Uniform Greening in the Arctic Tundra Biome",
+  author   = "Berner, Logan T., Richard Massey, Patrick Jantz, Bruce C. Forbes, Marc Macias-Fauria, Isla Myers-Smith, Timo Kumpula, et al.",
+  journal  = "Nature Communications",
+  year     = 2020,
+  volume   = 11,
+  number   = 1,
+  pages    = 4621,
+  url      = "https://doi.org/10.1038/s41467-020-18479-5",
+  textVersion = paste(
+"Berner, Logan T., Richard Massey, Patrick Jantz, Bruce C. Forbes, Marc Macias-Fauria, Isla Myers-Smith, Timo Kumpula, et al. 2020. Summer Warming Explains Widespread but Not Uniform Greening in the Arctic Tundra Biome. Nature Communications 11, no. 1: 4621. https://doi.org/10.1038/s41467-020-18479-5"
+  )
+)
