@@ -6,7 +6,7 @@ test_that("lsat_export_ts works", {
   load("../data/lsat_export_ts.Rda")
 
   # Export time-series using lsat_export_ts()
-  task_list <- lsat_export_ts(test_points_sf, site_from = "pixel_id")
+  task_list <- lsat_export_ts(test_points_sf)
 
   # Monitor task completion
   cat("Waiting for export from EE to finish...")
