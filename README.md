@@ -7,17 +7,17 @@
 
 <!-- badges: end -->
 
-**Logan T. Berner, Jakob J. Assmann, Richard Massey (TBC), Signe Normand
-and Scott Goetz**
+**Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and
+Scott Goetz**
 
 Building upon the workflow developed for [Berner et
 al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
-**lsatTS** package facilitates:
+**lsatTS** package helps you to:
 
-  - The export of time-series for the whole Landsat record from point
+  - Export time-series for the whole Landsat record based on point
     coordinates (“sites”).
-  - The cross-calibration of VIs derived from the time-series to account
-    for sparse observations.
+  - Cross-calibration of Landsat VI time-series to account for sparse
+    observations and sensor differences.
   - The definition of growing season characteristics such as the maximum
     NDVI.
 
@@ -46,7 +46,7 @@ devtools::install_github("jakobjassmann/lsatTS")
 
 For the preparation and extractions scripts you will also have to make
 sure you have the `rgee` package installed, fully configured and the
-Earth Engine initalized for the current R session. You can find out how
+Earth Engine initialized for the current R session. You can find out how
 to do that on the [rgee website](https://r-spatial.github.io/rgee/).
 
 [\[to top\]](#content)
@@ -54,19 +54,21 @@ to do that on the [rgee website](https://r-spatial.github.io/rgee/).
 ## 2\. Preparation and extraction
 
 Before you start you will have to determine whether you will extract
-data for point coordinates or for a polygon area.
+data for point coordinates or for a polygon area. See flow chart below.
 
-Please note, the time-series extraction from the Google Earth Engine
-*only* work on a point coordinate basis. For each coordinate supplied
-`lsat_extract_ts()` the function will pull down all Landsat pixels that
-overlap with this coordinate. If you don’t have point coordinates, but
-rather an area of interest you would like to retrieve the time-series
-for, you can determine all pixel centers from a Landsat 8 scene that
-fall within your polygon using the `lsat_get_pixel_centres()` function.
-See flow chart below. This section shows examples for using both
-functions.
+The time-series extraction from the Google Earth Engine with
+`lsat_extract_ts()` will ***only*** work for point coordinates. If you
+have a polygon you can use `lsat_get_pixel_centres()` to generate point
+coordinates based on all Landsat 8 pixel centers that fall within your
+polygon.
 
-![](man/figures/Landsat%20R%20Package%20-%20Preparation%20and%20Extraction.jpg)
+This section illustrates how to use the two functions. Please note that
+while the other sections below will always run well in a non-interactive
+session some of the optional functionality in this section may require R
+Studio. This includes for example generating the map views and using the
+access to the Google Drive via `rgee`.
+
+![](man/figures/fig_1_prep_and_extraction.jpg)
 
 **Setting up the environment**
 
@@ -77,12 +79,12 @@ Let’s prepare the environment for the extractions:
 library(sf)
 library(dplyr)
 library(purrr)
+library(data.table)
+library(stringr)
 library(rgee)
 
 # Load lsatTS package
-# library(lsatTS)
-source("R/lsat_get_pixel_centers.R") # @Logan this will eventually be done by just loading the package
-source("R/lsat_export_ts.R") # @Logan this will eventually be done by just loading the package
+library(lsatTS)
 
 # Intialize the Earth Engine with rgee
 ee_Initialize()
@@ -101,10 +103,10 @@ how it works.
 specify it in the function call to avoid downloading it every time the
 function is called. See `?lsat_get_pixel_centers` for more info.*
 
-**Please note:** It is not advisable to determine pixel centers for very
+**Important:** It is not advisable to determine pixel centers for very
 large polygons. See `?lsat_get_pixel_centers` for more on this.
 
-**First**, a single polygon:
+**First**, for a single polygon:
 
 ``` r
 # Specify a region 
@@ -127,9 +129,9 @@ Studio:
 
 ![](man/figures/lsat_get_pixel_centers.png)
 
-**Second**, multiple polygons:
+**Second**, for multiple polygons:
 
-``` 
+``` r
 
 ## Ge pixel centers for multiple regions
 # Create multi-polygon sf
@@ -170,62 +172,67 @@ lsat\_extract\_ts()**
 
 Now that we have point coordinates ready we can use `lsat_extract_ts()`
 to extract the Landsat time-series from the Earth Engine. See the code
-examples below for how this is done. Please note, that for this tutorial
-we only use a small number of points grabbed from the `pixel_list`
-defined above to speed things up a bit.
+examples below for how this is done. For this tutorial we only use a
+small number of points to speed things up a bit.
 
-The `lsat_extract_ts()` function will accept any sf pbject that has got
+The `lsat_extract_ts()` function will accept any sf object that contains
 a point feature collection. It also requires one column with unique
-identifiers for each “site”/“pixel\_id” these can be specified with
-`pixel_id_from =`. If you have an attribute column called “pixel\_id”
-such as that generated by `lsat_get_pixel_centers()` you will not have
-to specify anything extra.
+identifiers for each “site” (i.e. a pixel identifier) these can be
+specified with `site_id_from =`. If you have an attribute column called
+“site\_id” such as that generated by `lsat_get_pixel_centers()` you
+will not have to specify anything extra.
 
 `lsat_extract_ts()` issues a task to the Earth Engine that exports the
 data to your Google Drive. The output folder is by default
-`/lsatTS_export/` you can change the folder using the relevant arguments
-(see `?lsat_extract_ts`). More importantly is though that for larger
-data sets of points the time-series will have to be export in chunks.
-You can let the function chunk the data automatically (no argumnets
-needed), set the chunk size (ue `max_chunk_size =`) or define the chunks
-based on a column in the dataset (use `chunks_from =`). Examples for all
-are shown below.
+`/lsatTS_export/` you can change the output folder and file name using
+the relevant arguments (see `?lsat_extract_ts`).
+
+Importantly to note is that for larger data sets of points the
+time-series will have to be export in chunks. You can a) let the
+function chunk the data automatically (no arguments needed), b) set the
+chunk size (ue `max_chunk_size =`) or c) define the chunks based on a
+column in the dataset (use `chunks_from =`). Examples for all are shown
+below.
 
 **Please note:** There is a reason we decided to export the data in
-small chunks. For this function there are two bottlenecks: 1) transfer
-of the point data to the Earth Engine and 2) export of time-series from
-the Earth Engine. The latter is particularly important. Larger chunks
-are prone to cause more errors and exceed the user limit set on exports
-by Google. It is safer and perhaps more efficient to issue smaller
-chunks and bind them back together later rather than exporting one big
-mass of time-series. We found that 250 points is a happy medium (at time
-of writing about 3h export).
+small chunks. For the exports there are two important bottlenecks: 1)
+transfer of the point data to the Earth Engine and 2) export of
+time-series from the Earth Engine. The latter is particularly important.
+Larger chunks are prone to cause more errors and exceed the user limit
+set on exports by Google. It is safer and perhaps more efficient to
+issue smaller chunks and bind them back together later rather than
+exporting one big mass of time-series. We found that 250 points is a
+happy medium (at time of writing a chunck of that size took about 3h to
+export).
 
-    # Generate test points
-    test_points_sf <- st_sfc(sf::st_point(c(-149.6026, 68.62574)),
-                              sf::st_point(c(-149.6003, 68.62524)),
-                              sf::st_point(c(-75.78057, 78.87038)),
-                              sf::st_point(c(-75.77098, 78.87256)),
-                              sf::st_point(c(68.54736, 70.19058)),
-                              sf::st_point(c(68.54814, 70.19112)), crs = 4326) %>%
-       st_sf() %>%
-       mutate(pixel_id = c("toolik_1",
-                           "toolik_2",
-                           "ellesmere_1",
-                           "ellesmere_1",
-                           "yamal_1",
-                         "yamal_2"),
-              region = c("toolik", "toolik",
-                         "ellesmere", "ellesmere",
-                         "yamal", "yamal"))
-     # Export time-series using lsat_export_ts()
-     task_list <- lsat_export_ts(test_points_sf)
-    
-     # Export time-series using with a chunk size of 2
-     # task_list <- lsat_export_ts(test_points_sf, max_chunk_size = 2)
-    
-     # Export time-series in chunks by column
-     # task_list <- lsat_export_ts(test_points_sf, chunks_from = "region")
+``` r
+# Generate test points
+test_points_sf <- st_sfc(sf::st_point(c(-149.6026, 68.62574)),
+                          sf::st_point(c(-149.6003, 68.62524)),
+                          sf::st_point(c(-75.78057, 78.87038)),
+                          sf::st_point(c(-75.77098, 78.87256)),
+                          sf::st_point(c(68.54736, 70.19058)),
+                          sf::st_point(c(68.54814, 70.19112)), crs = 4326) %>%
+   st_sf() %>%
+   mutate(pixel_id = c("toolik_1",
+                       "toolik_2",
+                       "ellesmere_1",
+                       "ellesmere_1",
+                       "yamal_1",
+                     "yamal_2"),
+          region = c("toolik", "toolik",
+                     "ellesmere", "ellesmere",
+                     "yamal", "yamal"))
+ # Export time-series using lsat_export_ts()
+ task_list <- lsat_export_ts(test_points_sf)
+
+ ## Further examples:
+ # Export time-series using with a chunk size of 2
+ # task_list <- lsat_export_ts(test_points_sf, max_chunk_size = 2)
+
+ # Export time-series in chunks by column
+ # task_list <- lsat_export_ts(test_points_sf, chunks_from = "region")
+```
 
 The function returns the task objects generated by rgee for each chunk
 to be exported. You can monitor progress of the task using rgee’s
@@ -241,8 +248,8 @@ the export task using the `this_chunk_only =` option. See below.*
 
 Once the tasks are completed, open your Google Drive and check the
 `/lsatTS_export/` folder (or the folder you specified) and retrieve the
-data to process it in steps 3 and 4 below. Please note that you can use
-the Google Drive Backup tool as well as rgee’s `ee_drive_to_local()`
+data to process it in Sections 3 and 4 below. For example, you could use
+the Google Drive Backup tool or rgee’s `ee_drive_to_local()`
 [function](https://r-spatial.github.io/rgee/reference/ee_drive_to_local.html)
 to copy the data automatically to a local drive:
 
@@ -258,13 +265,57 @@ temp_files <- map(task_list, ee_drive_to_local)
 
 ## 3\. Cross-calibration of time-series
 
-![](man/figures/Landsat%20R%20Package%20-%20Cross-calibration%20of%20time-series.jpg)
+![](man/figures/fig_2_cross_calibration.jpg)
+
+``` r
+# Read in and combine the temp files containing Landsat data 
+# (as extracted form the EE above using lsat_export_ts()
+lsat.dt <- do.call("rbind", lapply(temp_files, fread))
+setnames(lsat.dt, 'pixel_id','site') # all lsatTS function depend on there being a column called "site" that uniquely identifies each location
+
+# Parse data, filter to clear-sky observations, compute mean surface reflectance among pxls w/in each window around a site
+lsat.dt <- lsat_general_prep(lsat.dt)
+
+# Clean the data, filtering out clouds, snow, water, radiometric and geometric errors
+lsat.dt <- lsat_clean_data(lsat.dt, geom.max = 15, cloud.max = 80, sza.max = 60, filter.snow = T, filter.water = T)
+
+# Optional:
+# lsat.dt <- lsat_ngb_mean(lsat.dt)
+
+# Compute NDVI
+lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+
+# Cross-calibrate NDVI among sensors using RF models
+lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs = 2, frac.train = 0.80, outdir = 'tests/lsat_TS_test_run/ndvi_xcal/')
+
+# Drop column with uncalibrated data and remain column with calibrated data
+lsat.dt[, c('ndvi') := NULL]
+setnames(lsat.dt, 'ndvi.xcal', 'ndvi')
+
+# Optional: Summarize availability of Landsat data by site
+data.summary.dt <- lsat_summarize_data_avail(lsat.dt)
+data.summary.dt
+```
 
 [\[to top\]](#content)
 
 ## 4\. Defining growing season characteristics
 
-![](man/figures/Landsat%20R%20Package%20-%20Defining%20growing%20season%20characteristics.jpg)
+![](man/figures/fig_3_define_growing_season.jpg)
+
+``` r
+# Fit phenological models (cubic splines) to each time series
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs = 5, window.min.obs = 10, vi.min = 0, spl.fit.outfile = F, progress = T)
+
+# Summarize vegetation index for the "growing season", including estimating annual max vegetation index
+lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, vi = 'ndvi', min.frac.of.max = 0.75)
+
+# Optional: Evaluate
+lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 10, min.frac.of.max = 0.75)
+
+# Write out data.table with growing season summaries
+# fwrite(lsat.gs.dt, 'tests/lsat_TS_test_run/lsat_annual_growing_season_summaries.csv')
+```
 
 [\[to top\]](#content)
 
@@ -282,16 +333,19 @@ Tundra Biome. Nature Communications 11, no. 1: 4621.
 
 ## 6\. Contact
 
-Logan T. Berner and Jakob J. Assmann Email Logan at:
-<Logan.Berner@nau.edu> Email Jakob at: <j.assmann@bio.au.dk>
+Logan T. Berner and Jakob J. Assmann
+
+Email Logan at: <Logan.Berner@nau.edu>
+
+Email Jakob at: <j.assmann@bio.au.dk>
 
 [\[to top\]](#content)
 
 ## 7\. Contributions
 
-Logatn T. Berner wrote the analysis functions (items 3 and 4). Jakob J.
-Assmann wrote the extraction and preparation functions (item 1). Richard
-Massey wrote the original Python code for the `lsat_export_ts()`
+Logan T. Berner wrote the analysis functions (Sections 3 and 4). Jakob
+J. Assmann wrote the extraction and preparation functions (Section 1).
+Richard Massey wrote the original Python code for the `lsat_export_ts()`
 function, later refined and transferred to JavaScript and R by Jakob
 Assmann. Singe Normand and Scoet Goetz provided funding (?) and
 mentorship for this project. Jakob J. Assmann faciliated package
