@@ -8,7 +8,6 @@
 #' @param min.frac.of.max Numeric threshold (0-1) that defines the "growing season" as the seasonal window when the
 #' phenological curves indicate the VI is within a specified fraction of the maximum VI. In otherwords, an observation
 #' is considered to be from the "growing season" when the VI is within a user-specified fraction of the curve-fit growing season maximum VI.
-#' @param zscore.thresh Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.
 #' @param min.obs Minimum number of observations needed for a site x year to be included in the evaluation (Default = 10)
 #' @param reps Number of times to bootstrap the assessment (Default = 10)
 #' @param zscore.thresh Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.
@@ -18,7 +17,7 @@
 #' @export lsat_evaluate_phenological_max
 #' @examples # Forthcoming...
 
-lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, min.obs = 6, reps = 10, outdir = 'output/pheno_max_eval/'){
+lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscore.thresh = 3, min.obs = 6, reps = 10, outdir = 'output/pheno_max_eval/'){
 
   colnames(dt) <- gsub(vi, 'vi', colnames(dt))
 
@@ -32,8 +31,8 @@ lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, min.o
   # identify and filter out obs-level predictions of max VI that are anomalously high or low relative to other obs from that site x year
   dt <- dt[, ':='(avg = mean(vi.max.pred), sd = stats::sd(vi.max.pred), n=.N), by = c('site','year')]
   dt <- dt[, abs.zscore := abs((vi.max.pred - avg )/sd)]
-  dt <- dt[abs.zscore < 2]
-
+  dt <- dt[abs.zscore <= zscore.thresh]
+  
   # compute max observed VI (actually 90% percentile to avoid spuriously high values)
   dt <- dt[, vi.max.obs := stats::quantile(vi, 0.90), by = c('site','year')]
 
