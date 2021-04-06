@@ -206,8 +206,8 @@ lsat_get_pixel_centers <- function(polygon_sf,
       coords = c("longitude", "latitude"),
       crs = 4326)
 
-  # Add pixel and site ID
-  ls8_pixels_sf$pixel_id <- paste0(pixel_prefix, "_",
+  # Add site ID
+  ls8_pixels_sf$site <- paste0(pixel_prefix, "_",
                                    1:nrow(ls8_pixels_sf))
 
   # Visusalise grid using the mapview if requested
