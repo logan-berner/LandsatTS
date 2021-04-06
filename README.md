@@ -41,6 +41,8 @@ You can install the package using `devtools` as follows:
 ``` r
 # install.packages("devtools")
 devtools::install_github("logan-berner/lsatTS")
+
+# NB: As long as the repo is private this will not work, unless you supply a GitHub access token (see ?install_github). Alternatively, you can 1) clone the repo to local, 2) open the project in an R Session and 3) run `devtools::install()` in the project folder. 
 ```
 
 For the preparation and extractions scripts you will also have to make
