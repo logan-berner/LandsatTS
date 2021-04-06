@@ -41,13 +41,7 @@
 #' @examples # lsat.dt <- lsat_xcal_rf(lsat.dt, band = 'ndvi', doy.rng = 152:243, min.obs = 5, frac.train = 0.75, outfile.id = 'ndvi', outdir ='data/lsat_site_data/sensor_xcal/ndvi/')
 
 lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, outfile.id=band, outdir){
-  require(data.table)
-  require(ggplot2)
-  require(ggpubr)
-  require(ranger)
-  require(R.utils)
-  require(zoo)
-  require(dplyr)
+
   R.utils::mkdirs(outdir)
 
   dt <- data.table::data.table(dt)
