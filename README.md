@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# lsatTS - an R package to make sense of Landsat greenness time-series
+# lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -13,20 +13,23 @@ Building upon the workflow developed for [Berner et
 al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
 **lsatTS** package helps you to:
 
--   Export time-series for the whole Landsat record based on point
-    coordinates (“sites”).
--   Cross-calibration of Landsat VI time-series to account for sparse
-    observations and sensor differences.
--   Define growing season characteristics such as the maximum NDVI.
+-   Export whole Landsat record time series based on point coordinates
+    (“sites”).
+-   Quality screen surface reflectance measurements from Landsat.
+-   Cross-calibrate surface reflectance measurements and vegetation
+    indices among Landsat sensors.
+-   Quantify growing season characteristics (e.g., annual maximum NDVI)
+    using Landsat time series.
 
 ## Content
 
 1.  [Installation](#1-installation)
-2.  [Preparation and extraction](#2-preparation-and-extraction)
-3.  [Cross calibration of
-    time-series](#3-cross-calibration-of-time-series)
-4.  [Defining growing season
-    characteristics](#4-defining-growing-season-characteristics)
+2.  [Prepare and extract Landsat
+    data](#2-prepare-and-extract-Landsat-data)
+3.  [Cross-calibrate Landsat
+    sensors](#3-cross-calibrate-Landsat-sensors)
+4.  [Quantify growing season
+    characteristics](#4-quantify-growing-season-characteristics)
 5.  [Citation](#5-citation)
 6.  [Contact](#6-contact)
 7.  [Contributions](#7-contributions)
