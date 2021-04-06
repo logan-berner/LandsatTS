@@ -103,11 +103,11 @@ list(matrix(c(-138.90125, 69.58413,
                -138.89147, 69.58095,
                -138.90298, 69.57986,
                -138.90125, 69.58413),
-             ncol = 2, byrow = T)))
+             ncol = 2, byrow = TRUE)))
 test_poly_sf <- st_sf(st_sfc(test_poly, crs = 4326))
 
 # Use lsat_get_pixel_centers to retrieve pixel centers and plot to a file that can be added to this documentation.
-# We set plot_map to T to view 
+# We set plot_map to a file path (or just TRUE) to view 
 pixel_list_test_poly <- lsat_get_pixel_centers(test_poly_sf, plot_map = "man/figures/lsat_get_pixel_centers.png")
 
 ```
@@ -126,19 +126,19 @@ ellesmere <- st_polygon(list(matrix(c(-75.78526, 78.86973,
                                       -75.77116, 78.87246, 
                                       -75.77116, 78.86973, 
                                       -75.78526, 78.86973),
-                                      ncol = 2, byrow = T)))
+                                      ncol = 2, byrow = TRUE)))
 yamal <- st_polygon(list(matrix(c(68.54580, 70.18874, 
                                   68.54580, 70.19145,
                                   68.55379, 70.19145, 
                                   68.55379, 70.18874,
                                   68.54580, 70.18874), 
-                                  ncol = 2, byrow = T)))
+                                  ncol = 2, byrow = TRUE)))
 toolik <- st_polygon(list(matrix(c(-149.60686, 68.62364, 
                                    -149.60686, 68.62644, 
                                    -149.59918, 68.62644, 
                                    -149.59918, 68.62364, 
                                    -149.60686, 68.62364), 
-                                   ncol = 2, byrow = T)))
+                                   ncol = 2, byrow = TRUE)))
 test_regions_sf <- st_sfc(ellesmere, yamal, toolik, crs = 4326) %>% st_sf() %>%
    mutate(region = c("ellesmere", "yamal", "toolik"))
 
