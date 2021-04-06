@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# lsatTS - an R package to make sense of Landsat greeneness time-series
+# lsatTS - an R package to make sense of Landsat greenness time-series
 
 <!-- badges: start -->
 
@@ -18,8 +18,8 @@ al. 2020](https://www.nature.com/articles/s41467-020-18479-5) the
     coordinates (“sites”).
   - Cross-calibration of Landsat VI time-series to account for sparse
     observations and sensor differences.
-  - The definition of growing season characteristics such as the maximum
-    NDVI.
+  - Define growing season characteristics that describe greenness
+    time-series such as the maximum NDVI.
 
 ## Content
 
@@ -41,7 +41,7 @@ You can install the package using `devtools` as follows:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jakobjassmann/lsatTS")
+devtools::install_github("logan-berner/lsatTS")
 ```
 
 For the preparation and extractions scripts you will also have to make
@@ -214,7 +214,7 @@ test_points_sf <- st_sfc(sf::st_point(c(-149.6026, 68.62574)),
                           sf::st_point(c(68.54736, 70.19058)),
                           sf::st_point(c(68.54814, 70.19112)), crs = 4326) %>%
    st_sf() %>%
-   mutate(pixel_id = c("toolik_1",
+   mutate(site = c("toolik_1",
                        "toolik_2",
                        "ellesmere_1",
                        "ellesmere_1",
@@ -271,7 +271,9 @@ temp_files <- map(task_list, ee_drive_to_local)
 # Read in and combine the temp files containing Landsat data 
 # (as extracted form the EE above using lsat_export_ts()
 lsat.dt <- do.call("rbind", lapply(temp_files, fread))
-setnames(lsat.dt, 'pixel_id','site') # all lsatTS function depend on there being a column called "site" that uniquely identifies each location
+
+# all lsatTS function depend on there being a column called "site" that uniquely identifies each location, should this column not be called 'site' you can rename it for example using data.table as follows:
+# setnames(lsat.dt, 'my_unique_location_column','site') 
 
 # Parse data, filter to clear-sky observations, compute mean surface reflectance among pxls w/in each window around a site
 lsat.dt <- lsat_general_prep(lsat.dt)
