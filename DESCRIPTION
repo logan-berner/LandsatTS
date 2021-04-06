@@ -1,15 +1,36 @@
 Package: lsatTS
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: An R package to make sense of Landsat greenness time-series 
+Version: 0.0.5
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    c(
+    person(given = "Logan T.",
+           family = "Berner",
+           role = c("aut"),
+           email = "Logan.Berner@nau.edu",
+           comment = c(ORCID = "YOUR-ORCID-ID")),
+    person(given = "Jakob J.",
+           family = "Assmann",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "j.assmann@bio.au.dk",
+           comment = c(ORCID = "0000-0002-3492-8419")),
+    person(given = "Richard",
+           family = "Massey",
+           role = c("aut"),
+           email = "",
+           comment = c(ORCID = "YOUR-ORCID-ID")),
+    person(given = "Signe",
+           family = "Normand",
+           role = c("aut"),
+           email = "",
+           comment = c(ORCID = "YOUR-ORCID-ID")),
+    person(given = "Scott",
+           family = "Goetz",
+           role = c("aut"),
+           email = "",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+           )
+Description: Building upon the workflow developed for Berner et al. 2020 the lsatTS package helps you to: 1) Export time-series for the whole Landsat record based on point coordinates ("sites"). 2) Cross-calibration of Landsat VI time-series to account for sparse observations and sensor differences. 3) Define growing season characteristics such as the maximum NDVI.
+License: Modified MIT
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
