@@ -38,5 +38,5 @@ This function filters out observations that exhibit:
 More information about Landsat Quality Bands here https://landsat.usgs.gov/collectionqualityband
 }
 \examples{
-lsat.dt <- lsat_clean_dt(lsat.dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T)
+# lsat.dt <- lsat_clean_dt(lsat.dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T)
 }

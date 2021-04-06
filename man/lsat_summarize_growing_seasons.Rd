@@ -31,5 +31,5 @@ using observations for a user-specified "growing season," but also estimates the
 using phenology modeling and growing season observations.
 }
 \examples{
-Forthcoming...
+# Forthcoming...
 }

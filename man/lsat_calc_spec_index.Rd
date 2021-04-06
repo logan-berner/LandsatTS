@@ -21,5 +21,5 @@ the Enhanced Vegetationd Index (EVI), and 10 others (EVI2, kNDVI, MSI, NBR, NIRv
 Only one index can be computed at a time.
 }
 \examples{
-my.dt <- lsat_spec_index(my.dt, 'ndvi')
+# my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')
 }

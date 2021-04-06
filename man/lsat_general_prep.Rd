@@ -17,5 +17,5 @@ This function parses the (1) Landsat satellite; (2) Landsat collection; (3) year
 The function also renames and rescales bands 1 - 7, taking into account differences between Landsat 5 / 7 and 8
 }
 \examples{
-parsed.dt <- lsat_general_prep(gee.dt)
+# parsed.dt <- lsat_general_prep(gee.dt)
 }

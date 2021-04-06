@@ -8,7 +8,7 @@ lsat_evaluate_phenological_max(
   dt,
   vi,
   min.frac.of.max = 0.75,
-  min.obs = 10,
+  min.obs = 6,
   reps = 10,
   outdir = "output/pheno_max_eval/"
 )
@@ -40,5 +40,5 @@ compares these with estimates derived when using progressively smaller subsets o
 annual estimates of maximum vegetation greenness are impacted the the number of available observations.
 }
 \examples{
-Forthcoming... 
+# Forthcoming...
 }

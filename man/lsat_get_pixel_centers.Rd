@@ -4,12 +4,27 @@
 \alias{lsat_get_pixel_centers}
 \title{Landsat 8 pixels centers within a polygon}
 \usage{
-lsat_get_pixel_centers(polygon_sf, buffer)
+lsat_get_pixel_centers(
+  polygon_sf,
+  pixel_prefix = "pixel",
+  pixel_prefix_from = NULL,
+  buffer = 15,
+  plot_map = F,
+  lsat_WRS2_scene_bounds = NULL
+)
 }
 \arguments{
-\item{polygon_sf}{Simple feature collection (or simple feature) with the polygon's geometry.}
+\item{polygon_sf}{Simple feature with a simple feature collection of type "sfc_POLYGON" containing a single polygon geometry.}
+
+\item{pixel_prefix}{Optional prefix for the generated pixel ids. Defaults to "pixel".}
+
+\item{pixel_prefix_from}{Optional, column name in simple feature to specify pixel_prefix. Overrides "pixel_prefix".}
 
 \item{buffer}{Buffer surrounding the geometry to be included. Specified in m.}
+
+\item{plot_map}{Optional. If TRUE the retrieved pixel centers and the polygon are plotted on a mid-season Landsat 8 image (grey-scale red band) in the mapview. If a character is supplied an addtional output to a file is generated (png, pdf, and jpg supported, see mapview::mapshot). Both slow down the execution of this funciton dramatically, especially for large polygons.}
+
+\item{lsat_WRS2_scene_bounds}{File path to the Landsat WRS2 path row scene boundaries. If not specified these are downloaded to a temporary file. To speed up this function consider downloading the file manually and specifiying the file path in this argument. The file can be found here: https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml}
 }
 \value{
 sfc of point geometries for Landsat 8 pixel centers within the polygon for use in lsat_download_ts
@@ -19,11 +34,71 @@ A convenience helper function that determines the Landsat 8 grid (pixel)
 centers within a polygon and a surrounding buffer.
 }
 \details{
-Will fail gracefully for large polygons or polygons extending across multiple
-Landsat WRS tiles. Errors/warnings will be issues in this case.
+Does not work for large polygons. The default maximum number of pixels set by the GEE is 10000000.
+Consider whether extractions for a large polygon is a good idea.
+Split the polygon into manageable chuncks. For the unlikely case that a polygon
+exceeds the boundaries of the Landsat tile closest to the polygon's centre,
+the polygon is clipped ot the boundaries of the Landsat tile and a warning is issued.
+Again, consider processing smaller polygons.
+
+Please note that approximation of tile overlap with polygon generates a warning
+by sf that the coordinates are assumed to be planar. This can be ignored.
 }
 \examples{
+# Using sf, dplyr, rgee and purr
+library(sf)
+library(dplyr)
+library(rgee)
+library(purrr)
 
-my_polgyon <-
+# Initialize EE
+ee_Initialize()
 
+# Specify a region to retrieve pixel centers for
+test_poly <- st_polygon(
+list(matrix(c(-138.90125, 69.58413,
+              -138.88988, 69.58358,
+              -138.89147, 69.58095,
+              -138.90298, 69.57986,
+              -138.90125, 69.58413),
+            ncol = 2, byrow = TRUE)))
+test_poly_sf <- st_sf(st_sfc(test_poly, crs = 4326))
+
+# Retrieve pixel centers and plot to mapview
+pixels <- lsat_get_pixel_centers(test_poly_sf, plot_map = TRUE)
+
+
+## Ge pixel centers for multiple regions
+# Create multi-polygon sf
+ellesmere <- st_polygon(list(matrix(c(-75.78526, 78.86973,
+                                      -75.78526, 78.87246,
+                                      -75.77116, 78.87246,
+                                      -75.77116, 78.86973,
+                                      -75.78526, 78.86973),
+                                      ncol = 2, byrow = TRUE)))
+yamal <- st_polygon(list(matrix(c(68.54580, 70.18874,
+                                  68.54580, 70.19145,
+                                  68.55379, 70.19145,
+                                  68.55379, 70.18874,
+                                  68.54580, 70.18874),
+                                  ncol = 2, byrow = TRUE)))
+toolik <- st_polygon(list(matrix(c(-149.60686, 68.62364,
+                                   -149.60686, 68.62644,
+                                   -149.59918, 68.62644,
+                                   -149.59918, 68.62364,
+                                   -149.60686, 68.62364),
+                                   ncol = 2, byrow = TRUE)))
+test_regions_sf <- st_sfc(ellesmere, yamal, toolik, crs = 4326) \%>\% st_sf() \%>\%
+  mutate(region = c("ellesmere", "yamal", "toolik"))
+
+# Split and map lsat_get_pixel_centers using dplyr and purrr
+pixel_list <- test_regions_sf \%>\%
+   split(.$region) \%>\%
+   map(lsat_get_pixel_centers,
+       pixel_prefix_from = "region") \%>\%
+   bind_rows()
+
+}
+\author{
+Jakob J. Assmann
 }

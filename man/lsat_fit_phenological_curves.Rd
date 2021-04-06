@@ -48,6 +48,6 @@ The underlying algorithm was construted to facilitate estimating annual maximum 
 The function returns information about typical phenology at a site and about the timing of an individual observation relative
 }
 \examples{
-To come...
+# To come...
 
 }

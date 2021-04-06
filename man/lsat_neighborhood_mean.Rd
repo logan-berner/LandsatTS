@@ -18,5 +18,5 @@ Use this function when working with Landsat data extracted for buffered points.
 Also, make sure to have previously cleaning the individual observations using lsat_clean_data().
 }
 \examples{
-ngb.avg.dt <- lsat_ngb_mean(my.dt)
+# ngb.avg.dt <- lsat_ngb_mean(my.dt)
 }

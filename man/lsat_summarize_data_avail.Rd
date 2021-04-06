@@ -17,5 +17,5 @@ the minimum and maximum number of observations in a year, the total number of ob
 This little function summarizes the temporal period and availability of observations at each site
 }
 \examples{
-summary.dt <- lsat_summarize_data_avail(dt)
+# summary.dt <- lsat_summarize_data_avail(dt)
 }

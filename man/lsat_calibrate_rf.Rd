@@ -61,5 +61,5 @@ The specific steps to cross-calibrating sensors include:
 See Berner et al. (2020) for a full description of the approach.
 }
 \examples{
-lsat.dt <- lsat_xcal_rf(lsat.dt, band = 'ndvi', doy.rng = 152:243, min.obs = 5, frac.train = 0.75, outfile.id = 'ndvi', outdir ='data/lsat_site_data/sensor_xcal/ndvi/')
+# lsat.dt <- lsat_xcal_rf(lsat.dt, band = 'ndvi', doy.rng = 152:243, min.obs = 5, frac.train = 0.75, outfile.id = 'ndvi', outdir ='data/lsat_site_data/sensor_xcal/ndvi/')
 }
