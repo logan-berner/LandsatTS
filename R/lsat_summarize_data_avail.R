@@ -5,7 +5,7 @@
 #' the minimum and maximum number of observations in a year, the total number of observations across years.
 #' @export lsat_summarize_data_avail
 #'
-#' @examples summary.dt <- lsat_summarize_data_avail(dt)
+#' @examples # summary.dt <- lsat_summarize_data_avail(dt)
 
 lsat_summarize_data_avail <- function(dt){
   yr.dt <- data.table::dt[, .(n.obs = .N), by = c('site','year')]

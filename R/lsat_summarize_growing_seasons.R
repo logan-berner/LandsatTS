@@ -12,7 +12,7 @@
 #' @return Data.table summarizing annual growing season conditions based on a vegetation index.
 #' @export lsat_summarize_growing_seasons
 #'
-#' @examples Forthcoming...
+#' @examples # Forthcoming...
 
 lsat_summarize_growing_seasons = function(dt, vi, min.frac.of.max = 0.75, zscore.thresh = 3){
   dt <- data.table::data.table(dt)

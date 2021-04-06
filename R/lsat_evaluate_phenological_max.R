@@ -16,7 +16,7 @@
 #'
 #' @return Data.table
 #' @export lsat_evaluate_phenological_max
-#' @examples Forthcoming...
+#' @examples # Forthcoming...
 
 lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, min.obs = 6, reps = 10, outdir = 'output/pheno_max_eval/'){
 

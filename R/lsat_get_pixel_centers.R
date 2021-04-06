@@ -27,7 +27,14 @@
 #' @export lsat_get_pixel_centers
 #'
 #' @examples
-#' # Using sf and dplyr
+#' # Using sf, dplyr, rgee and purr
+#' library(sf)
+#' library(dplyr)
+#' library(rgee)
+#' library(purrr)
+#'
+#' # Initialize EE
+#' ee_Initialize()
 #'
 #' # Specify a region to retrieve pixel centers for
 #' test_poly <- st_polygon(
@@ -36,18 +43,33 @@
 #'               -138.89147, 69.58095,
 #'               -138.90298, 69.57986,
 #'               -138.90125, 69.58413),
-#'             ncol = 2, byrow = T)))
+#'             ncol = 2, byrow = TRUE)))
 #' test_poly_sf <- st_sf(st_sfc(test_poly, crs = 4326))
 #'
 #' # Retrieve pixel centers and plot to mapview
-#' pixels <- lsat_get_pixel_centers(test_poly_sf, plot_map = T)
+#' pixels <- lsat_get_pixel_centers(test_poly_sf, plot_map = TRUE)
 #'
 #'
 #' ## Ge pixel centers for multiple regions
 #' # Create multi-polygon sf
-#' ellesmere <- st_polygon(list(matrix(c(-75.78526, 78.86973, -75.78526, 78.87246, -75.77116, 78.87246, -75.77116, 78.86973, -75.78526, 78.86973), ncol = 2, byrow = T)))
-#' yamal <- st_polygon(list(matrix(c(68.54580, 70.18874, 68.54580, 70.19145, 68.55379, 70.19145, 68.55379, 70.18874, 68.54580, 70.18874), ncol = 2, byrow = T)))
-#' toolik <- st_polygon(list(matrix(c(-149.60686, 68.62364, -149.60686, 68.62644, -149.59918, 68.62644, -149.59918, 68.62364, -149.60686, 68.62364), ncol = 2, byrow = T)))
+#' ellesmere <- st_polygon(list(matrix(c(-75.78526, 78.86973,
+#'                                       -75.78526, 78.87246,
+#'                                       -75.77116, 78.87246,
+#'                                       -75.77116, 78.86973,
+#'                                       -75.78526, 78.86973),
+#'                                       ncol = 2, byrow = TRUE)))
+#' yamal <- st_polygon(list(matrix(c(68.54580, 70.18874,
+#'                                   68.54580, 70.19145,
+#'                                   68.55379, 70.19145,
+#'                                   68.55379, 70.18874,
+#'                                   68.54580, 70.18874),
+#'                                   ncol = 2, byrow = TRUE)))
+#' toolik <- st_polygon(list(matrix(c(-149.60686, 68.62364,
+#'                                    -149.60686, 68.62644,
+#'                                    -149.59918, 68.62644,
+#'                                    -149.59918, 68.62364,
+#'                                    -149.60686, 68.62364),
+#'                                    ncol = 2, byrow = TRUE)))
 #' test_regions_sf <- st_sfc(ellesmere, yamal, toolik, crs = 4326) %>% st_sf() %>%
 #'   mutate(region = c("ellesmere", "yamal", "toolik"))
 #'

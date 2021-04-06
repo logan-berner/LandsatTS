@@ -33,7 +33,13 @@
 #' @export lsat_export_ts
 #'
 #' @examples
-#' # Using sf and dplyr
+#' # Using sf, dplyr and rgee
+#' library(sf)
+#' library(dplyr)
+#' library(rgee)
+#'
+#' # Initialize EE
+#' ee_Initialize()
 #'
 #' # Generate test points
 #' test_points_sf <- st_sfc(sf::st_point(c(-149.6026, 68.62574)),

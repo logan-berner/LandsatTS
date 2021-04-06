@@ -21,7 +21,7 @@
 #'
 #' @export lsat_fit_phenological_curves
 #'
-#' @examples To come...
+#' @examples # To come...
 #'
 lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10, vi.min = 0, spar=0.7, pcnt.dif.thresh=100, spl.fit.outfile=F, progress=T){
   # LOAD LIBRARIES

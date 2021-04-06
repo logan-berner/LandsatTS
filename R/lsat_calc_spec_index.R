@@ -1,17 +1,17 @@
 #' Compute Spectral Indices
-#' 
+#'
 #' @description This function computes some widely used spetral indices.
 #' These include the Normalized Difference Vegetation Index (NDVI),
 #' the Enhanced Vegetationd Index (EVI), and 10 others (EVI2, kNDVI, MSI, NBR, NIRv, NDII, NDVSI, NDWI, PSRI, SATVI).
 #' Only one index can be computed at a time.
-#'   
+#'
 #' @param dt Data.table containing surface reflectance data.
 #' @param si Character string specifying the desired spetral index.
-#' 
+#'
 #' @return The input data.table with an appended colunm containing the spectral index
 #' @export lsat_calc_spec_index
-#' 
-#' @examples my.dt <- lsat_spec_index(my.dt, 'ndvi')
+#'
+#' @examples # my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')
 
 lsat_calc_spec_index <- function(dt, si){
   require(data.table)
@@ -24,7 +24,7 @@ lsat_calc_spec_index <- function(dt, si){
   if (si == 'nbr'){data.table::dt[, nbr := (swir1 - swir2) / (swir1 + swir2)]} # Key and Benson (1999) USGS
   if (si == 'nirv'){data.table::dt[, nirv := (nir * (nir - red)) / (nir + red)]} # Badgley et al. (2017) Sciences Advances
   if (si == 'ndii'){data.table::dt[, ndii := (nir - swir1) / (nir + swir1)]} # Hardisky et al. (1983) Photogram. Engineering and Remote Sensing
-  if (si == 'ndvi'){data.table::dt[, ndvi := (nir - red) / (nir + red)]} # Rouse et al. (1974) NASA publication  
+  if (si == 'ndvi'){data.table::dt[, ndvi := (nir - red) / (nir + red)]} # Rouse et al. (1974) NASA publication
   if (si == 'ndvsi'){data.table::dt[, ndvsi := (swir1 - red) / (swir1 + red)]} # Qi et al (2002) EOS
   if (si == 'ndwi'){data.table::dt[, ndwi := (green - nir) / (green + nir)]} # McFeeters (1996) Int. J. Remote Sensing
   if (si == 'psri'){data.table::dt[, psri := (red - blue) / nir]} # Merzlyak et al. (1999) Physiologia Plantarum
