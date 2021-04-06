@@ -28,4 +28,8 @@ Imports:
     data.table,
     ggplot2,
     R.utils,
-    stats
+    stats,
+    stringr,
+    ggpubr,
+    ranger,
+    zoo
