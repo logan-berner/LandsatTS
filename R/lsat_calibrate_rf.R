@@ -153,16 +153,16 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
     obs <- paste('LE07',band,'pred',sep='.')
 
     # raw figure
-    fig.raw <- ggplot2::ggplot(rf.dat.eval, aes_string(x = band, y = obs))
+    fig.raw <- ggplot2::ggplot(rf.dat.eval, ggplot2::aes_string(x = band, y = obs))
     fig.raw <- fig.raw + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange') + ggplot2::scale_fill_viridis_c()
     fig.raw <- fig.raw + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=uncal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
-    fig.raw <- fig.raw + ggplot2::theme(legend.position="right", axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
+    fig.raw <- fig.raw + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
 
     # cal figure
-    fig.cal <- ggplot2::ggplot(rf.dat.eval, aes_string(x = pred, y = obs))
+    fig.cal <- ggplot2::ggplot(rf.dat.eval, ggplot2::aes_string(x = pred, y = obs))
     fig.cal <- fig.cal + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange') + ggplot2::scale_fill_viridis_c()
     fig.cal <- fig.cal + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=cal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
-    fig.cal <- fig.cal + ggplot2::theme(legend.position="right", axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
+    fig.cal <- fig.cal + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
 
     # combine figures
     fig <- ggpubr::ggarrange(fig.raw, fig.cal, ncol = 2)
