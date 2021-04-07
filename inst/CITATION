@@ -1,6 +1,17 @@
 citHeader("To cite lsatTS in publications use:")
 
 citEntry(
+  entry    = "Website",
+  title    = "lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data",
+  author   = "Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz",
+  year     = 2021,
+  url      = "https://github.com/logan-berner/lsatTS",
+  textVersion = paste(
+"Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz. 2021. lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data. https://github.com/logan-berner/lsatTS"
+  )
+)
+
+citEntry(
   entry    = "Article",
   title    = "Summer Warming Explains Widespread but Not Uniform Greening in the Arctic Tundra Biome",
   author   = "Berner, Logan T., Richard Massey, Patrick Jantz, Bruce C. Forbes, Marc Macias-Fauria, Isla Myers-Smith, Timo Kumpula, et al.",
