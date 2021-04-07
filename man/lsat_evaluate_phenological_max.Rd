@@ -8,6 +8,7 @@ lsat_evaluate_phenological_max(
   dt,
   vi,
   min.frac.of.max = 0.75,
+  zscore.thresh = 3,
   min.obs = 6,
   reps = 10,
   outdir = "output/pheno_max_eval/"
@@ -22,13 +23,13 @@ lsat_evaluate_phenological_max(
 phenological curves indicate the VI is within a specified fraction of the maximum VI. In otherwords, an observation
 is considered to be from the "growing season" when the VI is within a user-specified fraction of the curve-fit growing season maximum VI.}
 
+\item{zscore.thresh}{Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.}
+
 \item{min.obs}{Minimum number of observations needed for a site x year to be included in the evaluation (Default = 10)}
 
 \item{reps}{Number of times to bootstrap the assessment (Default = 10)}
 
 \item{outdir}{Output directory into which evaluation data and figure will be writen.}
-
-\item{zscore.thresh}{Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.}
 }
 \value{
 Data.table

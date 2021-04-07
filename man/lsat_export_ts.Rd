@@ -81,18 +81,18 @@ test_points_sf <- st_sfc(st_point(c(-149.6026, 68.62574)),
                          st_point(c(-149.6003, 68.62524)),
                          st_point(c(-75.78057, 78.87038)),
                          st_point(c(-75.77098, 78.87256)),
-                         st_point(c(68.54736, 70.19058)),
-                         st_point(c(68.54814, 70.19112)), crs = 4326) \%>\%
+                         st_point(c(-20.56182, 74.47670)),
+                         st_point(c(-20.55376, 74.47749)), crs = 4326) \%>\%
   st_sf() \%>\%
   mutate(site = c("toolik_1",
                       "toolik_2",
                       "ellesmere_1",
                       "ellesmere_1",
-                      "yamal_1",
-                      "yamal_2"),
+                      "zackenberg_1",
+                      "zackenberg_2"),
          region = c("toolik", "toolik",
                     "ellesmere", "ellesmere",
-                    "yamal", "yamal"))
+                    "zackenberg", "zackenberg"))
 # Export time-series using lsat_export_ts()
 task_list <- lsat_export_ts(test_points_sf)
 
