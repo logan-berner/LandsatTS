@@ -2,8 +2,25 @@ test_that("lsat_export_ts works", {
   # Initialize rgee
   rgee::ee_Initialize()
 
-  # Load control data
-  load("../data/lsat_export_ts.Rda")
+  # Set test points
+  test_points_sf <- sf::st_sfc(sf::st_point(c(-149.6026, 68.62574)),
+                               sf::st_point(c(-149.6003, 68.62524)),
+                               sf::st_point(c(-75.78057, 78.87038)),
+                               sf::st_point(c(-75.77098, 78.87256)),
+                               sf::st_point(c(-20.56182, 74.47670)),
+                               sf::st_point(c(-20.55376, 74.47749)),
+                               crs = 4326)
+  test_points_sf <- sf::st_sf(geometry = test_points_sf)
+  test_points_sf$site <- c("toolik_1",
+                           "toolik_2",
+                           "ellesmere_1",
+                           "ellesmere_1",
+                           "zackenberg_1",
+                           "zackenberg_2")
+
+  test_points_sf$region <- c("toolik", "toolik",
+                             "ellesmere", "ellesmere",
+                             "zackenberg", "zackenberg")
 
   # Export time-series using lsat_export_ts()
   task_list <- lsat_export_ts(test_points_sf)

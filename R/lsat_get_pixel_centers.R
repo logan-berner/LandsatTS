@@ -58,11 +58,11 @@
 #'                                       -75.77116, 78.86973,
 #'                                       -75.78526, 78.86973),
 #'                                       ncol = 2, byrow = TRUE)))
-#' yamal <- st_polygon(list(matrix(c(68.54580, 70.18874,
-#'                                   68.54580, 70.19145,
-#'                                   68.55379, 70.19145,
-#'                                   68.55379, 70.18874,
-#'                                   68.54580, 70.18874),
+#' zackenberg <- st_polygon(list(matrix(c(-20.56254, 74.47469,
+#'                                     -20.56254, 74.47740,
+#'                                     -20.55242, 74.47740,
+#'                                     -20.55242, 74.47469,
+#'                                     -20.56254, 74.47469),
 #'                                   ncol = 2, byrow = TRUE)))
 #' toolik <- st_polygon(list(matrix(c(-149.60686, 68.62364,
 #'                                    -149.60686, 68.62644,
@@ -70,8 +70,8 @@
 #'                                    -149.59918, 68.62364,
 #'                                    -149.60686, 68.62364),
 #'                                    ncol = 2, byrow = TRUE)))
-#' test_regions_sf <- st_sfc(ellesmere, yamal, toolik, crs = 4326) %>% st_sf() %>%
-#'   mutate(region = c("ellesmere", "yamal", "toolik"))
+#' test_regions_sf <- st_sfc(ellesmere, zackenberg, toolik, crs = 4326) %>% st_sf() %>%
+#'   mutate(region = c("ellesmere", "zackenberg", "toolik"))
 #'
 #' # Split and map lsat_get_pixel_centers using dplyr and purrr
 #' pixel_list <- test_regions_sf %>%
