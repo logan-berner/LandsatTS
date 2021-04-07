@@ -1,7 +1,7 @@
 citHeader("To cite lsatTS in publications use:")
 
 citEntry(
-  entry    = "Website",
+  entry    = "Misc",
   title    = "lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data",
   author   = "Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz",
   year     = 2021,
