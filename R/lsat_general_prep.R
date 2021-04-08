@@ -8,8 +8,6 @@
 #'
 #' @examples # parsed.dt <- lsat_general_prep(gee.dt)
 
-dt <- fread('C:/Users/Logan/Google Drive/earth_engine/lsat_brooks_range_transect_chunk_1_test.csv')
-
 lsat_general_prep <- function(dt){
 
   # type cast
