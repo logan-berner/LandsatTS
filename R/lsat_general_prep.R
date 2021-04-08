@@ -8,6 +8,8 @@
 #'
 #' @examples # parsed.dt <- lsat_general_prep(gee.dt)
 
+dt <- fread('C:/Users/Logan/Google Drive/earth_engine/lsat_brooks_range_transect_chunk_1_test.csv')
+
 lsat_general_prep <- function(dt){
 
   # type cast
@@ -29,7 +31,7 @@ lsat_general_prep <- function(dt){
 
   # parse coords
   coords <- stringr::str_extract(string = dt$.geo, pattern = "(?<=\\[).*(?=\\])")
-  coords <- matrix(unlist(str_split(coords, ',')), ncol = 2, byrow = T)
+  coords <- matrix(unlist(strsplit(coords, ',')), ncol = 2, byrow = T)
   dt$latitude <- as.numeric(coords[,2])
   dt$longitude <- as.numeric(coords[,1])
 
