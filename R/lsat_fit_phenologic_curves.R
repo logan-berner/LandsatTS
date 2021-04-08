@@ -56,7 +56,7 @@ lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10,
     focal.dt <- focal.dt[, n.obs.focal.win := .N, by = 'site']
     focal.dt <- focal.dt[n.obs.focal.win >= window.min.obs]
 
-    # if (nrow(focal.dt) == 0){next()}
+    if (nrow(focal.dt) == 0){next()}
 
     doy.rng <- min(focal.dt$doy):max(focal.dt$doy)
 
