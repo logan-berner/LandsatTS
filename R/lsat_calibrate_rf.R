@@ -41,7 +41,7 @@
 #' @export lsat_calibrate_rf
 #' @examples # lsat.dt <- lsat_xcal_rf(lsat.dt, band = 'ndvi', doy.rng = 152:243, min.obs = 5, frac.train = 0.75, outfile.id = 'ndvi', outdir ='data/lsat_site_data/sensor_xcal/ndvi/')
 
-lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, outfile.id=band, outdir){
+lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, overwrite.col = F, outfile.id=band, outdir){
 
   R.utils::mkdirs(outdir)
 
@@ -193,12 +193,21 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
   }
   
 
-  # save model evaluation summary table
+  # print out and save model evaluation summary table
   print(model.eval.df)
   write.table(model.eval.df, paste(outdir, '/', outfile.id, '_xcal_rf_eval.csv', sep=''), sep = ',', row.names = F, col.names = T)
 
   # output rf models and updated data table
   dt[satellite == 'LE07', xcal:= get(band)]
-  data.table::setnames(dt, 'xcal', eval(paste(band, 'xcal', sep='.')))
+  
+  # overwrite original column with cross-calibrated data or return new column?  
+  if (overwrite.col == F){
+    data.table::setnames(dt, 'xcal', eval(paste(band, 'xcal', sep='.')))
+  } else {
+    dt[, eval(band) := NULL]
+    data.table::setnames(dt, 'xcal', eval(band))
+    }
+  
   dt
+  
 }
