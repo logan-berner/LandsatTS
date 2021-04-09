@@ -53,7 +53,7 @@ lsat_clean_data <- function(dt, cloud.max=80, geom.max=30, sza.max=60, filter.sn
 
   n.final <- nrow(dt)
   n.removed <- n.orig - n.final
-  print(paste('removed', n.removed, 'of', n.orig, 'observations (', round(n.removed / n.orig * 100, 2), '%)', sep=' '))
+  print(paste0('removed ', n.removed, ' of ', n.orig, ' observations (', round(n.removed / n.orig * 100, 2), '%)'))
   dt
 }
 
