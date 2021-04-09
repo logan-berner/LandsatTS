@@ -24,7 +24,6 @@
 #' @examples # To come...
 #'
 lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10, vi.min = 0, spar=0.7, pcnt.dif.thresh=100, spl.fit.outfile=F, progress=T){
-  # LOAD LIBRARIES
   dt <- data.table::data.table(dt)
 
   # GET SITE, DOY, YEAR, AND VEG INDEX FROM INPUT DATA TABLE
@@ -84,12 +83,18 @@ lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10,
         # check the number of obs per site and filter sites out those with too few obs
         refit.dt <- refit.dt[, n.obs.focal.win := .N, by = 'site']
         refit.dt <- refit.dt[n.obs.focal.win >= window.min.obs]
-
-        # refit
-        spline.refits.dt <- refit.dt[, .(spl.fit = list(stats::smooth.spline(doy, vi, spar = spar))), by = 'site']
-        spline.refits.dt <- spline.refits.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'site']
-        spline.refits.dt <- spline.refits.dt[, doy := doy.rng, by = 'site']
-        spline.fits.dt <- rbind(spline.fits.dt, spline.refits.dt)
+        
+        # if no data are left, then stop refitting...
+        if (nrow(refit.dt) == 0){
+          refitting = 0
+        } else{
+          # refit
+          spline.refits.dt <- refit.dt[, .(spl.fit = list(stats::smooth.spline(doy, vi, spar = spar))), by = 'site']
+          spline.refits.dt <- spline.refits.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'site']
+          spline.refits.dt <- spline.refits.dt[, doy := doy.rng, by = 'site']
+          spline.fits.dt <- rbind(spline.fits.dt, spline.refits.dt)
+        }
+        
       } else {
         refitting = 0
       }
