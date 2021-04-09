@@ -18,7 +18,7 @@
 #' @param progress (TRUE/FALSE) Print a progress report?
 #' @return Data.table that provides, for each observation, information on the phenological conditions for that specific day of year during the focal period.
 #' These data can then be used to estimate annual maximum vegegation index and other growing season metrics using lsat_summarize_growing_season().
-#'
+#' @import data.table
 #' @export lsat_fit_phenological_curves
 #'
 #' @examples # To come...

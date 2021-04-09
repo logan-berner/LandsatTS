@@ -16,6 +16,7 @@
 #' @param filter.water (TRUE/FALSE) Remove observations with CFmask flag = water or where innundated based on JRC Global Surface Water Dataset.
 #'
 #' @return A data.table that includes Landsat observations that met the quality control criteria
+#' @import data.table
 #' @export lsat_clean_data
 #'
 #' @examples # lsat.dt <- lsat_clean_dt(lsat.dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T)

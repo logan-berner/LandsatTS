@@ -10,6 +10,7 @@
 #' @param zscore.thresh Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.
 
 #' @return Data.table summarizing annual growing season conditions based on a vegetation index.
+#' @import data.table
 #' @export lsat_summarize_growing_seasons
 #'
 #' @examples # Forthcoming...

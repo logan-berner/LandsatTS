@@ -9,6 +9,7 @@
 #' @param si Character string specifying the desired spetral index.
 #'
 #' @return The input data.table with an appended colunm containing the spectral index
+#' @import data.table
 #' @export lsat_calc_spec_index
 #'
 #' @examples # my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')
