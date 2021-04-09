@@ -30,6 +30,7 @@
 #' @param doy.rng Sequence of numbers specifying the Days of Year (Julian Days) to use for model development.
 #' @param min.obs Minimum number of paired, seasonally-matched observations from Landsat 7 and Landsat 5/8 required to include a sampling site.
 #' @param frac.train Fraction of sites to use for training the random forest models. The remaining sites are used for model cross-validation.
+#' @param overwrite.col Overwrite existing column or append cross-calibrated data as a new column?
 #' @param outfile.id Identifier used when naming output files. Defaults to the input band, but can be specified if needed such as when performing Monte Carlo simulations.
 #' @param outdir Output directory (created if necessary) to which multiple files will be written.
 #' The files include the (1) fitted random forest models as an R object, (2) evaluation data in a csv file, (3) summary of
