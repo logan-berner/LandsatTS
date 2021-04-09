@@ -8,8 +8,12 @@
 #' @examples # summary.dt <- lsat_summarize_data_avail(dt)
 
 lsat_summarize_data_avail <- function(dt){
+  # summarize data by site
   yr.dt <- dt[, .(n.obs = .N), by = c('site','year')]
   smry.dt <- yr.dt[, .(first.yr = data.table::first(year), last.yr = data.table::last(year), n.yrs = length(unique(year)),
          n.obs.min = min(n.obs), n.obs.max = max(n.obs), n.obs.tot = sum(n.obs)), by = site]
   smry.dt
+  
+  # density plot of observations across years
+  ggplot2::ggplot(dt, aes(year)) + geom_density(fill='lightblue') + labs(y='Density of observations', x='Year')
 }
