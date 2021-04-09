@@ -371,13 +371,13 @@ Email Jakob at: <j.assmann@bio.au.dk>
 ## 7\. Contributions
 
 Logan T. Berner wrote the analysis functions (Sections 3 and 4). Jakob
-J. Assmann faciliated package development and wrote the extraction and
+J. Assmann facilitated package development and wrote the extraction and
 preparation functions (Section 1). Richard Massey wrote the original
 Python code for the `lsat_export_ts()` function, later refined and
 translated first to JavaScript and then rgee code by Jakob J. Assmann.
-Singe Normand and Scoet Goetz provided funding (?) and mentorship for
-this project. Logan T. Berner and Jakob J. Assmann prepared the code for
-publication and wrote the documnetation.
+Singe Normand and Scott Goetz provided funding and mentorship for this
+project. Logan T. Berner and Jakob J. Assmann prepared the code for
+publication and wrote the documentation.
 
 Thank you to all the testers: Tester A, Tester B and Tester C.
 
