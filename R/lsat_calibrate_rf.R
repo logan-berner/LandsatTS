@@ -173,6 +173,7 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
       grDevices::jpeg(fig.name, 4.5, 4, units = 'in', res=400)
       print(fig)
       grDevices::dev.off()
+      print(fig)
     } else {
       fig.lst[[i]] <- fig
     }
@@ -185,12 +186,14 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, out
     grDevices::jpeg(fig.name, 9, 7.5, units = 'in', res=400)
     print(fig)
     grDevices::dev.off()
+    print(fig)
   } else {
     print('modify to accommodate plotting more satellites!')
   }
-
+  
 
   # save model evaluation summary table
+  print(model.eval.df)
   write.table(model.eval.df, paste(outdir, '/', outfile.id, '_xcal_rf_eval.csv', sep=''), sep = ',', row.names = F, col.names = T)
 
   # output rf models and updated data table
