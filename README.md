@@ -326,8 +326,8 @@ lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs =
 # Summarize vegetation index for the "growing season", including estimating annual max vegetation index
 lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, vi = 'ndvi', min.frac.of.max = 0.75)
 
-# Optional: Evaluate
-lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 10, min.frac.of.max = 0.75)
+# Optional: Evaluate how raw and modeled estimates of annual max NDVI vary with scene availability  
+lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 5, min.frac.of.max = 0.75, outdir = NA)
 
 # Write out data.table with growing season summaries
 # fwrite(lsat.gs.dt, 'tests/lsat_TS_test_run/lsat_annual_growing_season_summaries.csv')
@@ -369,7 +369,7 @@ Email Jakob at: <j.assmann@bio.au.dk>
 
 Logan T. Berner wrote the analysis functions (Sections 3 and 4). Jakob
 J. Assmann facilitated package development and wrote the extraction and
-preparation functions (Section 1). Richard Massey wrote the original
+preparation functions (Section 2). Richard Massey wrote the original
 Python code for the `lsat_export_ts()` function, later refined and
 translated first to JavaScript and then rgee code by Jakob J. Assmann.
 Singe Normand and Scott Goetz provided funding and mentorship for this
