@@ -14,6 +14,7 @@
 #' @param outdir Output directory into which evaluation data and figure will be writen.
 #'
 #' @return Data.table
+#' @import data.table
 #' @export lsat_evaluate_phenological_max
 #' @examples # Forthcoming...
 
@@ -32,7 +33,7 @@ lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscor
   dt <- dt[, ':='(avg = mean(vi.max.pred), sd = stats::sd(vi.max.pred), n=.N), by = c('site','year')]
   dt <- dt[, abs.zscore := abs((vi.max.pred - avg )/sd)]
   dt <- dt[abs.zscore <= zscore.thresh]
-  
+
   # compute max observed VI (actually 90% percentile to avoid spuriously high values)
   dt <- dt[, vi.max.obs := stats::quantile(vi, 0.90), by = c('site','year')]
 

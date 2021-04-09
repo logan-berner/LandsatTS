@@ -4,6 +4,7 @@
 #' The function also renames and rescales bands 1 - 7, taking into account differences between Landsat 5 / 7 and 8
 #' @param dt Data.table containing Landsat data extracted from Google Earth Engine.
 #' @return Data.table with formatted and scaled values.
+#' @import data.table
 #' @export lsat_general_prep
 #'
 #' @examples # parsed.dt <- lsat_general_prep(gee.dt)

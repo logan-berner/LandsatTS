@@ -37,6 +37,7 @@
 #' If cross-calibrating both Landsat 5 and 8, then the function returns files for both sensors.
 
 #' @return The input data.table with an appended column titled band.xcal, where "band" is your specified band or spectral index
+#' @import data.table
 #' @export lsat_calibrate_rf
 #' @examples # lsat.dt <- lsat_xcal_rf(lsat.dt, band = 'ndvi', doy.rng = 152:243, min.obs = 5, frac.train = 0.75, outfile.id = 'ndvi', outdir ='data/lsat_site_data/sensor_xcal/ndvi/')
 

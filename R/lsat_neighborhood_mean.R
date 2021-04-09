@@ -5,6 +5,7 @@
 #' Also, make sure to have previously cleaning the individual observations using lsat_clean_data().
 #' @param dt A data.table containing coincident surface reflectance measurements for multiple Landsat pixels at each 'site'.
 #' @return A data.table with average surface reflectance
+#' @import data.table
 #' @export lsat_neighborhood_mean
 #' @examples # ngb.avg.dt <- lsat_ngb_mean(my.dt)
 
