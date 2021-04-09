@@ -57,6 +57,15 @@ sure you have the `rgee` package installed, fully configured and the
 Earth Engine initialized for the current R session. You can find out how
 to do that on the [rgee website](https://r-spatial.github.io/rgee/).
 
+*Tip: All functions are designed to run in a non-interactive R Session.
+The only exception is `lsat_get_pixel_centers()`, which optionally
+allows the user to view and export a map. For this to work the function
+may have to be run in an interactive session in RStudio (not tested
+outside) and you may also have to install the external program
+PhantomJS. If so, you will be prompted to do so using
+`webshot::install_phantomjs()`. You can find out more
+[here](https://wch.github.io/webshot/articles/intro.html).*
+
 [\[to top\]](#content)
 
 ## 2\. Prepare and extract Landsat data
