@@ -256,6 +256,7 @@ lsat.dt <- lsat_ngb_mean(lsat.dt)
 
 
 **Optional: Summarize the availability of Landsat data for each site using lsat_summarize_data_avail()**
+
 The function `lsat_summarize_data_avail()` creates a summary table that provides information on the time period of observations and number of observations available for each site. It also generates a figure showing the density of observations across years, which combines data across all sites. 
 
 ``` {r eval = FALSE}
@@ -274,6 +275,7 @@ lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
 
 
 **Cross-calibrate spectral reflectance or index using lsat_calibrate_rf()**
+
 There are systematic differences in surface reflectance and spectral indices among Landsat sensors. If you are working with data from multiple sensors, then it is very important to further cross-calibrate data among sensors. The function `lsat_calibrate_rf()` will  calibrate individual bands or spectral indices from Landsat 5/8 to match Landsat 7. Landsat 7 is used as a benchmark because it temporally overlaps with the other two sensors. Cross-calibration can only be performed on one band or spectral index at a time and requires having data from 100s to preferably many 1,000s of sample sites. The approach involves determining the typical reflectance at a site during a portion of the growing season using Landsat 7 and Landsat 5/8 data that were collected the same years. A Random Forest model is then trained to predict Landsat 7 reflectance from Landsat 5/8 reflectance. If your data include both Landsat 5 and 8, then the function will train a Random Forest model for each sensor. By default, `lsat_calibrate_rf()` will add a new column with the cross-calibrated data; however, the function will overwrite the existing column if you set the option overwrite.col = T. The function will also create an output directory that contains (1) trained Random Forest models, (2) a spreadsheet with model evaluation metrics, and (3) a multi-panel figure comparing sensors pre- and post-calibration. 
 
 ``` {r eval = FALSE}
@@ -289,6 +291,7 @@ lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs 
 ![](man/figures/fig_3_define_growing_season.jpg)
 
 **Fit phenological curves to vegetation greenness time series using lsat_fit_phenological_curves()**
+
 The function `lsat_fit_phenological_curves()` characterizes seasonal land surface phenology at each sampling site using vegetation greenness (e.g., NDVI) time series from Landsat satellite observations. The function was construted as a stepping stone to estimating annual maximum vegetation greenness (e.g., NDVImax). The function iteratively fits cubic splines to seasonal vegetation greenness time series and returns information about the timing and magnitude of individual vegetation greenness observation relative to a multi-year seasonal phenology at each site.
 
 ``` {r eval = FALSE}
@@ -317,6 +320,7 @@ lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', mi
 
 
 **Compute trends in annual vegetation greenness using lsat_calc_trend()** 
+
 Th function `lsat_calc_trend()` computes a temporal trend in annual time series of vegetation greenness for each sampling site over a user-specificed time period. This is a wrapper for the zyp.yuepilon() function from the zyp package. This function will iteratively pre-whiten a time series (i.e., remove temporal autocorrelation) and then compute Mann-Kendall trend tests and Theil-Sen slope indicators.
 
 ``` {r eval = FALSE}
