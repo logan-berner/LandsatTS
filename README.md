@@ -280,58 +280,128 @@ temp_files <- map(task_list, ee_drive_to_local)
 
 ## 3. Clean and cross-calibrate Landsat data
 
-![](man/figures/fig_2_cross_calibration.jpg)
+![](man/figures/fig_2_cross_calibration.jpg) **Prepare the exported
+Landsat data for analysis using lsat\_general\_prep()**
+
+After exporting Landsat data from Earth Engine, it is then necessary
+prepare the data for analysis. First, read the exported data into R
+using `data.table::fread()` and then use the `lsat_general_prep()`
+function to parse necessary information, rename columns, and scale band
+values.
+
+*Please note:* All lsatTS functions depend on there being a column
+called “site” that uniquely identifies each location. If this column is
+not called ‘site’ in your dataset, then make sure to modify your column
+name accordingly.
 
 ``` r
-# Read in Landsat data from files extracted from EE using lsat_export_ts() 
-lsat.dt <- do.call("rbind", lapply(temp_files, fread))
+lsat.dt <- do.call("rbind", lapply(files_exported_from_EE, fread))
 
-# All lsatTS functions depend on there being a column called "site" that uniquely identifies each location. If this column is not called 'site' yn your dataset, then you can rename it for example using data.table as follows:
 # setnames(lsat.dt, 'my_unique_location_column','site') 
 
-# Parse data, filter to clear-sky observations, compute mean surface reflectance among pxls w/in each window around a site
 lsat.dt <- lsat_general_prep(lsat.dt)
-
-# Clean the data, filtering out clouds, snow, water, radiometric and geometric errors
-lsat.dt <- lsat_clean_data(lsat.dt, geom.max = 15, cloud.max = 80, sza.max = 60, filter.snow = T, filter.water = T)
-
-# Optional: If each site is a neightborhood of Landsat pixels, then compute average reflectance across these pixels 
-# lsat.dt <- lsat_ngb_mean(lsat.dt)
-
-# Optional: Summarize the availability of Landsat data for each site
-data.summary.dt <- lsat_summarize_data_avail(lsat.dt)
-data.summary.dt
-
-# Compute NDVI or other vegetation index
-lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
-
-# Cross-calibrate NDVI among sensors using an approach based on Random Forest machine learning
-lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs = 5, frac.train = 0.75, overwrite.col = F, outdir = 'tests/lsat_TS_test_run/ndvi_xcal/')
-
-# Optional: By default, lsat_calibrate_rf() adds a new column with the cross-calibrated data. If you want to remove the column with uncalibrated data and rename the column with calibrated data, then do something like this:
-lsat.dt[, c('ndvi') := NULL]
-setnames(lsat.dt, 'ndvi.xcal', 'ndvi')
 ```
 
-[\[to top\]](#content)
+**Clean the surface reflectance data using lsat\_clean\_data()**
 
-## 4. Quantify growing season characteristics
-
-![](man/figures/fig_3_define_growing_season.jpg)
+For most analyses you’ll want to use high-quality surface reflectance
+measurements that were acquired under clear-sky conditions. You can
+filter surface reflectance measurements using `lsat_clean_data()`. This
+function allows you to filter measurements based on pixel quality flags
+and scene criteria. The USGS provides pixel quality flags based on the
+CFMask algorithm and provides information on each scene (e.g., cloud
+cover). The default settings from `lsat_clean_data()` will filter out
+snow and water. Addition water masking is provided based on the JRC
+Global Surface Water Dataset that was derived from Landsat.
 
 ``` r
-# Fit phenological models (cubic splines) to each time series
-lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs = 5, window.min.obs = 10, vi.min = 0, spl.fit.outfile = F, progress = T)
-
-# Summarize vegetation index for the "growing season", including estimating annual max vegetation index
-lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, vi = 'ndvi', min.frac.of.max = 0.75)
-
-# Optional: Evaluate how raw and modeled estimates of annual max NDVI vary with scene availability  
-lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 5, min.frac.of.max = 0.75, outdir = NA)
-
-# Write out data.table with growing season summaries
-# fwrite(lsat.gs.dt, 'tests/lsat_TS_test_run/lsat_annual_growing_season_summaries.csv')
+lsat.dt <- lsat_clean_data(lsat.dt, geom.max = 15, cloud.max = 80, sza.max = 60, filter.snow = T, filter.water = T)
 ```
+
+**Optional: Compute average surface reflectance among neighboring pixels
+using lsat\_ngb\_mean()**
+
+If each of your sites is actually a neightborhood of Landsat pixels
+(e.g., 3 x 3 pixels), then `lsat_ngb_mean()` will compute the mean
+reflectance across this neighborhood of pixels.
+
+``` r
+lsat.dt <- lsat_ngb_mean(lsat.dt)
+```
+
+**Optional: Summarize the availability of Landsat data for each site
+using lsat\_summarize\_data\_avail()** The function
+`lsat_summarize_data_avail()` creates a summary table that provides
+information on the time period of observations and number of
+observations available for each site. It also generates a figure showing
+the density of observations across years, which combines data across all
+sites.
+
+``` r
+data.summary.dt <- lsat_summarize_data_avail(lsat.dt)
+data.summary.dt
+```
+
+**Calculate spectral indices using lsat\_calc\_index()**
+
+The function `lsat_calc_index()` allows users to easily calculate some
+widely used spectral indices. These include NDVI, EVI, and currently
+nine other spectral indices (EVI2, kNDVI, MSI, NBR, NIRv, NDII, NDWI,
+PSRI, SATVI). Note that only one index can be computed at a time.
+
+``` r
+# Compute NDVI or other vegetation index
+lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+```
+
+**Cross-calibrate spectral reflectance or index using
+lsat\_calibrate\_rf()** There are systematic differences in surface
+reflectance and spectral indices among Landsat sensors. If you are
+working with data from multiple sensors, then it is very important to
+further cross-calibrate data among sensors. The function
+`lsat_calibrate_rf()` will calibrate individual bands or spectral
+indices from Landsat 5/8 to match Landsat 7. Landsat 7 is used as a
+benchmark because it temporally overlaps with the other two sensors.
+Cross-calibration can only be performed on one band or spectral index at
+a time and requires having data from 100s to preferably many 1,000s of
+sample sites. The approach involves determining the typical reflectance
+at a site during a portion of the growing season using Landsat 7 and
+Landsat 5/8 data that were collected the same years. A Random Forest
+model is then trained to predict Landsat 7 reflectance from Landsat 5/8
+reflectance. If your data include both Landsat 5 and 8, then the
+function will train a Random Forest model for each sensor. By default,
+`lsat_calibrate_rf()` will add a new column with the cross-calibrated
+data; however, the function will overwrite the existing column if you
+set the option overwrite.col = T. The function will also create an
+output directory that contains (1) trained Random Forest models, (2) a
+spreadsheet with model evaluation metrics, and (3) a multi-panel figure
+comparing sensors pre- and post-calibration.
+
+``` r
+# Cross-calibrate NDVI among sensors using an approach based on Random Forest machine learning
+lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs = 5, frac.train = 0.75, overwrite.col = F, outdir = 'tests/lsat_TS_test_run/ndvi_xcal/')
+```
+
+
+    [\[to top\]](#content)
+
+    ## 4. Quantify growing season characteristics
+
+    ![](man/figures/fig_3_define_growing_season.jpg)
+
+
+    ```r
+    # Fit phenological models (cubic splines) to each time series
+    lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs = 5, window.min.obs = 10, vi.min = 0, spl.fit.outfile = F, progress = T)
+
+    # Summarize vegetation index for the "growing season", including estimating annual max vegetation index
+    lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, vi = 'ndvi', min.frac.of.max = 0.75)
+
+    # Optional: Evaluate how raw and modeled estimates of annual max NDVI vary with scene availability  
+    lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 5, min.frac.of.max = 0.75, outdir = NA)
+
+    # Write out data.table with growing season summaries
+    # fwrite(lsat.gs.dt, 'tests/lsat_TS_test_run/lsat_annual_growing_season_summaries.csv')
 
 [\[to top\]](#content)
 

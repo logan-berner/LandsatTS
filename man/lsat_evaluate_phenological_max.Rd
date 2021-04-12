@@ -11,7 +11,7 @@ lsat_evaluate_phenological_max(
   zscore.thresh = 3,
   min.obs = 6,
   reps = 10,
-  outdir = "output/pheno_max_eval/"
+  outdir = NA
 )
 }
 \arguments{
@@ -29,7 +29,8 @@ is considered to be from the "growing season" when the VI is within a user-speci
 
 \item{reps}{Number of times to bootstrap the assessment (Default = 10)}
 
-\item{outdir}{Output directory into which evaluation data and figure will be writen.}
+\item{outdir}{If desired, specify the output directory where evaluation data and figure should be written. If left as NA, then no output is only displayed
+in the console and not written to disk.}
 }
 \value{
 Data.table

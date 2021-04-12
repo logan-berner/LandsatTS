@@ -10,6 +10,7 @@ lsat_calibrate_rf(
   doy.rng,
   min.obs,
   frac.train = 0.75,
+  overwrite.col = F,
   outfile.id = band,
   outdir
 )
@@ -24,6 +25,8 @@ lsat_calibrate_rf(
 \item{min.obs}{Minimum number of paired, seasonally-matched observations from Landsat 7 and Landsat 5/8 required to include a sampling site.}
 
 \item{frac.train}{Fraction of sites to use for training the random forest models. The remaining sites are used for model cross-validation.}
+
+\item{overwrite.col}{(True/False) Overwrite existing column or (by default) append cross-calibrated data as a new column?}
 
 \item{outfile.id}{Identifier used when naming output files. Defaults to the input band, but can be specified if needed such as when performing Monte Carlo simulations.}
 
