@@ -1,8 +1,8 @@
 #' Evaluate Estimates of Annual Phenological Maximum
 #' @description Assess how the number of annual Landsat observations impacts estimates of annual maximum vegetation greenness derived from raw observations and
-#' phenologic modeling. The algorithem computes annual maximum vegetation greenness using site x years with a user-specific number of observations and then
+#' phenological modeling. The algorithm computes annual maximum vegetation greenness using site x years with a user-specific number of observations and then
 #' compares these with estimates derived when using progressively smaller subsets of observations. This lets you determine the degree to which
-#' annual estimates of maximum vegetation greenness are impacted the the number of available observations.
+#' annual estimates of maximum vegetation greenness are impacted by the number of available observations.
 #' @param dt Data.table output from lsat_fit_phenologic_curves().
 #' @param vi Character string specifying the vegetation index (e.g., NDVI) to evaluate.
 #' @param min.frac.of.max Numeric threshold (0-1) that defines the "growing season" as the seasonal window when the

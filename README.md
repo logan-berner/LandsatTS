@@ -382,26 +382,75 @@ comparing sensors pre- and post-calibration.
 lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs = 5, frac.train = 0.75, overwrite.col = F, outdir = 'tests/lsat_TS_test_run/ndvi_xcal/')
 ```
 
+[\[to top\]](#content)
 
-    [\[to top\]](#content)
+## 4. Quantify growing season characteristics
 
-    ## 4. Quantify growing season characteristics
+![](man/figures/fig_3_define_growing_season.jpg)
 
-    ![](man/figures/fig_3_define_growing_season.jpg)
+**Fit phenological curves to vegetation greenness time series using
+lsat\_fit\_phenological\_curves()** The function
+`lsat_fit_phenological_curves()` characterizes seasonal land surface
+phenology at each sampling site using vegetation greenness (e.g., NDVI)
+time series from Landsat satellite observations. The function was
+construted as a stepping stone to estimating annual maximum vegetation
+greenness (e.g., NDVImax). The function iteratively fits cubic splines
+to seasonal vegetation greenness time series and returns information
+about the timing and magnitude of individual vegetation greenness
+observation relative to a multi-year seasonal phenology at each site.
 
+``` r
+# Fit phenological models (cubic splines) to each time series
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs = 5, window.min.obs = 10, vi.min = 0, spl.fit.outfile = F, progress = T)
+```
 
-    ```r
-    # Fit phenological models (cubic splines) to each time series
-    lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs = 5, window.min.obs = 10, vi.min = 0, spl.fit.outfile = F, progress = T)
+**Derived annual growing season metrics using
+lsat\_summarize\_growing\_seasons()**
 
-    # Summarize vegetation index for the "growing season", including estimating annual max vegetation index
-    lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, vi = 'ndvi', min.frac.of.max = 0.75)
+The function `lsat_summarize_growing_seasons()` estimates several annual
+growing season metrics from vegetation greenness time series derived
+from Landsat satellite observations. The metrics include annual mean,
+median, and 90th percentile vegetation greenness of observations during
+each growing season, as well as phenologically-modeled estimates of
+annual maximum vegetation greenness and the seasonal timing (Day of
+Year) of maximum vegetation greenness. This function relies on output
+from `lsat_fit_phenological_curves()`.
 
-    # Optional: Evaluate how raw and modeled estimates of annual max NDVI vary with scene availability  
-    lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 5, min.frac.of.max = 0.75, outdir = NA)
+``` r
+lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, vi = 'ndvi', min.frac.of.max = 0.75)
+```
 
-    # Write out data.table with growing season summaries
-    # fwrite(lsat.gs.dt, 'tests/lsat_TS_test_run/lsat_annual_growing_season_summaries.csv')
+**Optional: Evaluate how raw and modeled estimates of annual max NDVI
+vary with scene availability using lsat\_evaluate\_phenological\_max()**
+
+Estimates of annual maximum vegetation greenness are sensitive to the
+number of observations available from a growing season. The function
+`lsat_evaluate_phenological_max()` is a tool for assessing how the
+number of annual Landsat observations impacts estimates of annual
+maximum vegetation greenness derived from raw observations and after
+phenological modeling. The algorithm computes a “true” annual maximum
+vegetation greenness using site x years with a user-specific number of
+observations and then compares these with estimates derived when using
+progressively smaller subsets of observations. This lets you determine
+the degree to which annual estimates of maximum vegetation greenness are
+impacted by the number of available observations.
+
+``` r
+lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 5, min.frac.of.max = 0.75, outdir = NA)
+```
+
+**Compute trends in annual vegetation greenness using
+lsat\_calc\_trend()** Th function `lsat_calc_trend()` computes a
+temporal trend in annual time series of vegetation greenness for each
+sampling site over a user-specificed time period. This is a wrapper for
+the zyp.yuepilon() function from the zyp package. This function will
+iteratively pre-whiten a time series (i.e., remove temporal
+autocorrelation) and then compute Mann-Kendall trend tests and Theil-Sen
+slope indicators.
+
+``` r
+lsat.trnds.dt <- lsat_calc_trend(lsat.gs.dt, vi = 'ndvi.max', 2000:2020, sig = 0.1)
+```
 
 [\[to top\]](#content)
 
