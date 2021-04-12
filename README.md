@@ -466,7 +466,7 @@ When using this package please cite:
 Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and
 Scott J. Goetz. 2021. lsatTS - an R package for deriving vegetation
 greenness time series using Landsat satellite data.
-<https://github.com/logan-berner/lsatTS>
+<https://github.com/logan-berner/lsatTS>.
 
 Also please consider citing the peer-reviewed publication for which much
 of this code was developed:
@@ -508,9 +508,29 @@ Thank you to all the testers: Tester A, Tester B and Tester C.
 
 **rgee**
 
-C Aybar, Q Wu, L Bautista, R Yali and A Barja (2020) rgee: An R package
-for interacting with Google Earth Engine Journal of Open Source Software
-URL <https://github.com/r-spatial/rgee/>.
+Aybar C, Wu Q, Bautista L, Yali R and Barja A (2020) rgee: An R package
+for interacting with Google Earth Engine, Journal of Open Source
+Software, <https://github.com/r-spatial/rgee/>.
+
+**Peer-reviewed publications that have used `lsatTS` functions:**
+
+1.  Berner LT, et al. (2020) Summer warming explains widespread but not
+    uniform greening in the Arctic tundra biome. Nature Communications
+    11:4621. \[link\]
+    <https://www.nature.com/articles/s41467-020-18479-5>
+
+2.  Gaglioti B, Berner LT, Jones BM, Orndahl KM, Williams AP,
+    Andreu‐Hayles L, D’Arrigo R, Goetz SJ, Mann DH (2021) Tussocks
+    enduring or shrubs greening: Alternate responses to changing fire
+    regimes in the Noatak River Valley, Alaska. Journal of Geophysical
+    Research: Biogeosciences 126:e2020JG006009. \[link\]
+    <https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/2020JG006009>
+
+3.  Verdonen M, Berner LT, Forbes BC, Kumpula T (2020) Periglacial
+    vegetation dynamics in Arctic Russia: decadal analysis of tundra
+    regeneration on landslides with time series satellite imagery.
+    Environmental Research Letters 15:105020. \[link\]
+    <https://iopscience.iop.org/article/10.1088/1748-9326/abb500>
 
 ## 9. License
 
