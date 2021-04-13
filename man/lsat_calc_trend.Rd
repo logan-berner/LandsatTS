@@ -25,5 +25,5 @@ This function will iteratively pre-whiten a time series (i.e., remove temporal a
 Mann-Kendall trend tests and Theil-Sen slope indicators.
 }
 \examples{
-Forthcoming...
+# Forthcoming...
 }
