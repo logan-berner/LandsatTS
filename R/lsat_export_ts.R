@@ -187,6 +187,6 @@ lsat_export_ts <- function(pixel_coords_sf,
     })
   # Status update
   cat(crayon::green("Done!\n"))
-  cat("You can monitor the taks' progress using rgee's ee_monitoring() or the GEE WebAPI.\n")
+  cat("You can monitor the progress of the task(s) using rgee's ee_monitoring() or the GEE WebAPI.\n")
   return(task_list)
 }
