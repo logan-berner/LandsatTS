@@ -2,23 +2,32 @@
 % Please edit documentation in R/lsat_calc_spec_index.R
 \name{lsat_calc_spec_index}
 \alias{lsat_calc_spec_index}
-\title{Compute Spectral Indices}
+\title{Calculate Spectral Indices}
 \usage{
 lsat_calc_spec_index(dt, si)
 }
 \arguments{
 \item{dt}{Data.table containing surface reflectance data.}
 
-\item{si}{Character string specifying the desired spetral index.}
+\item{si}{Character string specifying abbreviation of the desired spetral index.}
 }
 \value{
 The input data.table with an appended colunm containing the spectral index
 }
 \description{
 This function computes some widely used spetral indices.
-These include the Normalized Difference Vegetation Index (NDVI),
-the Enhanced Vegetationd Index (EVI), and 10 others (EVI2, kNDVI, MSI, NBR, NIRv, NDII, NDVSI, NDWI, PSRI, SATVI).
-Only one index can be computed at a time.
+Only one index can be computed at a time. Current indices include the:
+Normalized Difference Vegetation Index (NDVI; Rouse et al. 1974),
+kernel NDVI (kNDVI; Camp-Valls et al. 2020)
+Enhanced Vegetationd Index (EVI; Huete et al. 2002),
+2-band EVI (EVI2; Jiang et al. 2008),
+Near Infrared Vegetation Index (NIRv; Badgley et al. 2017),
+Moisture Stress Index (MSI; Rock et al. 1986),
+Normalized Burn Ratio (NBR, Key and Benson 1999),
+Normalized Difference Infrared Index (NDII; Hardisky et al. 1983)
+Normalized Difference Water Index (NDWI; McFeeters 1996),
+Plant Senescence Reflectance Index (PSRI; Merzlyak et al. 1999),
+and the Soil-adjusted Total Vegetation Index (SATVI; Marsett et al. 2006).
 }
 \examples{
 # my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')

@@ -1,5 +1,5 @@
 Package: lsatTS
-Title: An R package to make sense of Landsat greenness time-series 
+Title: An R package for deriving vegetation greenness time series using Landsat satellite data
 Version: 0.0.5
 Authors@R: 
     c(
@@ -7,7 +7,7 @@ Authors@R:
            family = "Berner",
            role = c("aut"),
            email = "Logan.Berner@nau.edu",
-           comment = c(ORCID = "YOUR-ORCID-ID")),
+           comment = c(ORCID = "0000-0001-8947-0479")),
     person(given = "Jakob J.",
            family = "Assmann",
            role = c("aut", "cre"),
@@ -17,19 +17,19 @@ Authors@R:
            family = "Massey",
            role = c("aut"),
            email = "",
-           comment = c(ORCID = "YOUR-ORCID-ID")),
+           comment = c(ORCID = "0000-0002-4831-8718")),
     person(given = "Signe",
            family = "Normand",
            role = c("aut"),
            email = "",
-           comment = c(ORCID = "YOUR-ORCID-ID")),
+           comment = c(ORCID = "0000-0002-8782-4154")),
     person(given = "Scott",
            family = "Goetz",
            role = c("aut"),
            email = "",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0000-0002-6326-4308"))
            )
-Description: Building upon the workflow developed for Berner et al. 2020 the lsatTS package helps you to: 1) Export time-series for the whole Landsat record based on point coordinates ("sites"). 2) Cross-calibration of Landsat VI time-series to account for sparse observations and sensor differences. 3) Define growing season characteristics such as the maximum NDVI.
+Description: Building upon the workflow developed for Berner et al. 2020 the lsatTS package helps you to: 1) Export surface reflectance time-series for the whole Landsat record based on point coordinates ("sites"); 2) Clean and cross-calibrate Landsat; and 3) Derive growing season characteristics such as the annual maximum NDVI.
 License: Modified MIT
 Encoding: UTF-8
 LazyData: true
@@ -41,6 +41,7 @@ Config/testthat/edition: 3
 Imports: 
     magrittr,
     dplyr,
+    tidyr,
     rgee,
     sf,
     crayon,
@@ -53,4 +54,6 @@ Imports:
     stringr,
     ggpubr,
     ranger,
-    zoo
+    zoo,
+    zyp
+    

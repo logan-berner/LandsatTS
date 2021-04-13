@@ -27,8 +27,8 @@ Building upon the workflow developed for [Berner et al. 2020](https://www.nature
 
 ## Content
 1. [Installation](#1-installation)
-2. [Prepare and extract Landsat data](#2-prepare-and-extract-Landsat-data)
-3. [Cross-calibrate Landsat sensors](#3-cross-calibrate-Landsat-sensors)
+2. [Prepare sites and extract Landsat data](#2-prepare-sites-and-extract-Landsat-data)
+3. [Clean and cross-calibrate Landsat data](#3-clean-and-cross-calibrate-Landsat-data)
 4. [Quantify growing season characteristics](#4-quantify-growing-season-characteristics)
 5. [Citation](#5-citation)
 6. [Contact](#6-contact)
@@ -57,7 +57,7 @@ For the preparation and extractions scripts you will also have to make sure you 
 
 [\[to top\]](#content)
 
-## 2. Prepare and extract Landsat data
+## 2. Prepare sites and extract Landsat data
 
 Before you start you will have to determine whether you will extract data for point coordinates or for a polygon area. See flow chart below. 
 
@@ -219,41 +219,70 @@ temp_files <- map(task_list, ee_drive_to_local)
 
 [\[to top\]](#content)
 
-## 3. Cross-calibrate Landsat sensors
+## 3. Clean and cross-calibrate Landsat data
 
 ![](man/figures/fig_2_cross_calibration.jpg)
+**Prepare the exported Landsat data for analysis using lsat_general_prep()**
+
+After exporting Landsat data from Earth Engine, it is then necessary prepare the data for analysis. First, read the exported data into R using `data.table::fread()` and then use the `lsat_general_prep()` function to parse necessary information, rename columns, and scale band values. 
+
+*Please note:* All lsatTS functions depend on there being a column called "site" that uniquely identifies each location. If this column is not called 'site' in your dataset, then make sure to modify your column name accordingly. 
 
 ``` {r eval = FALSE}
-# Read in and combine the temp files containing Landsat data 
-# (as extracted form the EE above using lsat_export_ts()
-lsat.dt <- do.call("rbind", lapply(temp_files, fread))
+lsat.dt <- do.call("rbind", lapply(files_exported_from_EE, fread))
 
-# all lsatTS function depend on there being a column called "site" that uniquely identifies each location, should this column not be called 'site' you can rename it for example using data.table as follows:
 # setnames(lsat.dt, 'my_unique_location_column','site') 
 
-# Parse data, filter to clear-sky observations, compute mean surface reflectance among pxls w/in each window around a site
 lsat.dt <- lsat_general_prep(lsat.dt)
+```
 
-# Clean the data, filtering out clouds, snow, water, radiometric and geometric errors
+
+**Clean the surface reflectance data using lsat_clean_data()**
+
+For most analyses you'll want to use high-quality surface reflectance measurements that were acquired under clear-sky conditions. You can filter surface reflectance measurements using `lsat_clean_data()`. This function allows you to filter measurements based on pixel quality flags and scene criteria. The USGS provides pixel quality flags based on the CFMask algorithm and provides information on each scene (e.g., cloud cover). The default settings from `lsat_clean_data()` will filter out snow and water. Addition water masking is provided based on the JRC Global Surface Water Dataset that was derived from Landsat.     
+
+``` {r eval = FALSE}
 lsat.dt <- lsat_clean_data(lsat.dt, geom.max = 15, cloud.max = 80, sza.max = 60, filter.snow = T, filter.water = T)
+```
 
-# Optional:
-# lsat.dt <- lsat_ngb_mean(lsat.dt)
 
-# Compute NDVI
-lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+**Optional: Compute average surface reflectance among neighboring pixels using lsat_ngb_mean()**
 
-# Cross-calibrate NDVI among sensors using RF models
-lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs = 2, frac.train = 0.80, outdir = 'tests/lsat_TS_test_run/ndvi_xcal/')
+If each of your sites is actually a neightborhood of Landsat pixels (e.g., 3 x 3 pixels), then `lsat_ngb_mean()` will compute the mean  reflectance across this neighborhood of pixels. 
 
-# Drop column with uncalibrated data and remain column with calibrated data
-lsat.dt[, c('ndvi') := NULL]
-setnames(lsat.dt, 'ndvi.xcal', 'ndvi')
+``` {r eval = FALSE}
+lsat.dt <- lsat_ngb_mean(lsat.dt)
+```
 
-# Optional: Summarize availability of Landsat data by site
+
+**Optional: Summarize the availability of Landsat data for each site using lsat_summarize_data_avail()**
+
+The function `lsat_summarize_data_avail()` creates a summary table that provides information on the time period of observations and number of observations available for each site. It also generates a figure showing the density of observations across years, which combines data across all sites. 
+
+``` {r eval = FALSE}
 data.summary.dt <- lsat_summarize_data_avail(lsat.dt)
 data.summary.dt
 ```
+
+
+**Calculate spectral indices using lsat_calc_index()**
+
+The function `lsat_calc_index()` allows users to easily calculate some widely used spectral indices. These include NDVI, EVI, and currently nine other spectral indices (EVI2, kNDVI, MSI, NBR, NIRv, NDII, NDWI, PSRI, SATVI). Note that only one index can be computed at a time.
+``` {r eval = FALSE}
+# Compute NDVI or other vegetation index
+lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+```
+
+
+**Cross-calibrate spectral reflectance or index using lsat_calibrate_rf()**
+
+There are systematic differences in surface reflectance and spectral indices among Landsat sensors. If you are working with data from multiple sensors, then it is very important to further cross-calibrate data among sensors. The function `lsat_calibrate_rf()` will  calibrate individual bands or spectral indices from Landsat 5/8 to match Landsat 7. Landsat 7 is used as a benchmark because it temporally overlaps with the other two sensors. Cross-calibration can only be performed on one band or spectral index at a time and requires having data from 100s to preferably many 1,000s of sample sites. The approach involves determining the typical reflectance at a site during a portion of the growing season using Landsat 7 and Landsat 5/8 data that were collected the same years. A Random Forest model is then trained to predict Landsat 7 reflectance from Landsat 5/8 reflectance. If your data include both Landsat 5 and 8, then the function will train a Random Forest model for each sensor. By default, `lsat_calibrate_rf()` will add a new column with the cross-calibrated data; however, the function will overwrite the existing column if you set the option overwrite.col = T. The function will also create an output directory that contains (1) trained Random Forest models, (2) a spreadsheet with model evaluation metrics, and (3) a multi-panel figure comparing sensors pre- and post-calibration. 
+
+``` {r eval = FALSE}
+# Cross-calibrate NDVI among sensors using an approach based on Random Forest machine learning
+lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs = 5, frac.train = 0.75, overwrite.col = F, outdir = 'tests/lsat_TS_test_run/ndvi_xcal/')
+```
+
 
 [\[to top\]](#content)
 
@@ -261,18 +290,41 @@ data.summary.dt
 
 ![](man/figures/fig_3_define_growing_season.jpg)
 
+**Fit phenological curves to vegetation greenness time series using lsat_fit_phenological_curves()**
+
+The function `lsat_fit_phenological_curves()` characterizes seasonal land surface phenology at each sampling site using vegetation greenness (e.g., NDVI) time series from Landsat satellite observations. The function was construted as a stepping stone to estimating annual maximum vegetation greenness (e.g., NDVImax). The function iteratively fits cubic splines to seasonal vegetation greenness time series and returns information about the timing and magnitude of individual vegetation greenness observation relative to a multi-year seasonal phenology at each site.
+
 ``` {r eval = FALSE}
 # Fit phenological models (cubic splines) to each time series
 lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs = 5, window.min.obs = 10, vi.min = 0, spl.fit.outfile = F, progress = T)
+```
 
-# Summarize vegetation index for the "growing season", including estimating annual max vegetation index
+
+**Derived annual growing season metrics using lsat_summarize_growing_seasons()**
+
+The function `lsat_summarize_growing_seasons()` estimates several annual growing season metrics from vegetation greenness time series derived from Landsat satellite observations. The metrics include annual mean, median, and 90th percentile vegetation greenness of observations during each growing season, as well as phenologically-modeled estimates of annual maximum vegetation greenness and the seasonal timing (Day of Year) of maximum vegetation greenness. This function relies on output from `lsat_fit_phenological_curves()`.   
+
+``` {r eval = FALSE}
 lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, vi = 'ndvi', min.frac.of.max = 0.75)
+```
 
-# Optional: Evaluate
-lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 10, min.frac.of.max = 0.75)
 
-# Write out data.table with growing season summaries
-# fwrite(lsat.gs.dt, 'tests/lsat_TS_test_run/lsat_annual_growing_season_summaries.csv')
+**Optional: Evaluate how raw and modeled estimates of annual max NDVI vary with scene availability using lsat_evaluate_phenological_max()**
+
+Estimates of annual maximum vegetation greenness are sensitive to the number of observations available from a growing season. The function `lsat_evaluate_phenological_max()` is a tool for assessing how the number of annual Landsat observations impacts estimates of annual maximum vegetation greenness derived from raw observations and after phenological modeling. The algorithm computes a "true" annual maximum vegetation greenness using site x years with a user-specific number of observations and then compares these with estimates derived when using progressively smaller subsets of observations. This lets you determine the degree to which annual estimates of maximum vegetation greenness are impacted by the number of available observations.
+
+``` {r eval = FALSE}
+lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', min.obs = 10, reps = 5, min.frac.of.max = 0.75, outdir = NA)
+
+```
+
+
+**Compute trends in annual vegetation greenness using lsat_calc_trend()** 
+
+Th function `lsat_calc_trend()` computes a temporal trend in annual time series of vegetation greenness for each sampling site over a user-specificed time period. This is a wrapper for the zyp.yuepilon() function from the zyp package. This function will iteratively pre-whiten a time series (i.e., remove temporal autocorrelation) and then compute Mann-Kendall trend tests and Theil-Sen slope indicators.
+
+``` {r eval = FALSE}
+lsat.trnds.dt <- lsat_calc_trend(lsat.gs.dt, vi = 'ndvi.max', 2000:2020, sig = 0.1)
 ```
 
 [\[to top\]](#content)
@@ -280,8 +332,7 @@ lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, vi = 'ndvi', mi
 ## 5. Citation 
 When using this package please cite:
 
-Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz. 2021. lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data. https://github.com/logan-berner/lsatTS
-
+Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz. 2021. lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data. https://github.com/logan-berner/lsatTS.
 
 
 Also please consider citing the peer-reviewed publication for which much of this code was developed:
@@ -301,7 +352,7 @@ Email Jakob at: [j.assmann@bio.au.dk](mailto:j.assmann@bio.au.dk)
 
 ## 7. Contributions
 
-Logan T. Berner wrote the analysis functions (Sections 3 and 4). Jakob J. Assmann facilitated package development and wrote the extraction and preparation functions (Section 1). Richard Massey wrote the original Python code for the `lsat_export_ts()` function, later refined and translated first to JavaScript and then rgee code by Jakob J. Assmann. Singe Normand and Scott Goetz provided funding and mentorship for this project. Logan T. Berner and Jakob J. Assmann prepared the code for publication and wrote the documentation. 
+Logan T. Berner wrote the analysis functions (Sections 3 and 4). Jakob J. Assmann facilitated package development and wrote the extraction and preparation functions (Section 2). Richard Massey wrote the original Python code for the `lsat_export_ts()` function, later refined and translated first to JavaScript and then rgee code by Jakob J. Assmann. Singe Normand and Scott Goetz provided funding and mentorship for this project. Logan T. Berner and Jakob J. Assmann prepared the code for publication and wrote the documentation. 
 
 Thank you to all the testers: Tester A, Tester B and Tester C.
 
@@ -311,8 +362,17 @@ Thank you to all the testers: Tester A, Tester B and Tester C.
 
 **rgee**
 
-C Aybar, Q Wu, L Bautista, R Yali and A Barja (2020) rgee: An R package for interacting with Google Earth Engine
-  Journal of Open Source Software URL https://github.com/r-spatial/rgee/.
+Aybar C, Wu Q, Bautista L, Yali R and Barja A (2020) rgee: An R package for interacting with Google Earth Engine, Journal of Open Source Software,  https://github.com/r-spatial/rgee/.
+
+  
+**Peer-reviewed publications that have used `lsatTS` functions:**
+
+1. Berner LT, et al. (2020) Summer warming explains widespread but not uniform greening in the Arctic tundra biome. Nature Communications 11:4621. https://www.nature.com/articles/s41467-020-18479-5
+
+2. Gaglioti B, Berner LT, Jones BM, Orndahl KM, Williams AP, Andreu‐Hayles L, D’Arrigo R, Goetz SJ, Mann DH (2021) Tussocks enduring or shrubs greening: Alternate responses to changing fire regimes in the Noatak River Valley, Alaska. Journal of Geophysical Research: Biogeosciences 126:e2020JG006009. https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/2020JG006009
+
+3. Verdonen M, Berner LT, Forbes BC, Kumpula T (2020) Periglacial vegetation dynamics in Arctic Russia: decadal analysis of tundra regeneration on landslides with time series satellite imagery. Environmental Research Letters 15:105020. https://iopscience.iop.org/article/10.1088/1748-9326/abb500
+
   
 ## 9. License
 

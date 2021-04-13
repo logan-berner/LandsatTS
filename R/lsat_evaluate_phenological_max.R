@@ -1,8 +1,8 @@
 #' Evaluate Estimates of Annual Phenological Maximum
 #' @description Assess how the number of annual Landsat observations impacts estimates of annual maximum vegetation greenness derived from raw observations and
-#' phenologic modeling. The algorithem computes annual maximum vegetation greenness using site x years with a user-specific number of observations and then
+#' phenological modeling. The algorithm computes annual maximum vegetation greenness using site x years with a user-specific number of observations and then
 #' compares these with estimates derived when using progressively smaller subsets of observations. This lets you determine the degree to which
-#' annual estimates of maximum vegetation greenness are impacted the the number of available observations.
+#' annual estimates of maximum vegetation greenness are impacted by the number of available observations.
 #' @param dt Data.table output from lsat_fit_phenologic_curves().
 #' @param vi Character string specifying the vegetation index (e.g., NDVI) to evaluate.
 #' @param min.frac.of.max Numeric threshold (0-1) that defines the "growing season" as the seasonal window when the
@@ -11,14 +11,15 @@
 #' @param min.obs Minimum number of observations needed for a site x year to be included in the evaluation (Default = 10)
 #' @param reps Number of times to bootstrap the assessment (Default = 10)
 #' @param zscore.thresh Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.
-#' @param outdir Output directory into which evaluation data and figure will be writen.
+#' @param outdir If desired, specify the output directory where evaluation data and figure should be written. If left as NA, then no output is only displayed
+#' in the console and not written to disk.
 #'
 #' @return Data.table
 #' @import data.table
 #' @export lsat_evaluate_phenological_max
 #' @examples # Forthcoming...
 
-lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscore.thresh = 3, min.obs = 6, reps = 10, outdir = 'output/pheno_max_eval/'){
+lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscore.thresh = 3, min.obs = 6, reps = 10, outdir = NA){
 
   colnames(dt) <- gsub(vi, 'vi', colnames(dt))
 
@@ -67,18 +68,23 @@ lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscor
   fig <- ggplot2::ggplot(eval.smry.dt, ggplot2::aes(n.obs.fac, pcnt.dif, fill=correction)) + ggplot2::geom_boxplot(outlier.size=0.7, outlier.color='gray')
   fig <- fig + ggplot2::theme_bw() + ggplot2::labs(y=ylab.pcntdif, x='Number of observations')
   fig <- fig + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
-
-  # output
-  colnames(eval.smry.dt) <- gsub('vi', vi, colnames(eval.smry.dt))
-  R.utils::mkdirs(outdir)
-
-  fig.outname <- paste0(outdir,'pheno_max_eval_',vi,'.jpg')
-  grDevices::jpeg(fig.outname, width = 6, height = 4, res = 400, units = 'in')
   print(fig)
-  grDevices::dev.off()
-
-  data.outname <- paste0(outdir,'pheno_max_eval_',vi,'.csv')
-  data.table::fwrite(eval.smry.dt, data.outname)
-
+  
+  # console output
+  colnames(eval.smry.dt) <- gsub('vi', vi, colnames(eval.smry.dt))
   eval.smry.dt
+  
+  # should data and figure be written to disk?
+  if (is.na(outdir) == F){
+    R.utils::mkdirs(outdir)
+  
+    fig.outname <- paste0(outdir,'pheno_max_eval_',vi,'.jpg')
+    grDevices::jpeg(fig.outname, width = 6, height = 4, res = 400, units = 'in')
+    print(fig)
+    grDevices::dev.off()
+    
+    data.outname <- paste0(outdir,'pheno_max_eval_',vi,'.csv')
+    data.table::fwrite(eval.smry.dt, data.outname)
+  }
+  
 }
