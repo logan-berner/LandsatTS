@@ -391,7 +391,7 @@ lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs 
 
 # If needed, then manually overwrite the uncalibrated data with the calibrated data, then drop the duplicate column 
 # lsat.dt <- lsat.dt[, ndvi := ndvi.xcal]
-# setnames(lsat.dt, 'ndvi.xcal')
+# lsat.dt <- lsat.dt[, ndvi.xcal := NULL)
 ```
 
 [\[to top\]](#content)
