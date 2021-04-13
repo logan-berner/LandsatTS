@@ -276,11 +276,17 @@ lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
 
 **Cross-calibrate spectral reflectance or index using lsat_calibrate_rf()**
 
-There are systematic differences in surface reflectance and spectral indices among Landsat sensors. If you are working with data from multiple sensors, then it is very important to further cross-calibrate data among sensors. The function `lsat_calibrate_rf()` will  calibrate individual bands or spectral indices from Landsat 5/8 to match Landsat 7. Landsat 7 is used as a benchmark because it temporally overlaps with the other two sensors. Cross-calibration can only be performed on one band or spectral index at a time and requires having data from 100s to preferably many 1,000s of sample sites. The approach involves determining the typical reflectance at a site during a portion of the growing season using Landsat 7 and Landsat 5/8 data that were collected the same years. A Random Forest model is then trained to predict Landsat 7 reflectance from Landsat 5/8 reflectance. If your data include both Landsat 5 and 8, then the function will train a Random Forest model for each sensor. By default, `lsat_calibrate_rf()` will add a new column with the cross-calibrated data; however, the function will overwrite the existing column if you set the option overwrite.col = T. The function will also create an output directory that contains (1) trained Random Forest models, (2) a spreadsheet with model evaluation metrics, and (3) a multi-panel figure comparing sensors pre- and post-calibration. 
+There are systematic differences in surface reflectance and spectral indices among Landsat sensors. If you are working with data from multiple sensors, then it is very important to further cross-calibrate data among sensors. The function `lsat_calibrate_rf()` will  calibrate individual bands or spectral indices from Landsat 5/8 to match Landsat 7. Landsat 7 is used as a benchmark because it temporally overlaps with the other two sensors. Cross-calibration can only be performed on one band or spectral index at a time and requires having data from 100s to preferably many 1,000s of sample sites. The approach involves determining the typical reflectance at a site during a portion of the growing season using Landsat 7 and Landsat 5/8 data that were collected the same years. A Random Forest model is then trained to predict Landsat 7 reflectance from Landsat 5/8 reflectance. If your data include both Landsat 5 and 8, then the function will train a Random Forest model for each sensor. By default, `lsat_calibrate_rf()` will add a new column with the cross-calibrated data ([band].xcal); however, the function will overwrite the existing column if you set the option overwrite.col = T (as used in the example below). The function will also create an output directory that contains (1) trained Random Forest models, (2) a spreadsheet with model evaluation metrics, and (3) a multi-panel figure comparing sensors pre- and post-calibration. 
 
+*Note: If you use the default setting that adds a new column with the cross-calibrated data, then you'll either want to use those data in the subsequent functions (e.g., ndvi.xcal) or, once satisfied, manually overwrite the uncalibrated data to simplify subsuquent column names.*
 ``` {r eval = FALSE}
 # Cross-calibrate NDVI among sensors using an approach based on Random Forest machine learning
-lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs = 5, frac.train = 0.75, overwrite.col = F, outdir = 'tests/lsat_TS_test_run/ndvi_xcal/')
+lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs = 5, frac.train = 0.75, overwrite.col = T, outdir = 'tests/lsat_TS_test_run/ndvi_xcal/')
+
+# If needed, then manually overwrite the uncalibrated data with the calibrated data, then drop the duplicate column 
+# lsat.dt <- lsat.dt[, ndvi := ndvi.xcal]
+# setnames(lsat.dt, 'ndvi.xcal')
+
 ```
 
 
