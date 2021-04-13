@@ -168,7 +168,9 @@ lsat_get_pixel_centers <- function(polygon_sf,
   if(polygon_centroid_utm_crs != lsat_tile_crs) polygon_sf_utm <-  sf::st_transform(polygon_sf, crs = lsat_tile_crs)
 
   # Check whether polygon is fully covered by tile
-  is_covered <- as.numeric(sf::st_covers(lsat_overlapping_tiles_utm[min_distance_tile_index,], polygon_sf_utm))
+  is_covered <- as.numeric(sf::st_covers(sf::st_transform(lsat_overlapping_tiles_utm[min_distance_tile_index,],
+                                                          crs = lsat_tile_crs),
+                                         polygon_sf_utm))
   if(is.na(is_covered)){
     warning("Polygon exceeds boundaries of closest Landsat WRS tile!\n",
             "Clipping polygon to footprint of Landsat WRS tile ", wrs_tile_id, ". ",

@@ -37,9 +37,9 @@ Data.table
 }
 \description{
 Assess how the number of annual Landsat observations impacts estimates of annual maximum vegetation greenness derived from raw observations and
-phenologic modeling. The algorithem computes annual maximum vegetation greenness using site x years with a user-specific number of observations and then
+phenological modeling. The algorithm computes annual maximum vegetation greenness using site x years with a user-specific number of observations and then
 compares these with estimates derived when using progressively smaller subsets of observations. This lets you determine the degree to which
-annual estimates of maximum vegetation greenness are impacted the the number of available observations.
+annual estimates of maximum vegetation greenness are impacted by the number of available observations.
 }
 \examples{
 # Forthcoming...

@@ -115,7 +115,7 @@ pixel_list_test_poly <- lsat_get_pixel_centers(test_poly_sf, plot_map = "man/fig
 
 ```
 Here is a capture of what you would see in the map view port of R Studio: 
-
+ 
 ![](man/figures/lsat_get_pixel_centers.png)
 
 **Second**, for multiple polygons:
