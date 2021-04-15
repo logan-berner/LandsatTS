@@ -8,9 +8,10 @@
 #' 2-band EVI (EVI2; Jiang et al. 2008), 
 #' Near Infrared Vegetation Index (NIRv; Badgley et al. 2017),
 #' Moisture Stress Index (MSI; Rock et al. 1986),
+#' Normalized Difference Water Index (NDWI; McFeeters 1996),
+#' Normalized Difference Moisture Index (NDMI),
 #' Normalized Burn Ratio (NBR, Key and Benson 1999),
 #' Normalized Difference Infrared Index (NDII; Hardisky et al. 1983)
-#' Normalized Difference Water Index (NDWI; McFeeters 1996),
 #' Plant Senescence Reflectance Index (PSRI; Merzlyak et al. 1999),
 #' and the Soil-adjusted Total Vegetation Index (SATVI; Marsett et al. 2006). 
 #' 
@@ -33,6 +34,7 @@ lsat_calc_spec_index <- function(dt, si){
   if (si == 'nbr'){dt[, nbr := (swir1 - swir2) / (swir1 + swir2)]} 
   if (si == 'nirv'){dt[, nirv := (nir * (nir - red)) / (nir + red)]}
   if (si == 'ndii'){dt[, ndii := (nir - swir1) / (nir + swir1)]}
+  if (si == 'ndmi'){dt[, ndmi := (nir - swir1)/(nir + swir1)]}
   if (si == 'ndvi'){dt[, ndvi := (nir - red) / (nir + red)]}
   if (si == 'ndwi'){dt[, ndwi := (green - nir) / (green + nir)]}
   if (si == 'psri'){dt[, psri := (red - blue) / nir]}
