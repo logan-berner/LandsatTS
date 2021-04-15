@@ -17,7 +17,7 @@ lsat_fit_phenological_curves(
 )
 }
 \arguments{
-\item{dt}{Forthcoming...}
+\item{dt}{Data.table with a multi-year time series a vegetation index}
 
 \item{vi}{Character string specifying the vegetation index (e.g., NDVI) to use for determining surface phenology. This must correspond
 to an existing colunm in the data.table.}
@@ -45,7 +45,10 @@ These data can then be used to estimate annual maximum vegegation index and othe
 \description{
 This function characterizes seasonal land surface phenology at each sampling site using time series of spectral vegetation indices (e.g., NDVI).
 The underlying algorithm was construted to facilitate estimating annual maximum vegetation greenness (vegetation index)
-The function returns information about typical phenology at a site and about the timing of an individual observation relative
+The function returns information about typical phenology at a site and about the timing of an individual observation relative.
+Please note that this function was designed for sitations where the seasonal phenology is hump shaped. If you are using a spetral index that is
+typcially negative (e.g., Normalized Difference Water Index) then multiply the index by -1 before running this function, then backtransform
+your index after running the lsat_summarize_growing_seasons() function.
 }
 \examples{
 # To come...
