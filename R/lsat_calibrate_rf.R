@@ -103,7 +103,7 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, preds = c('doy', 'lati
     rf.dat.eval <- rf.dat[site %in% sites.eval]
 
     # fit random forest
-    form.rhs <- paste(eval(band), preds, sep = ' + ')
+    form.rhs <- paste(c(eval(band), preds), collapse = ' + ')
     form.lhs <- paste('LE07.', band, ' ~ ', sep='')
     rf.form <- stats::formula(paste(form.lhs, form.rhs, sep=''))
     rf.xcal <- ranger::ranger(rf.form, rf.dat.train, importance = 'impurity')
