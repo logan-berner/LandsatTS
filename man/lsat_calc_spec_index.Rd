@@ -24,7 +24,7 @@ Enhanced Vegetationd Index (EVI; Huete et al. 2002),
 Near Infrared Vegetation Index (NIRv; Badgley et al. 2017),
 Moisture Stress Index (MSI; Rock et al. 1986),
 Normalized Difference Water Index (NDWI; McFeeters 1996),
-Normalized Difference Moisture Index (NDMI),
+Normalized Difference Moisture Index (NDMI; Gao 1996),
 Normalized Burn Ratio (NBR, Key and Benson 1999),
 Normalized Difference Infrared Index (NDII; Hardisky et al. 1983)
 Plant Senescence Reflectance Index (PSRI; Merzlyak et al. 1999),
