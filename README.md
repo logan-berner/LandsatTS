@@ -413,6 +413,13 @@ information about the timing and magnitude of individual vegetation
 greenness observation relative to a multi-year seasonal phenology at
 each site.
 
+*Note: The function was designed for spectral indices that are typically
+positive (e.g., NDVI). If you are working with a spectral index that is
+typically negative (e.g., NDWI) then multiply your index by -1 before
+running the `lsat_fit_phenological_curves()` and
+`lsat_summarize_growing_seasons()` functions and backtransform
+afterwards.*
+
 ``` r
 # Fit phenological models (cubic splines) to each time series
 lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, vi = 'ndvi', window.yrs = 5, window.min.obs = 10, vi.min = 0, spl.fit.outfile = F, progress = T)
