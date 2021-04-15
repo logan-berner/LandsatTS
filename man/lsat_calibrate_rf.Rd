@@ -9,6 +9,7 @@ lsat_calibrate_rf(
   band,
   doy.rng,
   min.obs,
+  preds = c("doy", "latitude", "longitude"),
   frac.train = 0.75,
   overwrite.col = F,
   outfile.id = band,
@@ -23,6 +24,8 @@ lsat_calibrate_rf(
 \item{doy.rng}{Sequence of numbers specifying the Days of Year (Julian Days) to use for model development.}
 
 \item{min.obs}{Minimum number of paired, seasonally-matched observations from Landsat 7 and Landsat 5/8 required to include a sampling site.}
+
+\item{preds}{Additional predictors to use in the Random Forest models}
 
 \item{frac.train}{Fraction of sites to use for training the random forest models. The remaining sites are used for model cross-validation.}
 

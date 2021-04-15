@@ -29,6 +29,7 @@
 #' @param band Character string matching the column name of the band or spectral index to cross-calibrate.
 #' @param doy.rng Sequence of numbers specifying the Days of Year (Julian Days) to use for model development.
 #' @param min.obs Minimum number of paired, seasonally-matched observations from Landsat 7 and Landsat 5/8 required to include a sampling site.
+#' @param preds Additional predictors to use in the Random Forest models
 #' @param frac.train Fraction of sites to use for training the random forest models. The remaining sites are used for model cross-validation.
 #' @param overwrite.col (True/False) Overwrite existing column or (by default) append cross-calibrated data as a new column?
 #' @param outfile.id Identifier used when naming output files. Defaults to the input band, but can be specified if needed such as when performing Monte Carlo simulations.
@@ -42,7 +43,7 @@
 #' @export lsat_calibrate_rf
 #' @examples # lsat.dt <- lsat_xcal_rf(lsat.dt, band = 'ndvi', doy.rng = 152:243, min.obs = 5, frac.train = 0.75, outfile.id = 'ndvi', outdir ='data/lsat_site_data/sensor_xcal/ndvi/')
 
-lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, overwrite.col = F, outfile.id=band, outdir){
+lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, preds = c('doy', 'latitude', 'longitude'), frac.train = 0.75, overwrite.col = F, outfile.id=band, outdir){
 
   R.utils::mkdirs(outdir)
 
@@ -102,7 +103,7 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, frac.train = 0.75, ove
     rf.dat.eval <- rf.dat[site %in% sites.eval]
 
     # fit random forest
-    form.rhs <- paste(eval(band), 'doy', 'latitude', 'longitude', sep = ' + ')
+    form.rhs <- paste(eval(band), preds, sep = ' + ')
     form.lhs <- paste('LE07.', band, ' ~ ', sep='')
     rf.form <- stats::formula(paste(form.lhs, form.rhs, sep=''))
     rf.xcal <- ranger::ranger(rf.form, rf.dat.train, importance = 'impurity')
