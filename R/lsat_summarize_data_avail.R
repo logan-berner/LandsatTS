@@ -13,7 +13,7 @@ lsat_summarize_data_avail <- function(dt){
 
   # summarize data by site
   yr.dt <- dt[, .(n.obs = .N), by = c('site','year')]
-  smry.dt <- yr.dt[, .(first.yr = data.table::first(year), last.yr = data.table::last(year), n.yrs = length(unique(year)),
+  smry.dt <- yr.dt[, .(first.yr = min(year), last.yr = max(year), n.yrs = length(unique(year)),
          n.obs.min = min(n.obs), n.obs.max = max(n.obs), n.obs.tot = sum(n.obs)), by = site]
   output.lst[['data.smry']] <- smry.dt
 
