@@ -15,7 +15,7 @@ lsat_calc_spec_index(dt, si)
 The input data.table with an appended colunm containing the spectral index
 }
 \description{
-This function computes some widely used spetral indices.
+This function computes some widely used spectral indices.
 Only one index can be computed at a time. Current indices include the:
 Normalized Difference Vegetation Index (NDVI; Rouse et al. 1974),
 kernel NDVI (kNDVI; Camp-Valls et al. 2020)

@@ -1,6 +1,6 @@
 #' Calculate Spectral Indices
 #'
-#' @description This function computes some widely used spetral indices.
+#' @description This function computes some widely used spectral indices.
 #' Only one index can be computed at a time. Current indices include the:
 #' Normalized Difference Vegetation Index (NDVI; Rouse et al. 1974),
 #' kernel NDVI (kNDVI; Camp-Valls et al. 2020)
