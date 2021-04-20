@@ -64,7 +64,7 @@ lsat_calc_trend <- function(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, s
   trnd.dt[, trend.cat := character()]
   trnd.dt[pval <= sig & slope > 0, trend.cat := 'greening']
   trnd.dt[pval <= sig & slope < 0, trend.cat := 'browning']
-  trnd.dt[pval > sig, trend.cat := 'no trend']
+  trnd.dt[pval > sig, trend.cat := 'no_trend']
   
   # density plot of slope
   ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt)) +
