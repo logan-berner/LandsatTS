@@ -12,16 +12,16 @@
 #' @param cloud.max Maximum allowable cloud cover in Landsat scene (percentage).
 #' @param geom.max Maximum allowable geometric uncertainty (meters).
 #' @param sza.max Maximum allowable solar zenith angle (degrees).
-#' @param filter.snow (TRUE/FALSE) Remove observations with CFmask flag = snow.
-#' @param filter.water (TRUE/FALSE) Remove observations with CFmask flag = water or where innundated based on JRC Global Surface Water Dataset.
-#'
-#' @return A data.table that includes Landsat observations that met the quality control criteria
+#' @param filter.cfmask.snow (TRUE/FALSE) Remove observations with CFmask flag = snow.
+#' @param filter.cfmask.water (TRUE/FALSE) Remove observations with CFmask flag = water.
+#' @param filter.jrc.water (TRUE/FALSE) Remove observations that were ever innundated based on JRC Global Surface Water Dataset.
+#' @return A data.table that includes Landsat observations that met the quality control criteria.
 #' @import data.table
 #' @export lsat_clean_data
 #'
 #' @examples # lsat.dt <- lsat_clean_dt(lsat.dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T)
 
-lsat_clean_data <- function(dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T){
+lsat_clean_data <- function(dt, cloud.max=80, geom.max=30, sza.max=60, filter.cfmask.snow = T, filter.cfmask.water = T, filter.jrc.water = T){
   dt <- data.table::data.table(dt)
   n.orig <- nrow(dt)
 
@@ -30,19 +30,20 @@ lsat_clean_data <- function(dt, cloud.max=80, geom.max=30, sza.max=60, filter.sn
   dt <- dt[clear == 1]
 
   # pixel flags for snow
-  if (filter.snow == T){
+  if (filter.cfmask.snow == T){
     dt$snow <- apply(X = data.table(pixel.qa=dt$pixel.qa), MARGIN = 1, FUN = snow_flag)
     dt <- dt[snow == 0]
   }
 
   # pixel flags for water and JRC Max Water Extent
-  if (filter.water == T){
+  if (filter.cfmask.water == T){
     dt$water <- apply(X = data.table(pixel.qa=dt$pixel.qa), MARGIN = 1, FUN = water_flag)
     dt <- dt[water == 0]
-
+  }
+  
+  if (filter.jrc.water == T){
     dt$jrc.water <- as.numeric(dt$jrc.water)
     dt <- dt[jrc.water == 0]
-
   }
 
   # scene flags

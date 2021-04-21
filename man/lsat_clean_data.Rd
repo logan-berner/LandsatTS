@@ -9,8 +9,9 @@ lsat_clean_data(
   cloud.max = 80,
   geom.max = 30,
   sza.max = 60,
-  filter.snow = T,
-  filter.water = T
+  filter.cfmask.snow = T,
+  filter.cfmask.water = T,
+  filter.jrc.water = T
 )
 }
 \arguments{
@@ -22,12 +23,14 @@ lsat_clean_data(
 
 \item{sza.max}{Maximum allowable solar zenith angle (degrees).}
 
-\item{filter.snow}{(TRUE/FALSE) Remove observations with CFmask flag = snow.}
+\item{filter.cfmask.snow}{(TRUE/FALSE) Remove observations with CFmask flag = snow.}
 
-\item{filter.water}{(TRUE/FALSE) Remove observations with CFmask flag = water or where innundated based on JRC Global Surface Water Dataset.}
+\item{filter.cfmask.water}{(TRUE/FALSE) Remove observations with CFmask flag = water.}
+
+\item{filter.jrc.water}{(TRUE/FALSE) Remove observations that were ever innundated based on JRC Global Surface Water Dataset.}
 }
 \value{
-A data.table that includes Landsat observations that met the quality control criteria
+A data.table that includes Landsat observations that met the quality control criteria.
 }
 \description{
 This function filters out observations that exhibit:
