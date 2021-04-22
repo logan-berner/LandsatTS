@@ -13,7 +13,7 @@
 #' @param window.yrs Number specifying the focal window width in years that is used when pooling data to fit cubic splines (use odd numbers).
 #' @param window.min.obs Minimum number of focal window observations necessary to fit a cubic spline.
 #' @param vi.min Minimum value of vegetation index necessary for observation to be used when fitting cubic splines
-#' @param spar Smoothing paramater passed to smooth.spline(), typically around 0.65 - 0.75 for this application.
+#' @param spar Smoothing parameter passed to smooth.spline(), typically around 0.65 - 0.75 for this application.
 #' @param pcnt.dif.thresh Allowable percent difference (0-100) between individual observations and fitted cubic spline.
 #' Observations that differ by more than this threshold are filtered out and the cubic spline is iteratively re-reft.
 #' @param spl.fit.outfile (Optional) Name of output csv file containing the fitted cubic splines for each site.

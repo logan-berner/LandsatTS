@@ -28,7 +28,7 @@ to an existing colunm in the data.table.}
 
 \item{vi.min}{Minimum value of vegetation index necessary for observation to be used when fitting cubic splines}
 
-\item{spar}{Smoothing paramater passed to smooth.spline(), typically around 0.65 - 0.75 for this application.}
+\item{spar}{Smoothing parameter passed to smooth.spline(), typically around 0.65 - 0.75 for this application.}
 
 \item{pcnt.dif.thresh}{Allowable percent difference (0-100) between individual observations and fitted cubic spline.
 Observations that differ by more than this threshold are filtered out and the cubic spline is iteratively re-reft.}
