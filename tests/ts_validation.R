@@ -267,8 +267,16 @@ save_plot("tests/ts_validation_hist_by_band.png", hist_diff_by_band,
           base_asp = 1.6)
 
 # Plot pixel locations
+pixel_location_utm <- pixel_location %>% st_transform(st_crs(raster(tif_files[4])))
+bound_box <- pixel_location_utm %>%
+  st_bbox()
 pixel_locations <- ggplot() +
-  geom_sf(data = pixel_location)
+  geom_sf(data = pixel_location_utm,
+          size = 0.5,
+          colour = "red") +
+  geom_sf(data = ne_coastline(scale = "large", "sf")) +
+  coord_sf(xlim = c(bound_box["xmin"]-2500, bound_box["xmax"]+2500),
+           ylim = c(bound_box["ymin"]-2500, bound_box["ymax"]+2500))
 save_plot("tests/ts_validation_pixel_locations.png", pixel_locations,
           base_height = 6)
 
