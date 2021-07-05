@@ -220,7 +220,10 @@ combined_values[is.na(combined_values$gee_value) & is.na(combined_values$usgs_va
 (total_match_percent <- round(100 * (total_match/total),2))
 (total_diff <- total - total_match)
 (total_diff_precent <- round(100 * (total_diff/total),2))
-
+(total_usgs_na <- sum(combined_values$diff == -2))
+(total_usgs_na_precent <- round(100 * (total_usgs_na/total),2))
+(total_diff_dn <- sum(combined_values$diff == -1) + sum(combined_values$diff == 1))
+(total_diff_dn_precent <- round(100 * (total_diff_dn/total),2))
 # Add shorthand ID for the Landsat Scenes
 combined_values$LANDSAT_ID_short <- gsub("(L.*)_L1TP.*([0-9]{8})_[0-9]{8}_01_T1",
                                          "\\1 \\2", combined_values$LANDSAT_ID)
