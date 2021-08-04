@@ -319,7 +319,7 @@ lsat.dt <- lsat_clean_data(lsat.dt, geom.max = 15, cloud.max = 80, sza.max = 60,
 ```
 
 **Optional: Compute average surface reflectance among neighboring pixels
-using lsat\_ngb\_mean()**
+using lsat\_neighborhood\_mean()**
 
 If each of your sites is actually a neightborhood of Landsat pixels
 (e.g., 3 x 3 pixels), then `lsat_neighborhood_mean()` will compute the mean
