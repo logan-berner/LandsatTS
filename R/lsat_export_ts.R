@@ -87,7 +87,7 @@ lsat_export_ts <- function(pixel_coords_sf,
   tryCatch(rgee::ee_user_info(quiet = T), error = function(e) stop("rgee not initialized!\nPlease intialize rgee. See: https://r-spatial.github.io/rgee/index.html"))
 
   # Prep Landsat Time series
-  bands <- list("B1", "B2", "B3", "B4", "B5", "B6", "B7", "pixel_qa", "radsat_qa")
+  bands <- list("SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7", "QA_PIXEL", "QA_RADSAT")
   BAND_LIST <- rgee::ee$List(bands)
 
   # addon asset and bands
@@ -95,16 +95,16 @@ lsat_export_ts <- function(pixel_coords_sf,
   ADDON_BANDLIST <- rgee::ee$List(list("max_extent"));
 
   # Landsat Surface Reflectance collections
-  ls5_1 <- rgee::ee$ImageCollection("LANDSAT/LT05/C01/T1_SR");
-  ls5_2 <- rgee::ee$ImageCollection("LANDSAT/LT05/C01/T2_SR");
-  ls7_1 <- rgee::ee$ImageCollection("LANDSAT/LE07/C01/T1_SR");
-  ls7_2 <- rgee::ee$ImageCollection("LANDSAT/LE07/C01/T2_SR");
-  ls8_1 <- rgee::ee$ImageCollection("LANDSAT/LC08/C01/T1_SR");
-  ls8_2 <- rgee::ee$ImageCollection("LANDSAT/LC08/C01/T2_SR");
+  ls5_1 <- rgee::ee$ImageCollection("LANDSAT/LT05/C02/T1_L2");
+  ls5_2 <- rgee::ee$ImageCollection("LANDSAT/LT05/C02/T2_L2");
+  ls7_1 <- rgee::ee$ImageCollection("LANDSAT/LE07/C02/T1_L2");
+  ls7_2 <- rgee::ee$ImageCollection("LANDSAT/LE07/C02/T2_L2");
+  ls8_1 <- rgee::ee$ImageCollection("LANDSAT/LC08/C02/T1_L2");
+  ls8_2 <- rgee::ee$ImageCollection("LANDSAT/LC08/C02/T2_L2");
 
   ALL_BANDS <- BAND_LIST$cat(ADDON_BANDLIST)
 
-  # merge all collections in one with a global empty image at the beginning
+  # merge all collections into one
   LS_COLL <- ls5_1$
     merge(ls7_1$
          merge(ls8_1$
@@ -121,7 +121,7 @@ lsat_export_ts <- function(pixel_coords_sf,
 
   # Check if chunks_from was specified, if not determine chunks
   if(!is.null(chunks_from)){
-    if(!(chunks_from %in% colnames(pixel_coords_sf))) stop("Invalid columname specified for chunkls_from")
+    if(!(chunks_from %in% colnames(pixel_coords_sf))) stop("Invalid colum name specified for chunks_from")
   } else {
     n_chunks <- floor(nrow(pixel_coords_sf) / max_chunk_size) + 1
     pixel_coords_sf$chunk_id <- paste0("chunk_", sort(rep(1:n_chunks, max_chunk_size)))[1:nrow(pixel_coords_sf)]
