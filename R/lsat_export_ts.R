@@ -87,20 +87,23 @@ lsat_export_ts <- function(pixel_coords_sf,
   tryCatch(rgee::ee_user_info(quiet = T), error = function(e) stop("rgee not initialized!\nPlease intialize rgee. See: https://r-spatial.github.io/rgee/index.html"))
 
   # Prep Landsat Time series
-  bands <- list("SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7", "QA_PIXEL", "QA_RADSAT")
+  bands <- list("SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B7", "QA_PIXEL", "QA_RADSAT")
   BAND_LIST <- rgee::ee$List(bands)
 
-  # addon asset and bands
+  # addon assets and bands
   ADDON <- rgee::ee$Image('JRC/GSW1_0/GlobalSurfaceWater')$float()$unmask(MASK_VALUE)
   ADDON_BANDLIST <- rgee::ee$List(list("max_extent"));
 
+  # Blank image for "SR_B6" to replace in collections earlier than LS8
+  ZERO_IMAGE <- rgee::ee$Image(0)$select(list("constant"), list("SR_B6"))$selfMask()
+
   # Landsat Surface Reflectance collections
-  ls5_1 <- rgee::ee$ImageCollection("LANDSAT/LT05/C02/T1_L2");
-  ls5_2 <- rgee::ee$ImageCollection("LANDSAT/LT05/C02/T2_L2");
-  ls7_1 <- rgee::ee$ImageCollection("LANDSAT/LE07/C02/T1_L2");
-  ls7_2 <- rgee::ee$ImageCollection("LANDSAT/LE07/C02/T2_L2");
-  ls8_1 <- rgee::ee$ImageCollection("LANDSAT/LC08/C02/T1_L2");
-  ls8_2 <- rgee::ee$ImageCollection("LANDSAT/LC08/C02/T2_L2");
+  ls5_1 <- rgee::ee$ImageCollection("LANDSAT/LT05/C02/T1_L2")
+  ls5_2 <- rgee::ee$ImageCollection("LANDSAT/LT05/C02/T2_L2")
+  ls7_1 <- rgee::ee$ImageCollection("LANDSAT/LE07/C02/T1_L2")
+  ls7_2 <- rgee::ee$ImageCollection("LANDSAT/LE07/C02/T2_L2")
+  ls8_1 <- rgee::ee$ImageCollection("LANDSAT/LC08/C02/T1_L2")
+  ls8_2 <- rgee::ee$ImageCollection("LANDSAT/LC08/C02/T2_L2")
 
   ALL_BANDS <- BAND_LIST$cat(ADDON_BANDLIST)
 
@@ -114,6 +117,12 @@ lsat_export_ts <- function(pixel_coords_sf,
     filterDate(start_date, end_date)$
     filter(rgee::ee$Filter$calendarRange(startJulian, endJulian, "day_of_year"))$
     #.filterBounds(table)
+    map(function(image){
+      image = ee$Algorithms$If(image$bandNames()$size()$
+                                 eq(ee$Number(10)),
+                               image,
+                               image$addBands(ZERO_IMAGE))
+      return(image)})$
     map(function(image) {return(image$addBands(ADDON, ADDON_BANDLIST))})$
     select(ALL_BANDS)$
     map(function(image){ return(image$float())} )
@@ -151,7 +160,7 @@ lsat_export_ts <- function(pixel_coords_sf,
             # This will ensure all bands are present in the export
             rgee::ee$ImageCollection$fromImages(
             list(rgee::ee$Image(list(0,0,0,0,0,0,0,0,0,0))$
-                   select(list(0,1,2,3,4,5,6,7,8,9), ALL_BANDS)$
+                   select(list(0,1,2,3,4,5,6,7,8), ALL_BANDS)$
                    copyProperties(ls8_1$first())))$
               # Merge with extraction of time-series form whole Landsat collection
               merge(LS_COLL$filterBounds(feature$geometry()))$
