@@ -27,25 +27,25 @@ lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscor
   dt <- dt[spl.frac.max >= min.frac.of.max]
 
   # get site x years with atleast the min number of observations specificed
-  dt <- dt[, n.obs.gs := .N, by = c('site','year')]
+  dt <- dt[, n.obs.gs := .N, by = c('sample.id','year')]
   dt <- dt[n.obs.gs > min.obs]
 
   # identify and filter out obs-level predictions of max VI that are anomalously high or low relative to other obs from that site x year
-  dt <- dt[, ':='(avg = mean(vi.max.pred), sd = stats::sd(vi.max.pred), n=.N), by = c('site','year')]
+  dt <- dt[, ':='(avg = mean(vi.max.pred), sd = stats::sd(vi.max.pred), n=.N), by = c('sample.id','year')]
   dt <- dt[, abs.zscore := abs((vi.max.pred - avg )/sd)]
   dt <- dt[abs.zscore <= zscore.thresh]
 
   # compute max observed VI (actually 90% percentile to avoid spuriously high values)
-  dt <- dt[, vi.max.obs := stats::quantile(vi, 0.90), by = c('site','year')]
+  dt <- dt[, vi.max.obs := stats::quantile(vi, 0.90), by = c('sample.id','year')]
 
   # iteratively loop through sample size and reps
   out.list <- list()
   cnt=1
   for (i in 1:(min.obs-1)){
     for (j in 1:reps){
-      rep.dt <- dt[,.SD[sample(.N, i)], by=c('site','year')]
+      rep.dt <- dt[,.SD[sample(.N, i)], by=c('sample.id','year')]
       rep.dt <- rep.dt[,':='(n.obs=i, rep=j)]
-      rep.dt <- rep.dt[, .(vi.max.obs = data.table::first(vi.max.obs), vi.max.uncor = stats::quantile(vi,0.9), vi.max.cor = stats::median(vi.max.pred)), by = c('n.obs','rep','site','year')]
+      rep.dt <- rep.dt[, .(vi.max.obs = data.table::first(vi.max.obs), vi.max.uncor = stats::quantile(vi,0.9), vi.max.cor = stats::median(vi.max.pred)), by = c('n.obs','rep','sample.id','year')]
       rep.dt <- rep.dt[vi.max.cor < vi.max.uncor, vi.max.cor := vi.max.uncor]
       rep.dt[, vi.uncor.pcntdif := (vi.max.uncor - vi.max.obs)/vi.max.obs*100]
       rep.dt[, vi.cor.pcntdif := (vi.max.cor - vi.max.obs)/vi.max.obs*100]
@@ -58,8 +58,8 @@ lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscor
   eval.dt <- na.omit(eval.dt)
 
   # summarize across iterations
-  eval.smry.dt <- eval.dt[,.(vi.uncor.pcntdif.med = stats::median(vi.uncor.pcntdif, na.rm=T), vi.cor.pcntdif.med = stats::median(vi.cor.pcntdif, na.rm=T)), by = c('site','year','n.obs')]
-  eval.smry.dt <- melt.data.table(eval.smry.dt, id.vars=c('site','year','n.obs'), value.name='pcnt.dif', variable.name='correction')
+  eval.smry.dt <- eval.dt[,.(vi.uncor.pcntdif.med = stats::median(vi.uncor.pcntdif, na.rm=T), vi.cor.pcntdif.med = stats::median(vi.cor.pcntdif, na.rm=T)), by = c('sample.id','year','n.obs')]
+  eval.smry.dt <- melt.data.table(eval.smry.dt, id.vars=c('sample.id','year','n.obs'), value.name='pcnt.dif', variable.name='correction')
   eval.smry.dt$n.obs.fac <- as.factor(eval.smry.dt$n.obs)
   eval.smry.dt$correction <- factor(eval.smry.dt$correction, labels = c('Raw','Corrected'))
 

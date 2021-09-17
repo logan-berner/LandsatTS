@@ -1,6 +1,6 @@
-#' Summarize Availability of Landsat data by Site
-#' @description This little function summarizes the temporal period and availability of observations at each site
-#' @param dt Data.table with columns named "site" and "year"
+#' Summarize Availability of Landsat for each Sample Site
+#' @description This little function summarizes the temporal period and availability of observations at each sample site
+#' @param dt Data.table with columns named "sample.id" and "year"
 #' @return Data.table summarizing for each site the first, last, and number of years with observations,
 #' the minimum and maximum number of observations in a year, the total number of observations across years.
 #' @import data.table
@@ -12,9 +12,9 @@ lsat_summarize_data_avail <- function(dt){
   output.lst <- list()
 
   # summarize data by site
-  yr.dt <- dt[, .(n.obs = .N), by = c('site','year')]
+  yr.dt <- dt[, .(n.obs = .N), by = c('sample.id','year')]
   smry.dt <- yr.dt[, .(first.yr = min(year), last.yr = max(year), n.yrs = length(unique(year)),
-         n.obs.min = min(n.obs), n.obs.max = max(n.obs), n.obs.tot = sum(n.obs)), by = site]
+         n.obs.yrly.min = min(n.obs), n.obs.yrly.max = max(n.obs), n.obs.tot = sum(n.obs)), by = sample.id]
   output.lst[['data.smry']] <- smry.dt
 
   # density plot of observations across years

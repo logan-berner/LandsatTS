@@ -25,7 +25,7 @@ lsat_calc_trend <- function(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, s
 
   # summarize spatial and temporal data by site
   site.smry <- dt[, .(first.yr = min(year), last.yr = max(year), n.yr.obs = .N), 
-                  by = c('site','latitude','longitude')]
+                  by = c('sample.id','latitude','longitude')]
   
   site.smry[, trend.period := paste0(min(yrs),'to',max(yrs))]
 
@@ -42,19 +42,19 @@ lsat_calc_trend <- function(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, s
   site.smry <- site.smry[n.yr.obs >= round(length(yrs)*nyr.min.frac)]
 
   # subset data to sites that meet observation criteria
-  dt <- dt[site %in% site.smry$site]
+  dt <- dt[sample.id %in% site.smry$sample.id]
   
   # rescale year so that the regression intercept is the first year of the analysis time period
-  dt[, year.rescale := year - min(yrs), by = site]
+  dt[, year.rescale := year - min(yrs), by = sample.id]
   
   # fit regression models
-  trnd.dt <- dt %>% dplyr::group_by(site) %>%
+  trnd.dt <- dt %>% dplyr::group_by(sample.id) %>%
     dplyr::do(out=calc.trends(x=.$year.rescale, y=.$vi)) %>%
     tidyr::unnest(cols=c(out)) %>%
     data.table::data.table()
 
   # combine spatial / temporal and trend details into one data table
-  trnd.dt <- site.smry[trnd.dt, on = 'site']
+  trnd.dt <- site.smry[trnd.dt, on = 'sample.id']
 
   # compute total change (absolute and percent change)
   trnd.dt[, total.change := slope * length(yrs)]

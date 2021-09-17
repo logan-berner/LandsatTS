@@ -1,9 +1,9 @@
 #' Characterize Land Surface Phenology using Vegetation Index Time Series
 #'
 #' @description
-#' This function characterizes seasonal land surface phenology at each sampling site using time series of spectral vegetation indices (e.g., NDVI).
+#' This function characterizes seasonal land surface phenology at each sample site using time series of spectral vegetation indices (e.g., NDVI).
 #' The underlying algorithm was construted to facilitate estimating annual maximum vegetation greenness (vegetation index)
-#' The function returns information about typical phenology at a site and about the timing of an individual observation relative.
+#' The function returns information about typical phenology at a sample site and about the timing of an individual observation relative.
 #' Please note that this function was designed for sitations where the seasonal phenology is hump shaped. If you are using a spetral index that is 
 #' typcially negative (e.g., Normalized Difference Water Index) then multiply the index by -1 before running this function, then backtransform
 #' your index after running the lsat_summarize_growing_seasons() function.   
@@ -16,7 +16,7 @@
 #' @param spar Smoothing parameter passed to smooth.spline(), typically around 0.65 - 0.75 for this application.
 #' @param pcnt.dif.thresh Allowable percent difference (0-100) between individual observations and fitted cubic spline.
 #' Observations that differ by more than this threshold are filtered out and the cubic spline is iteratively re-reft.
-#' @param spl.fit.outfile (Optional) Name of output csv file containing the fitted cubic splines for each site.
+#' @param spl.fit.outfile (Optional) Name of output csv file containing the fitted cubic splines for each sample site.
 #' Useful for subsequent visualization
 #' @param progress (TRUE/FALSE) Print a progress report?
 #' @return Data.table that provides, for each observation, information on the phenological conditions for that specific day of year during the focal period.
@@ -29,10 +29,10 @@
 lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10, vi.min = 0, spar=0.7, pcnt.dif.thresh=100, spl.fit.outfile=F, progress=T){
   dt <- data.table::data.table(dt)
 
-  # GET SITE, DOY, YEAR, AND VEG INDEX FROM INPUT DATA TABLE
-  dt <- dt[, eval(c('site','latitude','longitude','year','doy',vi)), with=F]
+  # GET SAMPLE sample, DOY, YEAR, AND VEG INDEX FROM INPUT DATA TABLE
+  dt <- dt[, eval(c('sample.id','latitude','longitude','year','doy',vi)), with=F]
   dt <- data.table::setnames(dt, vi, 'vi')
-  dt <- dt[order(site,doy)]
+  dt <- dt[order(sample.id,doy)]
 
   # FILTER OUT LOW VALUES
   dt <- dt[vi >= vi.min]
@@ -46,45 +46,45 @@ lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10,
   data.list <- list()
   splines.list <- list()
 
-  # LOOP THROUGH FOCAL YEARS, FITTING SPLINE FOR EACH SITE
+  # LOOP THROUGH FOCAL YEARS, FITTING SPLINE FOR EACH SAMPLE SITE
   for (i in 1:n.focal.yrs){
     # SUBSET OBS FROM FOCAL PERIOD
     focal.yr <- focal.yrs[i]
     focal.win <- seq(focal.yr-round(window.yrs/2), focal.yr+round(window.yrs/2))
     focal.dt <- dt[year %in% focal.win]
-    focal.dt <- focal.dt[order(site,doy)]
+    focal.dt <- focal.dt[order(sample.id,doy)]
 
-    # COMPUTE NUMBER OF OBS DURING FOCAL PERIOD FOR EACH SITE AND EXCLUDE SITES WITH FEWER THAN SOME USE-SPECIFIC THRESHOLD
-    focal.dt <- focal.dt[, n.obs.focal.win := .N, by = 'site']
+    # COMPUTE NUMBER OF OBS DURING FOCAL PERIOD FOR EACH SAMPLE SITE AND EXCLUDE SITES WITH FEWER THAN SOME USE-SPECIFIC THRESHOLD
+    focal.dt <- focal.dt[, n.obs.focal.win := .N, by = 'sample.id']
     focal.dt <- focal.dt[n.obs.focal.win >= window.min.obs]
 
     if (nrow(focal.dt) == 0){next()}
 
     doy.rng <- min(focal.dt$doy):max(focal.dt$doy)
 
-    # FIT SPLINE TO SEASONAL TIME SERIES AT EACH SITE
-    splines.dt <- focal.dt[, .(spl.fit = list(stats::smooth.spline(doy, vi, spar = spar))), by = 'site']
-    spline.fits.dt <- splines.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'site']
-    spline.fits.dt <- spline.fits.dt[, doy := doy.rng, by = 'site']
+    # FIT SPLINE TO SEASONAL TIME SERIES AT EACH SAMPLE SITE
+    splines.dt <- focal.dt[, .(spl.fit = list(stats::smooth.spline(doy, vi, spar = spar))), by = 'sample.id']
+    spline.fits.dt <- splines.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'sample.id']
+    spline.fits.dt <- spline.fits.dt[, doy := doy.rng, by = 'sample.id']
 
     # ITERATIVE QUALITY CHECK: LOOK FOR LARGE DIFFS BETWEEN OBS AND FITTED VALUES, DROP OBS WITH TOO LARGE A DIFF, REFIT SPLINES, RECHECK
     refitting = 1
     # ii=1
     while(refitting == 1){
-      focal.dt <- spline.fits.dt[focal.dt, on = c('site','doy')]
+      focal.dt <- spline.fits.dt[focal.dt, on = c('sample.id','doy')]
       focal.dt <- focal.dt[, abs.pcnt.dif := abs((vi - spl.fit)/((vi+spl.fit)/2)*100)] # calc abs % dif
-      refit.sites <- unique(focal.dt[abs.pcnt.dif > pcnt.dif.thresh]$site)
+      refit.sites <- unique(focal.dt[abs.pcnt.dif > pcnt.dif.thresh]$sample.id)
       focal.dt <- focal.dt[abs.pcnt.dif <= pcnt.dif.thresh]
       focal.dt <- focal.dt[, c('spl.fit', 'abs.pcnt.dif'):= NULL]
-      refit.dt <- focal.dt[site %in% refit.sites]
+      refit.dt <- focal.dt[sample.id %in% refit.sites]
 
       # REFIT SPLINES AT SITES THAT HAD LARGE DIFFS BETWEEN OBS AND FITTED VALUES
       if (length(refit.sites) > 0){
         # set aside the splines that don't need to be refit
-        spline.fits.dt <- spline.fits.dt[site %in% refit.sites == F]
+        spline.fits.dt <- spline.fits.dt[sample.id %in% refit.sites == F]
 
         # check the number of obs per site and filter sites out those with too few obs
-        refit.dt <- refit.dt[, n.obs.focal.win := .N, by = 'site']
+        refit.dt <- refit.dt[, n.obs.focal.win := .N, by = 'sample.id']
         refit.dt <- refit.dt[n.obs.focal.win >= window.min.obs]
         
         # if no data are left, then stop refitting...
@@ -92,9 +92,9 @@ lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10,
           refitting = 0
         } else{
           # refit
-          spline.refits.dt <- refit.dt[, .(spl.fit = list(stats::smooth.spline(doy, vi, spar = spar))), by = 'site']
-          spline.refits.dt <- spline.refits.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'site']
-          spline.refits.dt <- spline.refits.dt[, doy := doy.rng, by = 'site']
+          spline.refits.dt <- refit.dt[, .(spl.fit = list(stats::smooth.spline(doy, vi, spar = spar))), by = 'sample.id']
+          spline.refits.dt <- spline.refits.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'sample.id']
+          spline.refits.dt <- spline.refits.dt[, doy := doy.rng, by = 'sample.id']
           spline.fits.dt <- rbind(spline.fits.dt, spline.refits.dt)
         }
         
@@ -103,12 +103,12 @@ lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10,
       }
     } # end of refitting
 
-    # CALCULATE SEVERAL PHENOLOGY METRICS FOR EACH SITE
-    site.doy.smry <- focal.dt[, .(min.doy = min(doy), max.doy = max(doy)), by = 'site'] # identify DOY range for each site
-    spline.fits.dt <- spline.fits.dt[site.doy.smry, on = 'site']
+    # CALCULATE SEVERAL PHENOLOGY METRICS FOR EACH SAMPLE SITE
+    sample.doy.smry <- focal.dt[, .(min.doy = min(doy), max.doy = max(doy)), by = 'sample.id'] # identify DOY range for each site
+    spline.fits.dt <- spline.fits.dt[sample.doy.smry, on = 'sample.id']
     spline.fits.dt <- spline.fits.dt[doy >= min.doy][doy <= max.doy] # limit spline fit to DOY range at each site
-    spline.fits.dt <- spline.fits.dt[, spl.fit.max := max(spl.fit), by = 'site'] # compute max vi typically observed at a site
-    spline.fits.dt <- spline.fits.dt[, spl.fit.max.doy := doy[which.max(spl.fit)], by = 'site'] # calculate typcial day of peak greenness
+    spline.fits.dt <- spline.fits.dt[, spl.fit.max := max(spl.fit), by = 'sample.id'] # compute max vi typically observed at a site
+    spline.fits.dt <- spline.fits.dt[, spl.fit.max.doy := doy[which.max(spl.fit)], by = 'sample.id'] # calculate typcial day of peak greenness
     spline.fits.dt <- spline.fits.dt[, spl.frac.max := spl.fit / spl.fit.max]
     spline.fits.dt <- spline.fits.dt[, vi.adjustment := abs(spl.fit - spl.fit.max)] # compute adjustment factor
     spline.fits.dt <- spline.fits.dt[, focal.yr := focal.yr]
@@ -116,7 +116,7 @@ lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10,
     splines.list[[i]] <- spline.fits.dt
 
     # ADD PHENOLOGY METRICS TO FOCAL DATA
-    focal.dt <- spline.fits.dt[focal.dt, on = c('site','doy')]
+    focal.dt <- spline.fits.dt[focal.dt, on = c('sample.id','doy')]
     focal.dt <- focal.dt[, vi.max.pred := vi + vi.adjustment]
     focal.dt <- focal.dt[, c('focal.yr') := NULL]
     setnames(focal.dt, c('n.obs.focal.win'),c('spl.n.obs'))
@@ -145,8 +145,8 @@ lsat_fit_phenological_curves = function(dt, vi, window.yrs=5, window.min.obs=10,
 
   # OUTPUT DATA TABLE
   dt <- data.table::data.table(rbindlist(data.list))
-  dt <- dt[order(site,year,doy)]
-  data.table::setcolorder(dt, c('site','latitude','longitude','year','doy','spl.n.obs','spl.fit','spl.frac.max','spl.fit.max','spl.fit.max.doy','vi.adjustment','vi','vi.max.pred'))
+  dt <- dt[order(sample.id,year,doy)]
+  data.table::setcolorder(dt, c('sample.id','latitude','longitude','year','doy','spl.n.obs','spl.fit','spl.frac.max','spl.fit.max','spl.fit.max.doy','vi.adjustment','vi','vi.max.pred'))
   colnames(dt) <- gsub('vi',vi,colnames(dt))
   dt
 }
