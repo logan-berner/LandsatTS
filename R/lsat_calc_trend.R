@@ -48,10 +48,7 @@ lsat_calc_trend <- function(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, s
   dt[, year.rescale := year - min(yrs), by = sample.id]
   
   # fit regression models
-  trnd.dt <- dt %>% dplyr::group_by(sample.id) %>%
-    dplyr::do(out=calc.trends(x=.$year.rescale, y=.$vi)) %>%
-    tidyr::unnest(cols=c(out)) %>%
-    data.table::data.table()
+  trnd.dt <- dt[, as.list(calc.trends(year.rescale, vi)), by = sample.id]
 
   # combine spatial / temporal and trend details into one data table
   trnd.dt <- site.smry[trnd.dt, on = 'sample.id']
