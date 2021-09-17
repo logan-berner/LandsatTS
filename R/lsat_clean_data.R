@@ -21,33 +21,44 @@
 #'
 #' @examples # lsat.dt <- lsat_clean_dt(lsat.dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T)
 
+# dt <- lsat.dt
+# cloud.max=80
+# geom.max=30
+# sza.max=60
+# filter.cfmask.snow = T
+# filter.cfmask.water = T
+# filter.jrc.water = T
+
 lsat_clean_data <- function(dt, cloud.max=80, geom.max=30, sza.max=60, filter.cfmask.snow = T, filter.cfmask.water = T, filter.jrc.water = T){
   dt <- data.table::data.table(dt)
   n.orig <- nrow(dt)
 
   # pixel flags for clear sky
-  dt$clear <- apply(X = data.table(pixel.qa=dt$pixel.qa), MARGIN = 1, FUN = clear_value)
+  dt[, clear := mapply(clear_value, qa.pixel)]
   dt <- dt[clear == 1]
 
   # pixel flags for snow
   if (filter.cfmask.snow == T){
-    dt$snow <- apply(X = data.table(pixel.qa=dt$pixel.qa), MARGIN = 1, FUN = snow_flag)
+    dt[, snow := mapply(snow_flag, qa.pixel)]
     dt <- dt[snow == 0]
   }
 
   # pixel flags for water and JRC Max Water Extent
   if (filter.cfmask.water == T){
-    dt$water <- apply(X = data.table(pixel.qa=dt$pixel.qa), MARGIN = 1, FUN = water_flag)
+    dt[, water := mapply(water_flag, qa.pixel)]
     dt <- dt[water == 0]
   }
   
   if (filter.jrc.water == T){
-    dt$jrc.water <- as.numeric(dt$jrc.water)
+    dt[, jrc.water := as.numeric(jrc.water)]
     dt <- dt[jrc.water == 0]
   }
 
   # scene flags
-  dt <- dt[cloud.cover <= cloud.max & geometric.rmse.model <= geom.max & solar.zenith.angle <= sza.max & radsat.qa == 0]
+  dt <- dt[cloud.cover <= cloud.max]
+  dt <- dt[geometric.rmse.model <= geom.max]
+  dt <- dt[90-sun.elevation <= sza.max]
+  dt <- dt[qa.radsat == 0]
 
   # filter out unrealistic band values
   dt <- dt[blue > 0.005][green > 0.005][red > 0.005][nir > 0.005]
@@ -61,17 +72,13 @@ lsat_clean_data <- function(dt, cloud.max=80, geom.max=30, sza.max=60, filter.cf
 
 # LANDSAT CLEAR SKY BIT VALUES (returns 1 if clear and 0 if not clear)
 clear_value = function(x) {
-  bit_str = paste(as.integer(intToBits(x)), collapse="") # reverse order of bits, left to right
+  bit_str = paste(as.integer(intToBits(x)), collapse="") # reverse order of bits so read from left to right
   # conditions
-  fill_val = substr(bit_str, 1, 1) == '1'
-  clear = substr(bit_str, 2, 2) == '0'
-  cloud_shadow = substr(bit_str, 4, 4) == '1'
-  cloud = substr(bit_str, 6, 6) == '1'
-  cloud_conf = substr(bit_str, 7, 8) == '11' | substr(bit_str, 7, 8) == '01'
-  cirrus_conf = substr(bit_str, 9, 10) == '11' | substr(bit_str, 9, 10) == '01'
-  terrain_occ = substr(bit_str, 11, 11) == '1'
+  filled = substr(bit_str, 1, 1) == '1'
+  cloud_shadow = substr(bit_str, 5, 5) == '1'
+  not_clear = substr(bit_str, 7, 7) == '0'
 
-  if(fill_val | cloud_shadow | cloud | cloud_conf | cirrus_conf | terrain_occ){
+  if(filled | cloud_shadow | not_clear){
     return(0)
   }  else{
     return(1)
@@ -82,7 +89,7 @@ clear_value = function(x) {
 snow_flag = function(x) {
   # reverse order of bits, left to right
   bit_str = paste(as.integer(intToBits(x)), collapse="")
-  snow = substr(bit_str, 5, 5) == '1'
+  snow = substr(bit_str, 6, 6) == '1'
   if(snow){return(1)}  else{return(0)}
 }
 
@@ -90,7 +97,6 @@ snow_flag = function(x) {
 water_flag = function(x) {
   # reverse order of bits, left to right
   bit_str = paste(as.integer(intToBits(x)), collapse="")
-  water = substr(bit_str, 3, 3) == '1'
+  water = substr(bit_str, 8, 8) == '1'
   if(water){return(1)}  else{return(0)}
 }
-
