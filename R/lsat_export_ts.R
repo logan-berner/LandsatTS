@@ -87,7 +87,7 @@ lsat_export_ts <- function(pixel_coords_sf,
   tryCatch(rgee::ee_user_info(quiet = T), error = function(e) stop("rgee not initialized!\nPlease intialize rgee. See: https://r-spatial.github.io/rgee/index.html"))
 
   # Prep Landsat Time series
-  bands <- list("SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B7", "QA_PIXEL", "QA_RADSAT")
+  bands <- list("SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7", "QA_PIXEL", "QA_RADSAT")
   BAND_LIST <- rgee::ee$List(bands)
 
   # addon assets and bands
@@ -96,6 +96,19 @@ lsat_export_ts <- function(pixel_coords_sf,
 
   # Blank image for "SR_B6" to replace in collections earlier than LS8
   ZERO_IMAGE <- rgee::ee$Image(0)$select(list("constant"), list("SR_B6"))$selfMask()
+
+  # Set image properties to export
+  PROPERTIES <- list("CLOUD_COVER",
+                     "COLLECTION_NUMBER",
+                     "DATE_ACQUIRED",
+                     "GEOMETRIC_RMSE_MODEL",
+                     "LANDSAT_PRODUCT_ID",
+                     'LANDSAT_SCENE_ID',
+                     "PROCESSING_LEVEL",
+                     'QA_PIXEL',
+                     "QA_RADSAT",
+                     "SPACECRAFT_ID",
+                     "SUN_ELEVATION")
 
   # Landsat Surface Reflectance collections
   ls5_1 <- rgee::ee$ImageCollection("LANDSAT/LT05/C02/T1_L2")
@@ -160,7 +173,7 @@ lsat_export_ts <- function(pixel_coords_sf,
             # This will ensure all bands are present in the export
             rgee::ee$ImageCollection$fromImages(
             list(rgee::ee$Image(list(0,0,0,0,0,0,0,0,0,0))$
-                   select(list(0,1,2,3,4,5,6,7,8), ALL_BANDS)$
+                   select(list(0,1,2,3,4,5,6,7,8,9), ALL_BANDS)$
                    copyProperties(ls8_1$first())))$
               # Merge with extraction of time-series form whole Landsat collection
               merge(LS_COLL$filterBounds(feature$geometry()))$
@@ -170,11 +183,11 @@ lsat_export_ts <- function(pixel_coords_sf,
                 return(rgee::ee$Feature(feature$geometry(),
                                   # fill it with the point value extracted with
                                   # reduceRegion and the first() reducer at the set SCALE
-                                  image$reduceRegion( rgee::ee$Reducer$first(),
+                                  image$reduceRegion(rgee::ee$Reducer$first(),
                                                      feature$geometry(),
                                                      SCALE))$
                          # copy the image properties to the feature (incl. date and image metadata)
-                         copyProperties(image)$
+                         copyProperties(image, PROPERTIES)$
                          # assign a pixel and chunk id columns for identification
                          set(site_from, feature$get(site_from))$
                          set(chunks_from, feature$get(chunks_from)))
