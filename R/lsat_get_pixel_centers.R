@@ -18,7 +18,7 @@
 #' @param pixel_prefix Optional prefix for the generated pixel ids. Defaults to "pixel".
 #' @param pixel_prefix_from Optional, column name in simple feature to specify pixel_prefix. Overrides "pixel_prefix".
 #' @param plot_map Optional. If TRUE the retrieved pixel centers and the polygon are plotted on a mid-season Landsat 8 image (grey-scale red band) in the mapview. If a character is supplied an addtional output to a file is generated (png, pdf, and jpg supported, see mapview::mapshot). Both slow down the execution of this funciton dramatically, especially for large polygons.
-#' @param lsat_WRS2_scene_bounds File path to the Landsat WRS2 path row scene boundaries. If not specified these are downloaded to a temporary file. To speed up this function consider downloading the file manually and specifiying the file path in this argument. The file can be found here: https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml
+#' @param lsat_WRS2_scene_bounds File path to the Landsat WRS2 path row scene boundaries. If not specified the boundaries are downloaded to a temporary file when the function is executed the first time during a session. To avoid future downloads, the file can be downloaded manually and specified using this argument. The file can be found here: https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml See also: https://www.usgs.gov/core-science-systems/nli/landsat/landsat-shapefiles-and-kml-files
 #'
 #' @return sfc of point geometries for Landsat 8 pixel centers within the polygon for use in lsat_download_ts
 #'
@@ -44,7 +44,7 @@
 #'               -138.90298, 69.57986,
 #'               -138.90125, 69.58413),
 #'             ncol = 2, byrow = TRUE)))
-#' test_poly_sf <- st_sf(st_sfc(test_poly, crs = 4326))
+#' test_poly_sf <- st_sfc(st_polygon(test_poly), crs = 4326)
 #'
 #' # Retrieve pixel centers and plot to mapview
 #' pixels <- lsat_get_pixel_centers(test_poly_sf, plot_map = TRUE)
@@ -91,6 +91,9 @@ lsat_get_pixel_centers <- function(polygon_sf,
   # confirm rgee is initialized
   tryCatch(rgee::ee_user_info(quiet = T), error = function(e) stop("rgee not initialized!\nPlease intialize rgee. See: https://r-spatial.github.io/rgee/index.html"))
 
+  # Turn off use of S2 in sf package if version is > sf 1.0
+  try(sf::sf_use_s2(FALSE))
+
   # Check function arguments
   # confirm polygon_sf is an sfc
   if(!("sfc_POLYGON" %in% class(sf::st_geometry(polygon_sf))) | length(sf::st_geometry(polygon_sf)) != 1) stop("Invalid argument supplied for polygon_sf!\nPlease supply an object of type 'sfc_POLYGON'.")
@@ -108,17 +111,23 @@ lsat_get_pixel_centers <- function(polygon_sf,
   # if not NULL check path
   # if NULL download file from USGS
   if(!is.null(lsat_WRS2_scene_bounds)) {
-    if(!is.character(lsat_WRS2_scene_bounds)) stop("Invalid file path for landsat_wrs2_scene_bounds!")
+    if(!is.character(lsat_WRS2_scene_bounds)) stop("file path for landsat_wrs2_scene_bounds is not a character vector!")
     if(!file.exists(lsat_WRS2_scene_bounds)) stop("landsat_wrs2_scene_bounds file does not exist!")
   } else {
-    cat(paste0("Argument 'lsat_WRS2_scene_bounds' was not specified!\n",
-        "Downloading WRS2 scene boundaries from USGS...\n"))
-    lsat_WRS2_scene_bounds <- tempfile(pattern = "lsat_WRS2_scene_bounds_", fileext = ".kml")
-    wrs2_usgs_path <- "https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml"
-    utils::download.file(wrs2_usgs_path, lsat_WRS2_scene_bounds)
-    if(!file.exists(lsat_WRS2_scene_bounds))stop("Could not download WRS2 boundaries from USGS, please specify file path!")
-    warning(paste0("Argument 'lsat_WRS2_scene_bounds' was not specified! WRS2 scene boundaries were downloaded to a temp file. Consider downloading the scene boundaries for future use (see help)."))
-    # Note add this to documentation: https://www.usgs.gov/core-science-systems/nli/landsat/landsat-shapefiles-and-kml-files
+    # Status update
+    cat("Argument 'lsat_WRS2_scene_bounds' was not specified!\n")
+
+    # Check whether file was downloaded previously in the current R session if not download.
+    lsat_WRS2_scene_bounds <- R.utils::getOption("lsat_WRS2_scene_bounds")
+    if(is.null(lsat_WRS2_scene_bounds)){
+      cat("Downloading WRS2 scene boundaries from USGS... (needed only once per session\n")
+      lsat_WRS2_scene_bounds <- tempfile(pattern = "lsat_WRS2_scene_bounds_", fileext = ".kml")
+      R.utils::setOption("lsat_WRS2_scene_bounds", lsat_WRS2_scene_bounds)
+      wrs2_usgs_path <- "https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml"
+      utils::download.file(wrs2_usgs_path, lsat_WRS2_scene_bounds)
+      if(!file.exists(lsat_WRS2_scene_bounds))stop("Could not download WRS2 boundaries from USGS, please specify file path!")
+      warning(paste0("Argument 'lsat_WRS2_scene_bounds' was not specified! To avoid download in future, save file locally and specify argument (see help)."))
+    }
   }
 
   # Load WRS2 scene bounds
@@ -216,12 +225,14 @@ lsat_get_pixel_centers <- function(polygon_sf,
   if(plot_map == T | is.character(plot_map)){
     # Status update
     cat("Plotting grid...\n")
+
+    # center map view
+    rgee::Map$centerObject(rgee::sf_as_ee(polygon_sf_utm))
+
     # make map
     region_map <- rgee::Map$addLayer(ls8_image$select("B4")) +
       rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_utm), list(color = "darkred")) +
       rgee::Map$addLayer(rgee::sf_as_ee(ls8_pixels_sf), list(color = "black"))
-    # center view
-    rgee::Map$centerObject(rgee::sf_as_ee(polygon_sf_utm))
 
     # display map
     print(region_map)
