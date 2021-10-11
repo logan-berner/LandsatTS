@@ -86,6 +86,9 @@ lsat_export_ts <- function(pixel_coords_sf,
   # confirm rgee is initialized
   tryCatch(rgee::ee_user_info(quiet = T), error = function(e) stop("rgee not initialized!\nPlease intialize rgee. See: https://r-spatial.github.io/rgee/index.html"))
 
+  # turn s2 off in sf for backwards compatibility
+  sf_use_s2(FALSE)
+
   # Prep Landsat Time series
   bands <- list("SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7", "QA_PIXEL", "QA_RADSAT")
   BAND_LIST <- rgee::ee$List(bands)
@@ -140,6 +143,22 @@ lsat_export_ts <- function(pixel_coords_sf,
     select(ALL_BANDS)$
     map(function(image){ return(image$float())} )
 
+  # Check if BUFFER_DIST was specified if yes, retrieve points in buffer using
+  # lsat_get_pixel_centers
+  if(BUFFER_DIST > 0){
+    pixel_coords_sf_buffered <- pixel_coords_sf %>%
+      split(pixel_coords_sf$site) %>%
+      purrr::map(lsat_get_pixel_centers,
+                 buffer = BUFFER_DIST + 15,
+                 pixel_prefix_from = site_from) %>%
+      bind_rows()
+    # re-add chunks_from column to data frame
+    pixel_coords_sf_buffered$site_original <- gsub("(.*)_[0-9]*$", "\\1", st_drop_geometry(pixel_coords_sf_buffered)[,"site"])
+    names(pixel_coords_sf_buffered)[names(pixel_coords_sf_buffered) == "site_original"] <- paste0(site_from, "_original")
+    names(pixel_coords_sf)[names(pixel_coords_sf) == site_from] <- paste0(site_from, "_original")
+    pixel_coords_sf_buffered <- pixel_coords_sf %>% st_drop_geometry() %>%
+      full_join(pixel_coords_sf_buffered)
+  }
 
   # Check if chunks_from was specified, if not determine chunks
   if(!is.null(chunks_from)){
