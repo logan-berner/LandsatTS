@@ -1,7 +1,8 @@
 #' Landsat 8 pixels centers within a polygon
 #'
 #' A convenience helper function that determines the Landsat 8 grid (pixel)
-#' centers within a polygon and a surrounding buffer.
+#' centers within a polygon and a surrounding buffer. It can also be applied to
+#' a single point to retrieve all pixels within a surrounding buffer.
 #'
 #' Does not work for large polygons. The default maximum number of pixels set by the GEE is 10000000.
 #' Consider whether extractions for a large polygon is a good idea.
@@ -13,7 +14,7 @@
 #' Please note that approximation of tile overlap with polygon generates a warning
 #' by sf that the coordinates are assumed to be planar. This can be ignored.
 #'
-#' @param polygon_sf Simple feature with a simple feature collection of type "sfc_POLYGON" containing a single polygon geometry.
+#' @param polygon_sf Simple feature with a simple feature collection of type "sfc_POLYGON" containing a single polygon geometry. Can also be an 'sfc_POINT' object with a single point for buffering.
 #' @param buffer Buffer surrounding the geometry to be included. Specified in m.
 #' @param pixel_prefix Optional prefix for the generated pixel ids. Defaults to "pixel".
 #' @param pixel_prefix_from Optional, column name in simple feature to specify pixel_prefix. Overrides "pixel_prefix".
@@ -95,8 +96,10 @@ lsat_get_pixel_centers <- function(polygon_sf,
   try(sf::sf_use_s2(FALSE))
 
   # Check function arguments
-  # confirm polygon_sf is an sfc
-  if(!("sfc_POLYGON" %in% class(sf::st_geometry(polygon_sf))) | length(sf::st_geometry(polygon_sf)) != 1) stop("Invalid argument supplied for polygon_sf!\nPlease supply an object of type 'sfc_POLYGON'.")
+  # confirm polygon_sf is sfc_POLYGON or sfc_POINT
+  if(!("sfc_POINT" %in% class(sf::st_geometry(polygon_sf)) |
+       ("sfc_POLYGON" %in% class(sf::st_geometry(polygon_sf))) |
+     (length(sf::st_geometry(polygon_sf)) != 1))) stop("Invalid argument supplied for polygon_sf!\nPlease supply an object of type 'sfc_POLYGON' or 'sfc_POINT'.")
   # confirm pixel prefix is a valid character
   if(!is.character(pixel_prefix)) stop("Invalid argument supplied for pixel_prefix, please supplly a character or do not specify.")
   # confirm whether pixel_prefix_from was specified and if so assign to pixel_prefix
@@ -105,7 +108,7 @@ lsat_get_pixel_centers <- function(polygon_sf,
     else stop("Invalid column name specified for pixel_prefix_from.")
   }
   # confirm buffer is a number
-  if(!is.numeric(buffer)) stop("Invalid argument supplied for buffer.\nPlease supplay an object of type 'numeric'.")
+  if(!is.numeric(buffer)) stop("Invalid argument supplied for buffer.\nPlease supply an object of type 'numeric'.")
 
   # Confirm landsat_wrs2_scene_bounds
   # if not NULL check path
@@ -140,7 +143,7 @@ lsat_get_pixel_centers <- function(polygon_sf,
   cat(crayon::green("Approximating tiles overlapping with polygon, the warning by st_intersects can be ignored!\n"))
   lsat_overlapping_tiles <- lsat_scene_footprints[sf::st_intersects(polygon_sf, lsat_scene_footprints)[[1]],]
 
-  # Identify EPSG for UTM zone of centroid (southern hemisphere landsat tiles use northern hemispher UTM )
+  # Identify EPSG for UTM zone of centroid (southern hemisphere landsat tiles use northern hemisphere UTM )
   polygon_centroid <- suppressWarnings(sf::st_centroid(polygon_sf, silent = T))
   polygon_centroid_utm_crs <- floor((sf::st_coordinates(polygon_centroid)[1] + 180) / 6) + 1 + 32600
 
@@ -192,8 +195,11 @@ lsat_get_pixel_centers <- function(polygon_sf,
   cat(paste0("Retrieving pixel centres based on WRS tile '", wrs_tile_id, "'...\n"))
 
   # Add buffer to sf if specified and transform to lat long
-  polygon_sf_buffered <- polygon_sf_utm %>% sf::st_buffer(buffer) %>% sf::st_transform(4326)
-
+  if("sfc_POLYGON" %in% class(sf::st_geometry(polygon_sf))) {
+    polygon_sf_buffered <- polygon_sf_utm %>% sf::st_buffer(buffer) %>% sf::st_transform(4326)
+  } else if("sfc_POINT" %in% class(sf::st_geometry(polygon_sf))) {
+    polygon_sf_buffered <- polygon_sf_utm %>% sf::st_buffer(buffer, endCapStyle = "SQUARE") %>% sf::st_transform(4326)
+  }
   # Retrieve first landsat 8 tile for summer 2019 from GEE
   ls8_image <- ls8IC$
     filterMetadata("WRS_PATH", "equals", as.integer(wrs_path))$
@@ -231,6 +237,7 @@ lsat_get_pixel_centers <- function(polygon_sf,
 
     # make map
     region_map <- rgee::Map$addLayer(ls8_image$select("B4")) +
+      rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_buffered), list(color = "blue")) +
       rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_utm), list(color = "darkred")) +
       rgee::Map$addLayer(rgee::sf_as_ee(ls8_pixels_sf), list(color = "black"))
 
