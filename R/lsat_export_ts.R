@@ -190,7 +190,8 @@ lsat_export_ts <- function(pixel_coords_sf,
       paste0(sample_id_from, "_original")
     pixel_coords_sf_buffered <- pixel_coords_sf %>%
       st_drop_geometry() %>%
-      full_join(pixel_coords_sf_buffered)
+      full_join(pixel_coords_sf_buffered, .)
+    pixel_coords_sf <- pixel_coords_sf_buffered
   }
 
   # Check if chunks_from was specified, if not determine chunks
