@@ -173,7 +173,7 @@ lsat_export_ts <- function(pixel_coords_sf,
   # lsat_get_pixel_centers
   if(BUFFER_DIST > 0){
     pixel_coords_sf_buffered <- pixel_coords_sf %>%
-      split(pixel_coords_sf[,sample_id_from]) %>%
+      split(st_drop_geometry(pixel_coords_sf)[,sample_id_from]) %>%
       purrr::map(lsat_get_pixel_centers,
                  buffer = BUFFER_DIST + 15,
                  pixel_prefix_from = sample_id_from) %>%
