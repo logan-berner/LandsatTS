@@ -1,27 +1,45 @@
-#' Landsat 8 pixels centers within a polygon
+#' Landsat 8 pixels centers within a polygon or buffer around a point coordinate
 #'
 #' A convenience helper function that determines the Landsat 8 grid (pixel)
 #' centers within a polygon and a surrounding buffer. It can also be applied to
 #' a single point to retrieve all pixels within a surrounding buffer.
 #'
-#' Does not work for large polygons. The default maximum number of pixels set by the GEE is 10000000.
-#' Consider whether extractions for a large polygon is a good idea.
-#' Split the polygon into manageable chuncks. For the unlikely case that a polygon
-#' exceeds the boundaries of the Landsat tile closest to the polygon's centre,
-#' the polygon is clipped ot the boundaries of the Landsat tile and a warning is issued.
-#' Again, consider processing smaller polygons.
+#' Does not work for large polygons. The default maximum number of pixels set by
+#' the GEE is 10000000. Consider whether extractions for a large polygon is a
+#' good idea. Split the polygon into manageable chunks. For the unlikely case
+#' that a polygon exceeds the boundaries of the Landsat tile closest to the
+#' polygon's centre, the polygon is clipped ot the boundaries of the Landsat
+#' tile and a warning is issued. Again, consider processing smaller polygons.
 #'
-#' Please note that approximation of tile overlap with polygon generates a warning
-#' by sf that the coordinates are assumed to be planar. This can be ignored.
+#' Please note that approximation of tile overlap with polygon generates a
+#' warning by sf that the coordinates are assumed to be planar.
+#' This can be ignored.
 #'
-#' @param polygon_sf Simple feature with a simple feature collection of type "sfc_POLYGON" containing a single polygon geometry. Can also be an 'sfc_POINT' object with a single point for buffering.
+#' @param polygon_sf Simple feature with a simple feature collection of type
+#'  "sfc_POLYGON" containing a single polygon geometry. Alternative a simple
+#'  feature collection of type 'sfc_POINT' with a single point.
 #' @param buffer Buffer surrounding the geometry to be included. Specified in m.
-#' @param pixel_prefix Optional prefix for the generated pixel ids. Defaults to "pixel".
-#' @param pixel_prefix_from Optional, column name in simple feature to specify pixel_prefix. Overrides "pixel_prefix".
-#' @param plot_map Optional. If TRUE the retrieved pixel centers and the polygon are plotted on a mid-season Landsat 8 image (grey-scale red band) in the mapview. If a character is supplied an addtional output to a file is generated (png, pdf, and jpg supported, see mapview::mapshot). Both slow down the execution of this funciton dramatically, especially for large polygons.
-#' @param lsat_WRS2_scene_bounds File path to the Landsat WRS2 path row scene boundaries. If not specified the boundaries are downloaded to a temporary file when the function is executed the first time during a session. To avoid future downloads, the file can be downloaded manually and specified using this argument. The file can be found here: https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml See also: https://www.usgs.gov/core-science-systems/nli/landsat/landsat-shapefiles-and-kml-files
+#' @param pixel_prefix Optional prefix for the generated pixel ids. Defaults to
+#'  "sample_id".
+#' @param pixel_prefix_from Optional, column name in simple feature to specify
+#'  pixel_prefix. Overrides "pixel_prefix".
+#' @param plot_map Optional. If TRUE the retrieved pixel centers and the polygon
+#'  are plotted on a mid-season Landsat 8 image (grey-scale red band) using
+#'  mapview. If a character is supplied an additional output to a file is
+#'  generated (png, pdf, and jpg supported, see mapview::mapshot). Note: Both
+#'  slow down the execution of this funciton dramatically, especially for large
+#'  polygons.
+#' @param lsat_WRS2_scene_bounds File path to the Landsat WRS2 path row scene
+#' boundaries. If not specified the boundaries are downloaded to a temporary
+#' file when the function is executed the first time during a session. To avoid
+#' future downloads, the file can be downloaded manually and specified using
+#' this argument. The file can be found here:
+#' https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml
+#' See also:
+#' https://www.usgs.gov/core-science-systems/nli/landsat/landsat-shapefiles-and-kml-files
 #'
-#' @return sfc of point geometries for Landsat 8 pixel centers within the polygon for use in lsat_download_ts
+#' @return sfc of point geometries for Landsat 8 pixel centers within the
+#' polygon for use in lsat_download_ts.
 #'
 #' @author Jakob J. Assmann
 #'
@@ -71,7 +89,8 @@
 #'                                    -149.59918, 68.62364,
 #'                                    -149.60686, 68.62364),
 #'                                    ncol = 2, byrow = TRUE)))
-#' test_regions_sf <- st_sfc(ellesmere, zackenberg, toolik, crs = 4326) %>% st_sf() %>%
+#' test_regions_sf <- st_sfc(ellesmere, zackenberg, toolik, crs = 4326) %>%
+#'   st_sf() %>%
 #'   mutate(region = c("ellesmere", "zackenberg", "toolik"))
 #'
 #' # Split and map lsat_get_pixel_centers using dplyr and purrr
@@ -90,7 +109,10 @@ lsat_get_pixel_centers <- function(polygon_sf,
   ## Preparations
 
   # confirm rgee is initialized
-  tryCatch(rgee::ee_user_info(quiet = T), error = function(e) stop("rgee not initialized!\nPlease intialize rgee. See: https://r-spatial.github.io/rgee/index.html"))
+  tryCatch(rgee::ee_user_info(quiet = T), error = function(e){
+    stop("rgee not initialized!\nPlease intialize rgee. ",
+         "See: https://r-spatial.github.io/rgee/index.html")
+    })
 
   # Turn off use of S2 in sf package if version is > sf 1.0
   try(sf::sf_use_s2(FALSE))
@@ -99,37 +121,59 @@ lsat_get_pixel_centers <- function(polygon_sf,
   # confirm polygon_sf is sfc_POLYGON or sfc_POINT
   if(!("sfc_POINT" %in% class(sf::st_geometry(polygon_sf)) |
        ("sfc_POLYGON" %in% class(sf::st_geometry(polygon_sf))) |
-     (length(sf::st_geometry(polygon_sf)) != 1))) stop("Invalid argument supplied for polygon_sf!\nPlease supply an object of type 'sfc_POLYGON' or 'sfc_POINT'.")
+     (length(sf::st_geometry(polygon_sf)) != 1))) {
+    stop("Invalid argument supplied for polygon_sf!\n",
+         "Please supply an object of type 'sfc_POLYGON' or 'sfc_POINT'.")
+    }
   # confirm pixel prefix is a valid character
-  if(!is.character(pixel_prefix)) stop("Invalid argument supplied for pixel_prefix, please supplly a character or do not specify.")
-  # confirm whether pixel_prefix_from was specified and if so assign to pixel_prefix
+  if(!is.character(pixel_prefix)) {
+    stop("Invalid argument supplied for pixel_prefix, please supplly a",
+         "character or do not specify.")
+    }
+  # confirm whether pixel_prefix_from was specified and if assign
   if(!is.null(pixel_prefix_from)){
-    if(pixel_prefix_from %in% colnames(polygon_sf)) pixel_prefix <- sf::st_drop_geometry(polygon_sf)[, pixel_prefix_from][1]
+    if(pixel_prefix_from %in% colnames(polygon_sf)) pixel_prefix <-
+        sf::st_drop_geometry(polygon_sf)[, pixel_prefix_from][1]
     else stop("Invalid column name specified for pixel_prefix_from.")
   }
   # confirm buffer is a number
-  if(!is.numeric(buffer)) stop("Invalid argument supplied for buffer.\nPlease supply an object of type 'numeric'.")
+  if(!is.numeric(buffer)) stop("Invalid argument supplied for buffer.\n",
+                               "Please supply an object of type 'numeric'.")
 
   # Confirm landsat_wrs2_scene_bounds
   # if not NULL check path
   # if NULL download file from USGS
   if(!is.null(lsat_WRS2_scene_bounds)) {
-    if(!is.character(lsat_WRS2_scene_bounds)) stop("file path for landsat_wrs2_scene_bounds is not a character vector!")
-    if(!file.exists(lsat_WRS2_scene_bounds)) stop("landsat_wrs2_scene_bounds file does not exist!")
+    if(!is.character(lsat_WRS2_scene_bounds)) {
+      stop("file path for landsat_wrs2_scene_bounds is not a character vector!")
+    }
+    if(!file.exists(lsat_WRS2_scene_bounds)){
+      stop("landsat_wrs2_scene_bounds file does not exist!")
+      }
   } else {
     # Status update
     cat("Argument 'lsat_WRS2_scene_bounds' was not specified!\n")
 
-    # Check whether file was downloaded previously in the current R session if not download.
+    # Check whether file was downloaded previously in current session,
+    # if not download.
     lsat_WRS2_scene_bounds <- R.utils::getOption("lsat_WRS2_scene_bounds")
     if(is.null(lsat_WRS2_scene_bounds)){
-      cat("Downloading WRS2 scene boundaries from USGS... (needed only once per session\n")
-      lsat_WRS2_scene_bounds <- tempfile(pattern = "lsat_WRS2_scene_bounds_", fileext = ".kml")
+      cat("Downloading WRS2 scene boundaries from USGS...",
+          "(required only once per session)\n")
+      lsat_WRS2_scene_bounds <- tempfile(pattern = "lsat_WRS2_scene_bounds_",
+                                         fileext = ".kml")
       R.utils::setOption("lsat_WRS2_scene_bounds", lsat_WRS2_scene_bounds)
-      wrs2_usgs_path <- "https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml"
+      wrs2_usgs_path <- paste0("https://prd-wret.s3.us-west-2.amazonaws.com/",
+                               "assets/palladium/production/atoms/files/",
+                               "WRS-2_bound_world_0.kml")
       utils::download.file(wrs2_usgs_path, lsat_WRS2_scene_bounds)
-      if(!file.exists(lsat_WRS2_scene_bounds))stop("Could not download WRS2 boundaries from USGS, please specify file path!")
-      warning(paste0("Argument 'lsat_WRS2_scene_bounds' was not specified! To avoid download in future, save file locally and specify argument (see help)."))
+      if(!file.exists(lsat_WRS2_scene_bounds)) {
+        stop("Could not download WRS2 boundaries from USGS, ",
+             "please specify file path!")
+        }
+      warning("Argument 'lsat_WRS2_scene_bounds' was not specified!",
+                     " To avoid download in future, save file locally and",
+                     " specify argument (see help).")
     }
   }
 
@@ -140,18 +184,24 @@ lsat_get_pixel_centers <- function(polygon_sf,
   cat(paste0("Determining Landsat WRS tile closest to the polygon centre...\n"))
 
   # Approximate overlapping tiles with polygon
-  cat(crayon::green("Approximating tiles overlapping with polygon, the warning by st_intersects can be ignored!\n"))
-  lsat_overlapping_tiles <- lsat_scene_footprints[sf::st_intersects(polygon_sf, lsat_scene_footprints)[[1]],]
+  cat(crayon::green("Approximating tiles overlapping with polygon, the warning",
+                    "by st_intersects can be ignored!\n"))
+  lsat_overlapping_tiles <- lsat_scene_footprints[
+    sf::st_intersects(polygon_sf, lsat_scene_footprints)[[1]],]
 
-  # Identify EPSG for UTM zone of centroid (southern hemisphere landsat tiles use northern hemisphere UTM )
+  # Identify EPSG for UTM zone of centroid (southern hemisphere landsat tiles
+  # use northern hemisphere UTM )
   polygon_centroid <- suppressWarnings(sf::st_centroid(polygon_sf, silent = T))
-  polygon_centroid_utm_crs <- floor((sf::st_coordinates(polygon_centroid)[1] + 180) / 6) + 1 + 32600
+  polygon_centroid_utm_crs <-
+    floor((sf::st_coordinates(polygon_centroid)[1] + 180) / 6) + 1 + 32600
 
   # Transform geometries to local UTM
-  polygon_sf_utm <-  sf::st_transform(polygon_sf, crs = polygon_centroid_utm_crs)
-  lsat_overlapping_tiles_utm <- sf::st_transform(lsat_overlapping_tiles, crs = polygon_centroid_utm_crs)
+  polygon_sf_utm <-  sf::st_transform(polygon_sf,
+                                      crs = polygon_centroid_utm_crs)
+  lsat_overlapping_tiles_utm <- sf::st_transform(lsat_overlapping_tiles,
+                                                 crs = polygon_centroid_utm_crs)
 
-  # Identify closest landsat tile to site centroid
+  # Identify closest Landsat tile to site centroid
   distance_to_tiles <- suppressWarnings(
     sf::st_distance(sf::st_centroid(polygon_sf_utm),
                     sf::st_centroid(lsat_overlapping_tiles_utm)))
@@ -176,29 +226,37 @@ lsat_get_pixel_centers <- function(polygon_sf,
     gsub("EPSG:(.*)", "\\1", .) %>%
     as.numeric()
 
-  # Compare with previously determined crs and if different change projection of polygon
-  if(polygon_centroid_utm_crs != lsat_tile_crs) polygon_sf_utm <-  sf::st_transform(polygon_sf, crs = lsat_tile_crs)
+  # Compare with previously determined crs, if different transform polygon
+  if(polygon_centroid_utm_crs != lsat_tile_crs) polygon_sf_utm <-
+    sf::st_transform(polygon_sf, crs = lsat_tile_crs)
 
   # Check whether polygon is fully covered by tile
-  is_covered <- as.numeric(sf::st_covers(sf::st_transform(lsat_overlapping_tiles_utm[min_distance_tile_index,],
-                                                          crs = lsat_tile_crs),
-                                         polygon_sf_utm))
+  is_covered <- lsat_overlapping_tiles_utm[min_distance_tile_index,] %>%
+    sf::st_transform(crs = lsat_tile_crs) %>%
+    sf::st_covers(polygon_sf_utm) %>%
+    as.numeric()
+  # If not, throw warning!
   if(is.na(is_covered)){
     warning("Polygon exceeds boundaries of closest Landsat WRS tile!\n",
-            "Clipping polygon to footprint of Landsat WRS tile ", wrs_tile_id, ". ",
-            "Any regions outwidth the tile will be ignored. ",
+            "Clipping polygon to footprint of Landsat WRS tile ", wrs_tile_id,
+            ". Any regions outwidth the tile will be ignored. ",
             "Consider splliting polygon into smaller chuncks!")
-    polygon_sf_utm <- sf::st_intersection(polygon_sf_utm, lsat_overlapping_tiles_utm[min_distance_tile_index,])
+    polygon_sf_utm <- polygon_sf_utm %>%
+      sf::st_intersection(lsat_overlapping_tiles_utm[min_distance_tile_index,])
   }
 
   # Status
-  cat(paste0("Retrieving pixel centres based on WRS tile '", wrs_tile_id, "'...\n"))
+  cat(paste0("Retrieving pixel centres based on WRS tile '",
+             wrs_tile_id,
+             "'...\n"))
 
   # Add buffer to sf if specified and transform to lat long
   if("sfc_POLYGON" %in% class(sf::st_geometry(polygon_sf))) {
-    polygon_sf_buffered <- polygon_sf_utm %>% sf::st_buffer(buffer) %>% sf::st_transform(4326)
+    polygon_sf_buffered <- polygon_sf_utm %>% sf::st_buffer(buffer) %>%
+      sf::st_transform(4326)
   } else if("sfc_POINT" %in% class(sf::st_geometry(polygon_sf))) {
-    polygon_sf_buffered <- polygon_sf_utm %>% sf::st_buffer(buffer, endCapStyle = "SQUARE") %>% sf::st_transform(4326)
+    polygon_sf_buffered <- polygon_sf_utm %>%
+      sf::st_buffer(buffer, endCapStyle = "SQUARE") %>% sf::st_transform(4326)
   }
   # Retrieve first landsat 8 tile for summer 2019 from GEE
   ls8_image <- ls8IC$
@@ -223,8 +281,8 @@ lsat_get_pixel_centers <- function(polygon_sf,
       coords = c("longitude", "latitude"),
       crs = 4326)
 
-  # Add site ID
-  ls8_pixels_sf$site <- paste0(pixel_prefix, "_",
+  # Add sample_id ID
+  ls8_pixels_sf$sample_id <- paste0(pixel_prefix, "_",
                                    1:nrow(ls8_pixels_sf))
 
   # Visusalise grid using the mapview if requested
@@ -237,9 +295,12 @@ lsat_get_pixel_centers <- function(polygon_sf,
 
     # make map
     region_map <- rgee::Map$addLayer(ls8_image$select("B4")) +
-      rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_buffered), list(color = "blue")) +
-      rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_utm), list(color = "darkred")) +
-      rgee::Map$addLayer(rgee::sf_as_ee(ls8_pixels_sf), list(color = "black"))
+      rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_buffered),
+                         list(color = "blue")) +
+      rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_utm),
+                         list(color = "darkred")) +
+      rgee::Map$addLayer(rgee::sf_as_ee(ls8_pixels_sf),
+                         list(color = "black"))
 
     # display map
     print(region_map)
@@ -250,8 +311,12 @@ lsat_get_pixel_centers <- function(polygon_sf,
         mapview::mapshot(
           region_map,
           file = plot_map,
-          remove_controls = c("zoomControl", "layersControl", "homeButton", "scaleBar",
-                              "drawToolbar", "easyButton")))
+          remove_controls = c("zoomControl",
+                              "layersControl",
+                              "homeButton",
+                              "scaleBar",
+                              "drawToolbar",
+                              "easyButton")))
     }
   }
 
