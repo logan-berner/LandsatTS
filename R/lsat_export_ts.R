@@ -132,8 +132,6 @@ lsat_export_ts <- function(pixel_coords_sf,
                      "LANDSAT_PRODUCT_ID",
                      'LANDSAT_SCENE_ID',
                      "PROCESSING_LEVEL",
-                     'QA_PIXEL',
-                     "QA_RADSAT",
                      "SPACECRAFT_ID",
                      "SUN_ELEVATION")
 
