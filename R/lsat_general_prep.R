@@ -13,6 +13,9 @@ lsat_general_prep <- function(dt){
 
   # type cast
   dt <- data.table::data.table(dt)
+  
+  # change sample_id to sample.id
+  setnames(dt, 'sample_id','sample.id')
 
   # change colunm names to lower case with conjoined words seperated by '.'
   colnames(dt) <- tolower(colnames(dt))
