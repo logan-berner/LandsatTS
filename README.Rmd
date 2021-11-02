@@ -87,6 +87,7 @@ library(lsatTS)
 ee_Initialize()
 
 ```
+Note: If you have trouble initializing the Earth Engine, please consult the rgee website or forum. Some `lsatTS` users have reported that they need to initialize by specifying their email address and using the `drive` option: `ee.Initialize(email = "myemail", drive = TRUE)`
 
 **Getting pixel centers using lsat_get_pixel_centers()**
 
@@ -107,7 +108,7 @@ list(matrix(c(-138.90125, 69.58413,
                -138.90298, 69.57986,
                -138.90125, 69.58413),
              ncol = 2, byrow = TRUE)))
-test_poly_sf <- st_sf(st_sfc(test_poly, crs = 4326))
+test_poly_sf <- st_sfc(test_poly, crs = 4326) %>% st_sf()
 
 # Use lsat_get_pixel_centers to retrieve pixel centers and plot to a file that can be added to this documentation.
 # We set plot_map to a file path (or just TRUE) to view 

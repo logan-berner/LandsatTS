@@ -65,7 +65,9 @@ PhantomJS. If so, you will be prompted to do so using
 `webshot::install_phantomjs()`. You can find out more
 [here](https://wch.github.io/webshot/articles/intro.html).*
 
-[\[to top\]](#content)
+[
+*t**o**t**o**p*
+](#content)
 
 ## 2. Prepare sites and extract Landsat data
 
@@ -106,6 +108,11 @@ library(lsatTS)
 ee_Initialize()
 ```
 
+Note: If you have trouble initializing the Earth Engine, please consult
+the rgee website or forum. Some `lsatTS` users have reported that they
+need to initialize by specifying their email address and using the
+`drive` option: `ee.Initialize(email = "myemail", drive = TRUE)`
+
 **Getting pixel centers using lsat\_get\_pixel\_centers()**
 
 Next, we assume you have no point coordinates ready yet, but would like
@@ -133,7 +140,7 @@ list(matrix(c(-138.90125, 69.58413,
                -138.90298, 69.57986,
                -138.90125, 69.58413),
              ncol = 2, byrow = TRUE)))
-test_poly_sf <- st_sf(st_sfc(test_poly, crs = 4326))
+test_poly_sf <- st_sfc(test_poly, crs = 4326) %>% st_sf()
 
 # Use lsat_get_pixel_centers to retrieve pixel centers and plot to a file that can be added to this documentation.
 # We set plot_map to a file path (or just TRUE) to view 
@@ -276,7 +283,9 @@ map(task_list, ee_monitoring)
 temp_files <- map(task_list, ee_drive_to_local)
 ```
 
-[\[to top\]](#content)
+[
+*t**o**t**o**p*
+](#content)
 
 ## 3. Clean and cross-calibrate Landsat data
 
@@ -319,14 +328,14 @@ lsat.dt <- lsat_clean_data(lsat.dt, geom.max = 15, cloud.max = 80, sza.max = 60,
 ```
 
 **Optional: Compute average surface reflectance among neighboring pixels
-using lsat\_neighborhood\_mean()**
+using lsat\_ngb\_mean()**
 
 If each of your sites is actually a neightborhood of Landsat pixels
-(e.g., 3 x 3 pixels), then `lsat_neighborhood_mean()` will compute the mean
+(e.g., 3 x 3 pixels), then `lsat_ngb_mean()` will compute the mean
 reflectance across this neighborhood of pixels.
 
 ``` r
-lsat.dt <- lsat_neighborhood_mean(lsat.dt)
+lsat.dt <- lsat_ngb_mean(lsat.dt)
 ```
 
 **Optional: Summarize the availability of Landsat data for each site
@@ -394,7 +403,9 @@ lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs 
 # lsat.dt <- lsat.dt[, ndvi.xcal := NULL)
 ```
 
-[\[to top\]](#content)
+[
+*t**o**t**o**p*
+](#content)
 
 ## 4. Quantify growing season characteristics
 
@@ -474,7 +485,9 @@ Mann-Kendall trend tests and Theil-Sen slope indicators.
 lsat.trnds.dt <- lsat_calc_trend(lsat.gs.dt, vi = 'ndvi.max', 2000:2020, sig = 0.1)
 ```
 
-[\[to top\]](#content)
+[
+*t**o**t**o**p*
+](#content)
 
 ## 5. Citation
 
@@ -494,7 +507,9 @@ Warming Explains Widespread but Not Uniform Greening in the Arctic
 Tundra Biome. Nature Communications 11, no. 1: 4621.
 <https://doi.org/10.1038/s41467-020-18479-5>.
 
-[\[to top\]](#content)
+[
+*t**o**t**o**p*
+](#content)
 
 ## 6. Contact
 
@@ -504,7 +519,9 @@ Email Logan at: <Logan.Berner@nau.edu>
 
 Email Jakob at: <j.assmann@bio.au.dk>
 
-[\[to top\]](#content)
+[
+*t**o**t**o**p*
+](#content)
 
 ## 7. Contributions
 
@@ -519,7 +536,9 @@ publication and wrote the documentation.
 
 Thank you to all the testers: Tester A, Tester B and Tester C.
 
-[\[to top\]](#content)
+[
+*t**o**t**o**p*
+](#content)
 
 ## 8. References
 
@@ -552,4 +571,6 @@ Software, <https://github.com/r-spatial/rgee/>.
 
 [MIT LICENSE](LICENSE)
 
-[\[to top\]](#content)
+[
+*t**o**t**o**p*
+](#content)
