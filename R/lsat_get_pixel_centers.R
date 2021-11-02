@@ -63,7 +63,7 @@
 #'               -138.90298, 69.57986,
 #'               -138.90125, 69.58413),
 #'             ncol = 2, byrow = TRUE)))
-#' test_poly_sf <- st_sfc(st_polygon(test_poly), crs = 4326)
+#' test_poly_sf <- st_polygon(test_poly) %>% st_sfc(crs = 4326)
 #'
 #' # Retrieve pixel centers and plot to mapview
 #' pixels <- lsat_get_pixel_centers(test_poly_sf, plot_map = TRUE)
