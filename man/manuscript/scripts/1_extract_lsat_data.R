@@ -1,24 +1,30 @@
 # DESCRIPTION --------------------------------------------------------------------------------------
-# This R script creates a random sample within a specificed area of interest and then extracts 
-# Landsat time series for each sample point by querying Google Earth Engine. 
-# Author: Logan Berner, NAU
-# Date: 2021-10-19
+# This R script extracts Landsat surface reflectance time series data for all pixels in an example 
+# study area on Disko Island using the lsatTS package to query Google Earth Engine via the rgee package.  
+# Authors Logan Berner 
+# Institution: Northern Arizona University, School of Informatics, Computing, and Cyber Systems
+# Date: 2021-11-18
+# URL: https://github.com/logan-berner/lsatTS
+#---------------------------------------------------------------------------------------------------
 
-# SET UP -------------------------------------------------------------------------------------------
+# Clear workspace
 rm(list=ls())
+
+# Load required R packages
 require(sf)
-require(dplyr)
 require(lsatTS)
 require(rgee)
-setwd('C:/Users/Logan/My Drive/research/code/lsatTS/man/manuscript/')
-ee_Initialize()
 
-# CREATE SAMPLE POINTS AND EXTRACT LANDSAT DATA ---------------------------------------------------
+# Set working directory
+setwd('C:/Users/Logan/My Drive/research/code/lsatTS/man/manuscript/')
+
+# Initialize Earth Engine
+ee_Initialize()
 
 # Read in a spatial polygon that demarcates the study area
 aoi.poly <- st_read('data/aoi_extent.kml')
 
-# Get the central coordinates of each Landsat pixel in study area
+# Get the central coordinates for each Landsat pixels in study area
 aoi.pts <- lsat_get_pixel_centers(aoi.poly)
 
 # Extract a time-series of Landsat surface reflectance measurements for each Landsat pixel
