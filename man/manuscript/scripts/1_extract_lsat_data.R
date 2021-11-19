@@ -1,7 +1,7 @@
 # DESCRIPTION --------------------------------------------------------------------------------------
 # This R script extracts Landsat surface reflectance time series data for all pixels in an example 
 # study area on Disko Island using the lsatTS package to query Google Earth Engine via the rgee package.  
-# Authors Logan Berner 
+# Author: Logan Berner 
 # Institution: Northern Arizona University, School of Informatics, Computing, and Cyber Systems
 # Date: 2021-11-18
 # URL: https://github.com/logan-berner/lsatTS
