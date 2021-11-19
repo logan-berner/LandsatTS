@@ -19,6 +19,10 @@ lsat_summarize_data_avail <- function(dt){
 
   # density plot of observations across years
   output.lst[['fig']] <- ggplot2::ggplot(dt, ggplot2::aes(year)) + ggplot2::geom_density(fill='lightblue') + ggplot2::labs(y='Density of observations', x='Year')
-
+  
+  # return
+  smry.msg <- paste0("Total of ", nrow(smry.dt), " sample locations with ", sum(smry.dt$n.obs.tot), " multi-band observations from ",
+                     min(smry.dt$first.yr), " to ", max(smry.dt$last.yr))
+  print(smry.msg)
   output.lst
 }
