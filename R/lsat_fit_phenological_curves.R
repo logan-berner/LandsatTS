@@ -2,25 +2,25 @@
 #'
 #' @description
 #' This function characterizes seasonal land surface phenology at each sample site using time series of spectral vegetation indices (e.g., NDVI).
-#' The underlying algorithm was construted to facilitate estimating annual maximum vegetation greenness (vegetation index)
+#' The underlying algorithm was constructed to facilitate estimating annual maximum vegetation greenness (spectral index)
 #' The function returns information about typical phenology at a sample site and about the timing of an individual observation relative.
-#' Please note that this function was designed for sitations where the seasonal phenology is hump shaped. If you are using a spetral index that is 
-#' typcially negative (e.g., Normalized Difference Water Index) then multiply the index by -1 before running this function, then backtransform
+#' Please note that this function was designed for situations where the seasonal phenology is hump shaped. If you are using a spectral index that is 
+#' typically negative (e.g., Normalized Difference Water Index) then multiply the index by -1 before running this function, then back-transform
 #' your index after running the lsat_summarize_growing_seasons() function.   
 #' @param dt Data.table with a multi-year time series a vegetation index
 #' @param si Character string specifying the spectral index (e.g., NDVI) to use for determining surface phenology. This must correspond
-#' to an existing colunm in the data.table.
+#' to an existing column in the data.table.
 #' @param window.yrs Number specifying the focal window width in years that is used when pooling data to fit cubic splines (use odd numbers).
 #' @param window.min.obs Minimum number of focal window observations necessary to fit a cubic spline.
-#' @param si.min Minimum value of vegetation index necessary for observation to be used when fitting cubic splines
+#' @param si.min Minimum value of spectral index necessary for observation to be used when fitting cubic splines
 #' @param spar Smoothing parameter passed to smooth.spline(), typically around 0.65 - 0.75 for this application.
 #' @param pcnt.dif.thresh Allowable percent difference (0-100) between individual observations and fitted cubic spline.
-#' Observations that differ by more than this threshold are filtered out and the cubic spline is iteratively re-reft.
+#' Observations that differ by more than this threshold are filtered out and the cubic spline is iteratively refit.
 #' @param spl.fit.outfile (Optional) Name of output csv file containing the fitted cubic splines for each sample site.
 #' Useful for subsequent visualization
 #' @param progress (TRUE/FALSE) Print a progress report?
 #' @return Data.table that provides, for each observation, information on the phenological conditions for that specific day of year during the focal period.
-#' These data can then be used to estimate annual maximum vegegation index and other growing season metrics using lsat_summarize_growing_season().
+#' These data can then be used to estimate annual maximum spectral index and other growing season metrics using lsat_summarize_growing_season().
 #' @import data.table
 #' @export lsat_fit_phenological_curves
 #'
@@ -29,7 +29,7 @@
 lsat_fit_phenological_curves = function(dt, si, window.yrs=5, window.min.obs=10, si.min = 0, spar=0.7, pcnt.dif.thresh=100, spl.fit.outfile=F, progress=T){
   dt <- data.table::data.table(dt)
 
-  # GET SAMPLE sample, DOY, YEAR, AND VEG INDEX FROM INPUT DATA TABLE
+  # GET SAMPLE sample, DOY, YEAR, AND SPECTRAL INDEX FROM INPUT DATA TABLE
   dt <- dt[, eval(c('sample.id','latitude','longitude','year','doy',si)), with=F]
   dt <- data.table::setnames(dt, si, 'si')
   dt <- dt[order(sample.id,doy)]
