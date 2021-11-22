@@ -59,13 +59,13 @@ lsat_evaluate_phenological_max <- function(dt, si, min.frac.of.max = 0.75, zscor
 
   # summarize across iterations
   eval.smry.dt <- eval.dt[,.(si.uncor.pcntdif.med = stats::median(si.uncor.pcntdif, na.rm=T), si.cor.pcntdif.med = stats::median(si.cor.pcntdif, na.rm=T)), by = c('sample.id','year','n.obs')]
-  eval.smry.dt <- melt.data.table(eval.smry.dt, id.vars=c('sample.id','year','n.obs'), value.name='pcnt.dif', variable.name='correction')
+  eval.smry.dt <- melt.data.table(eval.smry.dt, id.vars=c('sample.id','year','n.obs'), value.name='pcnt.dif', variable.name='Processing')
   eval.smry.dt$n.obs.fac <- as.factor(eval.smry.dt$n.obs)
-  eval.smry.dt$correction <- factor(eval.smry.dt$correction, labels = c('Raw','Corrected'))
+  eval.smry.dt$Processing <- factor(eval.smry.dt$Processing, labels = c('Raw','Modeled'))
 
   # EVALUATION PLOT
   ylab.pcntdif <- bquote("Difference from observed "~.(toupper(gsub('.xcal','',si)))['max']~" (%)")
-  fig <- ggplot2::ggplot(eval.smry.dt, ggplot2::aes(n.obs.fac, pcnt.dif, fill=correction)) + ggplot2::geom_boxplot(outlier.size=0.7, outlier.color='gray')
+  fig <- ggplot2::ggplot(eval.smry.dt, ggplot2::aes(n.obs.fac, pcnt.dif, fill=Processing)) + ggplot2::geom_boxplot(outlier.size=0.7, outlier.color='gray')
   fig <- fig + ggplot2::theme_bw() + ggplot2::labs(y=ylab.pcntdif, x='Number of observations')
   fig <- fig + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
   print(fig)
