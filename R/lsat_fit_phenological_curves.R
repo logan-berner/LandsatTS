@@ -133,7 +133,7 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=5, window.min.obs=10,
     }
 
     # PRINT STATUS (if requested)
-    if (progress == T){print(paste('focal year: ', focal.yr, '(', round(i/n.focal.yrs,2)*100, '% finished)', sep=''))}
+    if (progress == T){print(paste('focal year: ', focal.yr, '(', round(i/n.focal.yrs,2)*100, ' % finished)', sep=''))}
 
   } # end focal year loop
 
