@@ -19,31 +19,31 @@
 #' and the Soil-Adjusted Total Vegetation Index (SATVI; Marsett et al. 2006). 
 #' 
 #' @param dt Data.table containing surface reflectance data
-#' @param vi Character string specifying abbreviation of the desired spectral vegetation index
+#' @param si Character string specifying abbreviation of the desired spectral index
 #'
 #' @return The input data.table with an appended column containing the spectral index
 #' @import data.table
-#' @export lsat_calc_spec_index
+#' @export lsat_calc_spectral_index
 #'
-#' @examples # my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')
+#' @examples # my.dt <- lsat_calc_spectral_index(my.dt, 'ndvi')
 
-lsat_calc_spec_index <- function(dt, vi){
+lsat_calc_spectral_index <- function(dt, svi){
   dt <- data.table::data.table(dt)
-  vi <- tolower(vi)
-  if (vi == 'evi'){dt[, evi := 2.5  * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)]}
-  if (vi == 'evi2'){dt[, evi2 := 2.5  * (nir - red) / (nir + 2.5 * red + 1)]}
-  if (vi == 'gndvi'){dt[, gndvi := (nir - green) / (nir + green)]}
-  if (vi == 'kndvi'){dt[, kndvi := tanh(((nir - red) / (nir + red))^2)]}
-  if (vi == 'msi'){dt[, msi := swir1 / nir]}
-  if (vi == 'nbr'){dt[, nbr := (swir1 - swir2) / (swir1 + swir2)]} 
-  if (vi == 'nirv'){dt[, nirv := (nir * (nir - red)) / (nir + red)]}
-  if (vi == 'ndii'){dt[, ndii := (nir - swir1) / (nir + swir1)]}
-  if (vi == 'ndmi'){dt[, ndmi := (nir - swir1)/(nir + swir1)]}
-  if (vi == 'ndvi'){dt[, ndvi := (nir - red) / (nir + red)]}
-  if (vi == 'ndwi'){dt[, ndwi := (green - nir) / (green + nir)]}
-  if (vi == 'psri'){dt[, psri := (red - blue) / nir]}
-  if (vi == 'satvi'){dt[, satvi := 1.5 * ((swir1 - red) / (swir1 + red + 0.5)) - swir2/2]}
-  if (vi == 'savi'){dt[, sati := (1.5 * (nir - red)) / (nir + red + 0.5)]}
-  if (vi == 'wdrvi'){dt[, wdrvi := (0.2*nir - red) / (0.2*nir + red)]}
+  si <- tolower(si)
+  if (si == 'evi'){dt[, evi := 2.5  * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)]}
+  if (si == 'evi2'){dt[, evi2 := 2.5  * (nir - red) / (nir + 2.5 * red + 1)]}
+  if (si == 'gndvi'){dt[, gndvi := (nir - green) / (nir + green)]}
+  if (si == 'kndvi'){dt[, kndvi := tanh(((nir - red) / (nir + red))^2)]}
+  if (si == 'msi'){dt[, msi := swir1 / nir]}
+  if (si == 'nbr'){dt[, nbr := (swir1 - swir2) / (swir1 + swir2)]} 
+  if (si == 'nirv'){dt[, nirv := (nir * (nir - red)) / (nir + red)]}
+  if (si == 'ndii'){dt[, ndii := (nir - swir1) / (nir + swir1)]}
+  if (si == 'ndmi'){dt[, ndmi := (nir - swir1)/(nir + swir1)]}
+  if (si == 'ndvi'){dt[, ndvi := (nir - red) / (nir + red)]}
+  if (si == 'ndwi'){dt[, ndwi := (green - nir) / (green + nir)]}
+  if (si == 'psri'){dt[, psri := (red - blue) / nir]}
+  if (si == 'satvi'){dt[, satvi := 1.5 * ((swir1 - red) / (swir1 + red + 0.5)) - swir2/2]}
+  if (si == 'savi'){dt[, sati := (1.5 * (nir - red)) / (nir + red + 0.5)]}
+  if (si == 'wdrvi'){dt[, wdrvi := (0.2*nir - red) / (0.2*nir + red)]}
   dt
 }
