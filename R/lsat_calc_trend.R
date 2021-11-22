@@ -16,7 +16,7 @@
 #' @import data.table
 #' @examples # Forthcoming...
 
-lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, sig = 0.10){
+lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, sig = 0.10){
   dt <- data.table::data.table(dt)
   data.table::setnames(dt, si, 'si')
 
@@ -63,14 +63,15 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, s
   trnd.dt[pval <= sig & slope < 0, trend.cat := 'browning']
   trnd.dt[pval > sig, trend.cat := 'no_trend']
   
+  # output.lst[['trend_summary']] <- trnd.dt
+  
   # density plot of slope
   fig <- ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt)) +
     ggplot2::geom_density(fill='lightblue') +
     ggplot2::labs(y='Density', x=paste0("Total % change in ", toupper(si), ' from ', min(yrs), ' to ', max(yrs)))
-
-  fig
   
   # output
+  print(fig)
   trnd.dt
 }
 
