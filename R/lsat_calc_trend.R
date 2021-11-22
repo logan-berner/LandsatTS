@@ -5,7 +5,7 @@
 #' This function will iteratively pre-whiten a time series (i.e., remove temporal autocorrelation) and then compute
 #' Mann-Kendall trend tests and Theil-Sen slope indicators.
 #' @param dt Data.table with columns including site, year, and the vegetation index of interest
-#' @param vi Vegetation index (e.g., NDVI) for which to assess trend
+#' @param si Spectral index (e.g., NDVI) for which to assess trend
 #' @param yrs A sequence of years (time period) over which to assess trends (e.g., 2000:2020)
 #' @param yr.tolerance The number of years that a site's first/last years of observations can differ from the start/end of the user-specified time period ('yrs') for a trend to be computed
 #' @param nyr.min.frac Fraction of years within the time period for which observations must be available if a trend is to be computed
@@ -16,9 +16,9 @@
 #' @import data.table
 #' @examples # Forthcoming...
 
-lsat_calc_trend <- function(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, sig = 0.10){
+lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, sig = 0.10){
   dt <- data.table::data.table(dt)
-  data.table::setnames(dt, vi, 'vi')
+  data.table::setnames(dt, si, 'si')
 
   # subset to years of interest
   dt <- dt[year %in% yrs]
@@ -29,8 +29,8 @@ lsat_calc_trend <- function(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, s
   
   site.smry[, trend.period := paste0(min(yrs),'to',max(yrs))]
 
-  # note which vi is being used
-  site.smry[, vi.name := vi]
+  # note which si is being used
+  site.smry[, si.name := si]
   
   # identify sites with observations within the specified tolerance of first and last years
   site.smry[, ':='(first.yr.abs.dif = abs(first.yr - min(yrs)),
@@ -48,7 +48,7 @@ lsat_calc_trend <- function(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, s
   dt[, year.rescale := year - min(yrs), by = sample.id]
   
   # fit regression models
-  trnd.dt <- dt[, as.list(calc.trends(year.rescale, vi)), by = sample.id]
+  trnd.dt <- dt[, as.list(calc.trends(year.rescale, si)), by = sample.id]
 
   # combine spatial / temporal and trend details into one data table
   trnd.dt <- site.smry[trnd.dt, on = 'sample.id']
@@ -66,7 +66,7 @@ lsat_calc_trend <- function(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, s
   # density plot of slope
   ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt)) +
     ggplot2::geom_density(fill='lightblue') +
-    ggplot2::labs(y='Density', x=paste0("Total % change in ", toupper(vi), ' from ', min(yrs), ' to ', max(yrs)))
+    ggplot2::labs(y='Density', x=paste0("Total % change in ", toupper(si), ' from ', min(yrs), ' to ', max(yrs)))
 
   # output
   trnd.dt
