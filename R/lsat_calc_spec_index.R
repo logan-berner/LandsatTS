@@ -27,7 +27,7 @@
 #'
 #' @examples # my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')
 
-lsat_calc_spec_index <- function(dt, svi){
+lsat_calc_spec_index <- function(dt, si){
   dt <- data.table::data.table(dt)
   si <- tolower(si)
   if (si == 'evi'){dt[, evi := 2.5  * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)]}
