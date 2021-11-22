@@ -26,7 +26,7 @@
 #' See Berner et al. (2020) for a full description of the approach.
 #'
 #' @param dt Data.table containing the band or spectral index to cross calibrate.
-#' @param band Character string matching the column name of the band or spectral index to cross-calibrate.
+#' @param band.or.si Character string matching the column name of the band or spectral index to cross-calibrate.
 #' @param doy.rng Sequence of numbers specifying the Days of Year (Julian Days) to use for model development.
 #' @param min.obs Minimum number of paired, seasonally-matched observations from Landsat 7 and Landsat 5/8 required to include a sampling sample.
 #' @param add.predictors Additional predictors to use in the Random Forest models. These should be time-invariant. 
@@ -43,7 +43,7 @@
 #' @export lsat_calibrate_rf
 #' @examples # lsat.dt <- lsat_xcal_rf(lsat.dt, band = 'ndvi', doy.rng = 152:243, min.obs = 5, frac.train = 0.75, outfile.id = 'ndvi', outdir ='data/lsat_sample_data/sensor_xcal/ndvi/')
 
-lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, add.predictors = c('latitude', 'longitude'), frac.train = 0.75, overwrite.col = F, outfile.id=band, outdir){
+lsat_calibrate_rf <- function(dt, band.or.si, doy.rng, min.obs, add.predictors = c('latitude', 'longitude'), frac.train = 0.75, overwrite.col = F, outfile.id=band.or.si, outdir){
   R.utils::mkdirs(outdir) # create output directory
   dt <- data.table::data.table(dt)
   sats <- dt[,unique(satellite)] # which satellites are in the data set?
@@ -52,7 +52,7 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, add.predictors = c('la
   model.lst <- list()  # list to store random forest models
   fig.lst <- list() # list to store output figures
   model.eval.df <- data.frame(matrix(data = NA, nrow = length(sats), ncol = 9))
-  colnames(model.eval.df) <- c('band','sat','rf.r2','rf.rmse','rf.n','xval.r2','xval.rmse','xval.n', 'xval.bias')
+  colnames(model.eval.df) <- c('band.or.si','sat','rf.r2','rf.rmse','rf.n','xval.r2','xval.rmse','xval.n', 'xval.bias')
   model.eval.df$sat <- sats
 
   for (i in sats){
@@ -84,11 +84,11 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, add.predictors = c('la
     xcal.dt <- sample.doy.win.dt[xcal.dt, on = c('sample.id','doy'), nomatch=0]
     xcal.dt <- xcal.dt[sample.doy.dt, on = 'sample.id']
 
-    # compute median band / VI value for the 15-day seasonal window at each sample
-    rf.data.dt <- xcal.dt[, .(mov.med=median(get(band), na.rm=T)), by = c('sample.id','satellite','focal.doy')]
+    # compute median band.or.si / VI value for the 15-day seasonal window at each sample
+    rf.data.dt <- xcal.dt[, .(mov.med=median(get(band.or.si), na.rm=T)), by = c('sample.id','satellite','focal.doy')]
     rf.data.dt <- data.table::setnames(rf.data.dt, 'focal.doy','doy')
     rf.data.dt <- data.table::dcast.data.table(rf.data.dt, sample.id + doy ~ satellite, value.var = 'mov.med')
-    rf.data.dt <- data.table::setnames(rf.data.dt, c('LANDSAT_7',i), c(paste('LANDSAT_7',band,sep='.'), band))
+    rf.data.dt <- data.table::setnames(rf.data.dt, c('LANDSAT_7',i), c(paste('LANDSAT_7',band.or.si,sep='.'), band.or.si))
     
     # add additional user-specificed predictors to data used for fitting RF model
     add.preds.dt <- xcal.dt[, lapply(.SD, first), by = sample.id, .SDcols = add.predictors]
@@ -103,8 +103,8 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, add.predictors = c('la
     rf.eval.dt <- rf.data.dt[sample.id %in% samples.eval]
 
     # fit random forest
-    form.lhs <- paste('LANDSAT_7.', band, ' ~ ', sep='')
-    form.rhs <- paste(c(eval(band), 'doy', add.predictors), collapse = ' + ')
+    form.lhs <- paste('LANDSAT_7.', band.or.si, ' ~ ', sep='')
+    form.rhs <- paste(c(eval(band.or.si), 'doy', add.predictors), collapse = ' + ')
     rf.form <- stats::formula(paste(form.lhs, form.rhs, sep=''))
     rf.xcal <- ranger::ranger(rf.form, rf.train.dt, importance = 'impurity')
 
@@ -118,16 +118,16 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, add.predictors = c('la
     saveRDS(rf.xcal, outname)
 
     # evaluate model using cross-validation and internal rf metrics, saving summaries to data table
-    rf.eval.dt[, eval(paste("LANDSAT_7", band, 'pred', sep='.')) := stats::predict(rf.xcal, rf.eval.dt)$predictions]
+    rf.eval.dt[, eval(paste("LANDSAT_7", band.or.si, 'pred', sep='.')) := stats::predict(rf.xcal, rf.eval.dt)$predictions]
     file.name <- paste(outdir, '/', outfile.id,'_', i, '_xcal_rf_eval_data.csv', sep='')
     data.table::fwrite(rf.eval.dt, file.name)
 
-    lm.form <- stats::formula(paste("LANDSAT_7.", band, ' ~ LANDSAT_7.', band,'.pred', sep=''))
+    lm.form <- stats::formula(paste("LANDSAT_7.", band.or.si, ' ~ LANDSAT_7.', band.or.si,'.pred', sep=''))
     xval.lm.smry <- summary(stats::lm(lm.form, rf.eval.dt))
-    xval.rmse <- as.numeric(rf.eval.dt[, .(rmse = round(sqrt(mean((get(paste('LANDSAT_7.', band, sep='')) - get(paste('LANDSAT_7.', band, '.pred', sep='')))^2)),4))])
-    xval.bias <- round(sum(rf.eval.dt[[paste('LANDSAT_7.',band,sep='')]] - rf.eval.dt[[paste('LANDSAT_7.',band,'.pred', sep='')]]) / nrow(rf.eval.dt),5)
+    xval.rmse <- as.numeric(rf.eval.dt[, .(rmse = round(sqrt(mean((get(paste('LANDSAT_7.', band.or.si, sep='')) - get(paste('LANDSAT_7.', band.or.si, '.pred', sep='')))^2)),4))])
+    xval.bias <- round(sum(rf.eval.dt[[paste('LANDSAT_7.',band.or.si,sep='')]] - rf.eval.dt[[paste('LANDSAT_7.',band.or.si,'.pred', sep='')]]) / nrow(rf.eval.dt),5)
 
-    model.eval.df$band <- band
+    model.eval.df$band.or.si <- band.or.si
     model.eval.df$rf.r2[model.eval.df$sat == i] <- round(rf.xcal$r.squared,3)
     model.eval.df$rf.rmse[model.eval.df$sat == i] <- round(sqrt(rf.xcal$prediction.error),5)
     model.eval.df$rf.n[model.eval.df$sat == i] <- rf.xcal$num.samples
@@ -136,27 +136,27 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, add.predictors = c('la
     model.eval.df$xval.bias[model.eval.df$sat == i] <- xval.bias
     model.eval.df$xval.n[model.eval.df$sat == i] <- nrow(rf.eval.dt)
 
-    # plot obs vs obs and obs vs predicted band values
-    axis.min <- rf.eval.dt[, .(min1 = min(get(paste('LANDSAT_7.', band, sep=''))), min2 = min(get(paste('LANDSAT_7.', band, '.pred', sep=''))))]
+    # plot obs vs obs and obs vs predicted band.or.si values
+    axis.min <- rf.eval.dt[, .(min1 = min(get(paste('LANDSAT_7.', band.or.si, sep=''))), min2 = min(get(paste('LANDSAT_7.', band.or.si, '.pred', sep=''))))]
     axis.min <- min(as.numeric(axis.min))
-    axis.max <- rf.eval.dt[, .(max1 = max(get(paste('LANDSAT_7.', band, sep=''))), max2 = max(get(paste('LANDSAT_7.', band, '.pred', sep=''))))]
+    axis.max <- rf.eval.dt[, .(max1 = max(get(paste('LANDSAT_7.', band.or.si, sep=''))), max2 = max(get(paste('LANDSAT_7.', band.or.si, '.pred', sep=''))))]
     axis.max <- max(as.numeric(axis.max))
     axis.lim <- c(axis.min, axis.max)
 
     if(i == 'LANDSAT_5'){
-      uncal.xlab <- bquote('Landsat 5'~.(toupper(band))~'(Raw)')
-      cal.xlab <- bquote('Landsat 5'~.(toupper(band))~'(Cross-Calibrated)')
+      uncal.xlab <- bquote('Landsat 5'~.(toupper(band.or.si))~'(Raw)')
+      cal.xlab <- bquote('Landsat 5'~.(toupper(band.or.si))~'(Cross-Calibrated)')
     } else if (i == 'LANDSAT_8'){
-      uncal.xlab <- bquote('Landsat 8'~.(toupper(band))~'(Raw)')
-      cal.xlab <- bquote('Landsat 8'~.(toupper(band))~'(Cross-Calibrated)')
+      uncal.xlab <- bquote('Landsat 8'~.(toupper(band.or.si))~'(Raw)')
+      cal.xlab <- bquote('Landsat 8'~.(toupper(band.or.si))~'(Cross-Calibrated)')
     }
 
-    lsat7.ylab <- bquote('Landsat 7'~.(toupper(band)))
-    pred <- paste('LANDSAT_7',band,sep='.')
-    obs <- paste('LANDSAT_7',band,'pred',sep='.')
+    lsat7.ylab <- bquote('Landsat 7'~.(toupper(band.or.si)))
+    pred <- paste('LANDSAT_7',band.or.si,sep='.')
+    obs <- paste('LANDSAT_7',band.or.si,'pred',sep='.')
 
     # raw figure
-    fig.raw <- ggplot2::ggplot(rf.eval.dt, ggplot2::aes_string(x = band, y = obs))
+    fig.raw <- ggplot2::ggplot(rf.eval.dt, ggplot2::aes_string(x = band.or.si, y = obs))
     fig.raw <- fig.raw + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange', size=1.5, alpha=0.3) + ggplot2::scale_fill_viridis_c()
     fig.raw <- fig.raw + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=uncal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
     fig.raw <- fig.raw + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
@@ -200,14 +200,14 @@ lsat_calibrate_rf <- function(dt, band, doy.rng, min.obs, add.predictors = c('la
   write.table(model.eval.df, paste(outdir, '/', outfile.id, '_xcal_rf_eval.csv', sep=''), sep = ',', row.names = F, col.names = T)
 
   # output rf models and updated data table
-  dt[satellite == 'LANDSAT_7', xcal:= get(band)]
+  dt[satellite == 'LANDSAT_7', xcal:= get(band.or.si)]
   
   # overwrite original column with cross-calibrated data or return new column?  
   if (overwrite.col == F){
-    data.table::setnames(dt, 'xcal', eval(paste(band, 'xcal', sep='.')))
+    data.table::setnames(dt, 'xcal', eval(paste(band.or.si, 'xcal', sep='.')))
   } else {
-    dt[, eval(band) := NULL]
-    data.table::setnames(dt, 'xcal', eval(band))
+    dt[, eval(band.or.si) := NULL]
+    data.table::setnames(dt, 'xcal', eval(band.or.si))
     }
   
   dt
