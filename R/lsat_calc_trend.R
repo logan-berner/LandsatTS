@@ -68,7 +68,7 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   # density plot of slope
   fig <- ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt)) +
     ggplot2::geom_density(fill='lightblue') +
-    ggplot2::labs(y='Density', x=paste0("Total % change in ", toupper(si), ' from ', min(yrs), ' to ', max(yrs)))
+    ggplot2::labs(y='Density', x=paste0("Total change in ", toupper(si), ' from ', min(yrs), ' to ', max(yrs), ' (%)'))
   
   # output
   print(fig)
