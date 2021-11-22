@@ -182,7 +182,7 @@ lsat_calibrate_rf <- function(dt, band.or.si, doy.rng, min.obs, add.predictors =
     }
   }
 
-  # write out composample figure
+  # write out composite figure
   if (length(sats) == 2){
     fig <- ggpubr::ggarrange(fig.lst[[1]], fig.lst[[2]], ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9)
     fig.name <- paste(outdir, '/', outfile.id,'_xval_pred_vs_obs.jpg', sep='')
