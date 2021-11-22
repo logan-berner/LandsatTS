@@ -4,9 +4,9 @@
 #' compares these with estimates derived when using progressively smaller subsets of observations. This lets you determine the degree to which
 #' annual estimates of maximum vegetation greenness are impacted by the number of available observations.
 #' @param dt Data.table output from lsat_fit_phenologic_curves().
-#' @param vi Character string specifying the vegetation index (e.g., NDVI) to evaluate.
+#' @param si Character string specifying the spectral index (e.g., NDVI) to evaluate.
 #' @param min.frac.of.max Numeric threshold (0-1) that defines the "growing season" as the seasonal window when the
-#' phenological curves indicate the VI is within a specified fraction of the maximum VI. In otherwords, an observation
+#' phenological curves indicate the VI is within a specified fraction of the maximum VI. In other words, an observation
 #' is considered to be from the "growing season" when the VI is within a user-specified fraction of the curve-fit growing season maximum VI.
 #' @param min.obs Minimum number of observations needed for a site x year to be included in the evaluation (Default = 10)
 #' @param reps Number of times to bootstrap the assessment (Default = 10)
@@ -19,9 +19,9 @@
 #' @export lsat_evaluate_phenological_max
 #' @examples # Forthcoming...
 
-lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscore.thresh = 3, min.obs = 6, reps = 10, outdir = NA){
+lsat_evaluate_phenological_max <- function(dt, si, min.frac.of.max = 0.75, zscore.thresh = 3, min.obs = 6, reps = 10, outdir = NA){
 
-  colnames(dt) <- gsub(vi, 'vi', colnames(dt))
+  colnames(dt) <- gsub(si, 'si', colnames(dt))
 
   # if desired, only use observations from the growing season
   dt <- dt[spl.frac.max >= min.frac.of.max]
@@ -30,13 +30,13 @@ lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscor
   dt <- dt[, n.obs.gs := .N, by = c('sample.id','year')]
   dt <- dt[n.obs.gs > min.obs]
 
-  # identify and filter out obs-level predictions of max VI that are anomalously high or low relative to other obs from that site x year
-  dt <- dt[, ':='(avg = mean(vi.max.pred), sd = stats::sd(vi.max.pred), n=.N), by = c('sample.id','year')]
-  dt <- dt[, abs.zscore := abs((vi.max.pred - avg )/sd)]
+  # identify and filter out obs-level predictions of max si that are anomalously high or low relative to other obs from that site x year
+  dt <- dt[, ':='(avg = mean(si.max.pred), sd = stats::sd(si.max.pred), n=.N), by = c('sample.id','year')]
+  dt <- dt[, abs.zscore := abs((si.max.pred - avg )/sd)]
   dt <- dt[abs.zscore <= zscore.thresh]
 
-  # compute max observed VI (actually 90% percentile to avoid spuriously high values)
-  dt <- dt[, vi.max.obs := stats::quantile(vi, 0.90), by = c('sample.id','year')]
+  # compute max observed si (actually 90% percentile to avoid spuriously high values)
+  dt <- dt[, si.max.obs := stats::quantile(si, 0.90), by = c('sample.id','year')]
 
   # iteratively loop through sample size and reps
   out.list <- list()
@@ -45,10 +45,10 @@ lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscor
     for (j in 1:reps){
       rep.dt <- dt[,.SD[sample(.N, i)], by=c('sample.id','year')]
       rep.dt <- rep.dt[,':='(n.obs=i, rep=j)]
-      rep.dt <- rep.dt[, .(vi.max.obs = data.table::first(vi.max.obs), vi.max.uncor = stats::quantile(vi,0.9), vi.max.cor = stats::median(vi.max.pred)), by = c('n.obs','rep','sample.id','year')]
-      rep.dt <- rep.dt[vi.max.cor < vi.max.uncor, vi.max.cor := vi.max.uncor]
-      rep.dt[, vi.uncor.pcntdif := (vi.max.uncor - vi.max.obs)/vi.max.obs*100]
-      rep.dt[, vi.cor.pcntdif := (vi.max.cor - vi.max.obs)/vi.max.obs*100]
+      rep.dt <- rep.dt[, .(si.max.obs = data.table::first(si.max.obs), si.max.uncor = stats::quantile(si,0.9), si.max.cor = stats::median(si.max.pred)), by = c('n.obs','rep','sample.id','year')]
+      rep.dt <- rep.dt[si.max.cor < si.max.uncor, si.max.cor := si.max.uncor]
+      rep.dt[, si.uncor.pcntdif := (si.max.uncor - si.max.obs)/si.max.obs*100]
+      rep.dt[, si.cor.pcntdif := (si.max.cor - si.max.obs)/si.max.obs*100]
       out.list[[cnt]] <- rep.dt
       cnt = cnt + 1
     }
@@ -58,32 +58,32 @@ lsat_evaluate_phenological_max <- function(dt, vi, min.frac.of.max = 0.75, zscor
   eval.dt <- na.omit(eval.dt)
 
   # summarize across iterations
-  eval.smry.dt <- eval.dt[,.(vi.uncor.pcntdif.med = stats::median(vi.uncor.pcntdif, na.rm=T), vi.cor.pcntdif.med = stats::median(vi.cor.pcntdif, na.rm=T)), by = c('sample.id','year','n.obs')]
+  eval.smry.dt <- eval.dt[,.(si.uncor.pcntdif.med = stats::median(si.uncor.pcntdif, na.rm=T), si.cor.pcntdif.med = stats::median(si.cor.pcntdif, na.rm=T)), by = c('sample.id','year','n.obs')]
   eval.smry.dt <- melt.data.table(eval.smry.dt, id.vars=c('sample.id','year','n.obs'), value.name='pcnt.dif', variable.name='correction')
   eval.smry.dt$n.obs.fac <- as.factor(eval.smry.dt$n.obs)
   eval.smry.dt$correction <- factor(eval.smry.dt$correction, labels = c('Raw','Corrected'))
 
   # EVALUATION PLOT
-  ylab.pcntdif <- bquote("Difference from observed "~.(toupper(gsub('.xcal','',vi)))['max']~" (%)")
+  ylab.pcntdif <- bquote("Difference from observed "~.(toupper(gsub('.xcal','',si)))['max']~" (%)")
   fig <- ggplot2::ggplot(eval.smry.dt, ggplot2::aes(n.obs.fac, pcnt.dif, fill=correction)) + ggplot2::geom_boxplot(outlier.size=0.7, outlier.color='gray')
   fig <- fig + ggplot2::theme_bw() + ggplot2::labs(y=ylab.pcntdif, x='Number of observations')
   fig <- fig + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
   print(fig)
   
   # console output
-  colnames(eval.smry.dt) <- gsub('vi', vi, colnames(eval.smry.dt))
+  colnames(eval.smry.dt) <- gsub('si', si, colnames(eval.smry.dt))
   eval.smry.dt
   
   # should data and figure be written to disk?
   if (is.na(outdir) == F){
     R.utils::mkdirs(outdir)
   
-    fig.outname <- paste0(outdir,'pheno_max_eval_',vi,'.jpg')
+    fig.outname <- paste0(outdir,'pheno_max_eval_',si,'.jpg')
     grDevices::jpeg(fig.outname, width = 6, height = 4, res = 400, units = 'in')
     print(fig)
     grDevices::dev.off()
     
-    data.outname <- paste0(outdir,'pheno_max_eval_',vi,'.csv')
+    data.outname <- paste0(outdir,'pheno_max_eval_',si,'.csv')
     data.table::fwrite(eval.smry.dt, data.outname)
   }
   
