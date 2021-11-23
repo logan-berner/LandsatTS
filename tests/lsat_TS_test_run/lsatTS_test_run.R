@@ -8,13 +8,14 @@ setwd('C:/Users/Logan/Google Drive/research/code/lsatTS/')
 # source R functions in lsatTS package
 lsatTS.fun.files = list.files('R/', full.names = T)
 sapply(lsatTS.fun.files, source)
-
-# Read in and combine files containing Landsat data extracted from GEE using lsat_download_ts()
-lsat.extract.files <- list.files('tests/lsat_TS_test_run/lsat_extract/', full.names = T)
-lsat.dt <- do.call("rbind", lapply(lsat.extract.files, fread))
-setnames(lsat.dt, 'pixel_id','site') # all lsatTS function depend on there being a column called "site" that uniquely identifies each location
+ 
+# # Read in and combine files containing Landsat data extracted from GEE using lsat_download_ts()
+# lsat.extract.files <- list.files('tests/lsat_TS_test_run/lsat_extract/', full.names = T)
+# lsat.dt <- do.call("rbind", lapply(lsat.extract.files, fread))
+# setnames(lsat.dt, 'pixel_id','site') # all lsatTS function depend on there being a column called "site" that uniquely identifies each location
 
 # Parse data, filter to clear-sky observations, compute mean surface reflectance among pxls w/in each window around a site
+lsat.dt <- fread('../../../earth_engine/lsat_brooks_range_transect_chunk_1_test.csv')
 lsat.dt <- lsat_general_prep(lsat.dt)
 
 # Clean the data, filtering out clouds, snow, water, radiometric and geometric errors
