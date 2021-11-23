@@ -52,12 +52,7 @@ lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, si = 'ndvi', min.fra
 lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, si = 'ndvi', min.obs = 5, reps = 10, min.frac.of.max = 0.75)
 ggsave('figures/Disko_NDVImax_evaluation.jpg', width = 6, height = 4, units = 'in', dpi = 400)
 
-# Compute temporal trends in NDVImax
-lsat.gs.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020)
-ggsave('figures/Disko_NDVImax_trends.jpg', width = 6, height = 3, units = 'in', dpi = 400)
-
-
 # Write out data.table with growing season summaries
-# fwrite(lsat.gs.dt, 'tests/lsat_TS_test_run/lsat_annual_growing_season_summaries.csv')
+fwrite(lsat.gs.dt, 'data/lsat_annual_growing_season_summaries.csv')
 
 # END SCRIPT #--------------------------------------------------------------------------------------------------------
