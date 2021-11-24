@@ -18,6 +18,7 @@ untar("man/manuscript/data/18_37_2_2_2m_v3.0.tar.gz")
 # Load
 dem <- raster("man/manuscript/data/18_37_2_2_2m_v3.0_reg_dem.tif")
 
+dem <- raster("C:/Users/Logan/My Drive/research/code/lsatTS/man/manuscript/data/disko_arcticDEM_crop.tif")
 
 ## WorldView
 # WorldView image for Disko Island acquired on 14 July 2019, purchased by Signe Normand

@@ -21,8 +21,17 @@ setwd('C:/Users/Logan/My Drive/research/code/lsatTS/man/manuscript/')
 # Initialize Earth Engine
 ee_Initialize()
 
-# Read in a spatial polygon that demarcates the study area
-aoi.poly <- st_read('data/aoi_extent.kml')
+# Create a spatial polygon that demarcates the study area
+aoi.proj <- st_crs('+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs')
+
+aoi.poly <- st_polygon(list(matrix(
+  c(-332950,-2243300,
+    -334950,-2243300,
+    -334950,-2245300,
+    -332950,-2245300,
+    -332950,-2243300),
+  ncol = 2, byrow = T))) %>%
+  st_sfc(crs = aoi.proj)
 
 # Get the central coordinates for each Landsat pixels in study area
 aoi.pts <- lsat_get_pixel_centers(aoi.poly)
