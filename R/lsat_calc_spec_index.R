@@ -30,20 +30,27 @@
 lsat_calc_spec_index <- function(dt, si){
   dt <- data.table::data.table(dt)
   si <- tolower(si)
-  if (si == 'evi'){dt[, evi := 2.5  * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)]}
-  if (si == 'evi2'){dt[, evi2 := 2.5  * (nir - red) / (nir + 2.5 * red + 1)]}
-  if (si == 'gndvi'){dt[, gndvi := (nir - green) / (nir + green)]}
-  if (si == 'kndvi'){dt[, kndvi := tanh(((nir - red) / (nir + red))^2)]}
-  if (si == 'msi'){dt[, msi := swir1 / nir]}
-  if (si == 'nbr'){dt[, nbr := (swir1 - swir2) / (swir1 + swir2)]} 
-  if (si == 'nirv'){dt[, nirv := (nir * (nir - red)) / (nir + red)]}
-  if (si == 'ndii'){dt[, ndii := (nir - swir1) / (nir + swir1)]}
-  if (si == 'ndmi'){dt[, ndmi := (nir - swir1)/(nir + swir1)]}
-  if (si == 'ndvi'){dt[, ndvi := (nir - red) / (nir + red)]}
-  if (si == 'ndwi'){dt[, ndwi := (green - nir) / (green + nir)]}
-  if (si == 'psri'){dt[, psri := (red - blue) / nir]}
-  if (si == 'satvi'){dt[, satvi := 1.5 * ((swir1 - red) / (swir1 + red + 0.5)) - swir2/2]}
-  if (si == 'savi'){dt[, sati := (1.5 * (nir - red)) / (nir + red + 0.5)]}
-  if (si == 'wdrvi'){dt[, wdrvi := (0.2*nir - red) / (0.2*nir + red)]}
-  dt
+  avail.si <- c('evi','evi2','gndvi','kndvi','msi','nbr','nirv','ndii',
+                'ndmi','ndvi','ndwi','psri','satvi','savi','wdrvi')
+  
+  if (si %in% avail.si){
+    if (si == 'evi'){dt[, evi := 2.5  * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)]}
+    if (si == 'evi2'){dt[, evi2 := 2.5  * (nir - red) / (nir + 2.5 * red + 1)]}
+    if (si == 'gndvi'){dt[, gndvi := (nir - green) / (nir + green)]}
+    if (si == 'kndvi'){dt[, kndvi := tanh(((nir - red) / (nir + red))^2)]}
+    if (si == 'msi'){dt[, msi := swir1 / nir]}
+    if (si == 'nbr'){dt[, nbr := (swir1 - swir2) / (swir1 + swir2)]} 
+    if (si == 'nirv'){dt[, nirv := (nir * (nir - red)) / (nir + red)]}
+    if (si == 'ndii'){dt[, ndii := (nir - swir1) / (nir + swir1)]}
+    if (si == 'ndmi'){dt[, ndmi := (nir - swir1)/(nir + swir1)]}
+    if (si == 'ndvi'){dt[, ndvi := (nir - red) / (nir + red)]}
+    if (si == 'ndwi'){dt[, ndwi := (green - nir) / (green + nir)]}
+    if (si == 'psri'){dt[, psri := (red - blue) / nir]}
+    if (si == 'satvi'){dt[, satvi := 1.5 * ((swir1 - red) / (swir1 + red + 0.5)) - swir2/2]}
+    if (si == 'savi'){dt[, sati := (1.5 * (nir - red)) / (nir + red + 0.5)]}
+    if (si == 'wdrvi'){dt[, wdrvi := (0.2*nir - red) / (0.2*nir + red)]}
+    dt
+  } else {
+    print('The requested SI is not currently available...')
+  }
 }
