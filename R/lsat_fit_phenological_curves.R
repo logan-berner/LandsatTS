@@ -25,48 +25,82 @@
 #' @export lsat_fit_phenological_curves
 #'
 #' @examples # To come...
-#'
-lsat_fit_phenological_curves = function(dt, si, window.yrs=5, window.min.obs=10, si.min = 0, spar=0.7, pcnt.dif.thresh=100, spl.fit.outfile=F, progress=T){
-  dt <- data.table::data.table(dt)
 
+# dt=lsat.dt
+# si='ndvi'
+# window.yrs=10
+# window.min.obs=15
+# si.min = 0.15
+# spar=0.75
+# pcnt.dif.thresh=30
+# spl.fit.outfile='output/disko_test.csv'
+# progress=T
+# weight = T
+
+lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15, si.min=0, spar=0.75,
+                                        pcnt.dif.thresh=30, weight=T, spl.fit.outfile=F, progress=T){
+  dt <- data.table::data.table(dt)
+  
   # GET SAMPLE sample, DOY, YEAR, AND SPECTRAL INDEX FROM INPUT DATA TABLE
   dt <- dt[, eval(c('sample.id','latitude','longitude','year','doy',si)), with=F]
   dt <- data.table::setnames(dt, si, 'si')
   dt <- dt[order(sample.id,doy)]
-
+  
   # FILTER OUT LOW VALUES
   dt <- dt[si >= si.min]
-
+  
   # IDENTIFY TIME PERIODS
   all.yrs <- sort(unique(dt$year))
-  focal.yrs <- all.yrs[-c(1:(round(window.yrs/2)), (length(all.yrs)-round(window.yrs/2)+1):length(all.yrs))]
+  rng.yrs <- min(all.yrs):max(all.yrs)
+  focal.yrs <- rng.yrs[-c(1:(round(window.yrs/2)), (length(rng.yrs)-round(window.yrs/2)+1):length(rng.yrs))]
   n.focal.yrs <- length(focal.yrs)
-
+  
   # CREATE LISTS FOR TEMPORARY STORAGE
   data.list <- list()
   splines.list <- list()
-
+  
   # LOOP THROUGH FOCAL YEARS, FITTING SPLINE FOR EACH SAMPLE SITE
-  for (i in 1:n.focal.yrs){
+  all.yrs <- min(dt$year):max(dt$year)
+  for (i in all.yrs){
+    focal.yr <- i
+    
+    # DETERMINE FOCAL WINDOW
+    half.win.yrs <- round(window.yrs/2)
+    if (i - half.win.yrs < min(all.yrs)){ # start of record
+      focal.win <- min(all.yrs):(min(all.yrs)+window.yrs-1)
+    } else if (i + half.win.yrs > max(all.yrs)){ # end of record
+      focal.win <- (max(all.yrs)-window.yrs+1):max(all.yrs)
+    } else{ # middle of record
+      focal.win <- (i - half.win.yrs+1):(i + half.win.yrs-1)
+    }
+    
     # SUBSET OBS FROM FOCAL PERIOD
-    focal.yr <- focal.yrs[i]
-    focal.win <- seq(focal.yr-round(window.yrs/2), focal.yr+round(window.yrs/2))
     focal.dt <- dt[year %in% focal.win]
     focal.dt <- focal.dt[order(sample.id,doy)]
-
+    
     # COMPUTE NUMBER OF OBS DURING FOCAL PERIOD FOR EACH SAMPLE SITE AND EXCLUDE SITES WITH FEWER THAN SOME USE-SPECIFIC THRESHOLD
     focal.dt <- focal.dt[, n.obs.focal.win := .N, by = 'sample.id']
     focal.dt <- focal.dt[n.obs.focal.win >= window.min.obs]
-
-    if (nrow(focal.dt) == 0){next()}
-
-    doy.rng <- min(focal.dt$doy):max(focal.dt$doy)
-
+    
+    # IF NO SITES MEET THE OBSERVATION CRITERIA, THEN SKIP TO THE NEXT YEAR
+    if (nrow(focal.dt) == 0){
+      if (progress == T){print(paste0('skipping ', focal.yr,' because too little data'))}
+      next()
+    }
+    
     # FIT SPLINE TO SEASONAL TIME SERIES AT EACH SAMPLE SITE
-    splines.dt <- focal.dt[, .(spl.fit = list(stats::smooth.spline(doy, si, spar = spar))), by = 'sample.id']
+    if (weight == T){
+      focal.dt[, n.yrs.from.focal := abs(year - focal.yr)]
+      focal.dt[, weight := exp(-0.25*n.yrs.from.focal)]
+      splines.dt <- focal.dt[, .(spl.fit = list(stats::smooth.spline(doy, si, w = weight, spar = spar))), by = 'sample.id']
+    } else {
+      splines.dt <- focal.dt[, .(spl.fit = list(stats::smooth.spline(doy, si, spar = spar))), by = 'sample.id']
+    }
+    
+    doy.rng <- min(focal.dt$doy):max(focal.dt$doy)
     spline.fits.dt <- splines.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'sample.id']
     spline.fits.dt <- spline.fits.dt[, doy := doy.rng, by = 'sample.id']
-
+    
     # ITERATIVE QUALITY CHECK: LOOK FOR LARGE DIFFS BETWEEN OBS AND FITTED VALUES, DROP OBS WITH TOO LARGE A DIFF, REFIT SPLINES, RECHECK
     refitting = 1
     # ii=1
@@ -77,12 +111,12 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=5, window.min.obs=10,
       focal.dt <- focal.dt[abs.pcnt.dif <= pcnt.dif.thresh]
       focal.dt <- focal.dt[, c('spl.fit', 'abs.pcnt.dif'):= NULL]
       refit.dt <- focal.dt[sample.id %in% refit.sites]
-
+      
       # REFIT SPLINES AT SITES THAT HAD LARGE DIFFS BETWEEN OBS AND FITTED VALUES
       if (length(refit.sites) > 0){
         # set aside the splines that don't need to be refit
         spline.fits.dt <- spline.fits.dt[sample.id %in% refit.sites == F]
-
+        
         # check the number of obs per site and filter sites out those with too few obs
         refit.dt <- refit.dt[, n.obs.focal.win := .N, by = 'sample.id']
         refit.dt <- refit.dt[n.obs.focal.win >= window.min.obs]
@@ -92,7 +126,11 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=5, window.min.obs=10,
           refitting = 0
         } else{
           # refit
-          spline.refits.dt <- refit.dt[, .(spl.fit = list(stats::smooth.spline(doy, si, spar = spar))), by = 'sample.id']
+          if (weight == T){
+            spline.refits.dt <- refit.dt[, .(spl.fit = list(stats::smooth.spline(doy, si, w = weight, spar = spar))), by = 'sample.id']
+          } else {
+            spline.refits.dt <- refit.dt[, .(spl.fit = list(stats::smooth.spline(doy, si, spar = spar))), by = 'sample.id']
+          }
           spline.refits.dt <- spline.refits.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'sample.id']
           spline.refits.dt <- spline.refits.dt[, doy := doy.rng, by = 'sample.id']
           spline.fits.dt <- rbind(spline.fits.dt, spline.refits.dt)
@@ -102,7 +140,10 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=5, window.min.obs=10,
         refitting = 0
       }
     } # end of refitting
-
+    
+    # DROP SOME COLUMNS
+    focal.dt <- focal.dt[, c('n.yrs.from.focal','weight') := NULL]
+    
     # CALCULATE SEVERAL PHENOLOGY METRICS FOR EACH SAMPLE SITE
     sample.doy.smry <- focal.dt[, .(min.doy = min(doy), max.doy = max(doy)), by = 'sample.id'] # identify DOY range for each site
     spline.fits.dt <- spline.fits.dt[sample.doy.smry, on = 'sample.id']
@@ -114,39 +155,53 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=5, window.min.obs=10,
     spline.fits.dt <- spline.fits.dt[, focal.yr := focal.yr]
     spline.fits.dt <- spline.fits.dt[, c('min.doy','max.doy'):= NULL]
     splines.list[[i]] <- spline.fits.dt
-
+    
     # ADD PHENOLOGY METRICS TO FOCAL DATA
     focal.dt <- spline.fits.dt[focal.dt, on = c('sample.id','doy')]
     focal.dt <- focal.dt[, si.max.pred := si + si.adjustment]
     focal.dt <- focal.dt[, c('focal.yr') := NULL]
     setnames(focal.dt, c('n.obs.focal.win'),c('spl.n.obs'))
-
+    
     # ADD PHENOLOGY DATA TO MAIN DATA TABLE
-    if (i == 1){
-      yr.win <- c((focal.yr-(round(window.yrs/2))):focal.yr)
-      data.list[[i]] <- focal.dt[year %in% yr.win]
-    } else if (i == n.focal.yrs) {
-      yr.win <- c(focal.yr:(focal.yr+round(window.yrs/2)))
-      data.list[[i]] <- focal.dt[year %in% yr.win]
-    } else {
-      data.list[[i]] <- focal.dt[year == focal.yr]
-    }
-
+    data.list[[i]] <- focal.dt
+    
     # PRINT STATUS (if requested)
-    if (progress == T){print(paste('focal year: ', focal.yr, ' (', round(i/n.focal.yrs,2)*100, '% finished)', sep=''))}
-
+    if (progress == T){print(paste0('finished ', focal.yr))}
+    
   } # end focal year loop
-
+  
   # WRITE OUT FILE WITH SPLINE FITS (OPTIONAL)
+  spline.dt <- data.table::data.table(data.table::rbindlist(splines.list))
   if (spl.fit.outfile != F){
-    spline.dt <- data.table::data.table(data.table::rbindlist(splines.list))
     data.table::fwrite(spline.dt, spl.fit.outfile)
   }
-
+  
+  # OUTPUT FIGURE
+  example.ids <- sample(unique(dt$sample.id), 9)
+  example.obs.dt <- dt[sample.id %in% example.ids]
+  example.curves.dt <- spline.dt[sample.id %in% example.ids]
+  
+  fig <- ggplot2::ggplot(example.obs.dt, aes(doy, ndvi)) + 
+    ggplot2::labs(y=paste0('Landsat', toupper(si)), x='Day of Year') + 
+    ggplot2::ggtitle('9 random sample locations') + 
+    ggplot2::facet_wrap(~sample.id, nrow = 3, ncol = 3, scales = 'free_y') + 
+    ggplot2::geom_point(aes(fill = year), pch=21, color = 'black', size = 2) + 
+    ggplot2::scale_fill_gradientn(name = 'Observation', colours = c('blue','red','gold')) + 
+    ggplot2::geom_line(data = example.curves.dt, mapping = aes(doy, spl.fit, group = focal.yr, color = focal.yr)) + 
+    ggplot2::scale_color_gradientn(name = 'Curve',  colours = c('blue','red','gold')) + 
+    ggplot2::theme_bw() + ggplot2::theme(legend.position = 'right', 
+                                         legend.text=element_text(size=8), legend.title=element_text(size=10), 
+                                         axis.text=element_text(size=12), axis.title=element_text(size=14),
+                                         plot.title=element_text(hjust = 0.5)) + 
+    ggplot2::guides(colour = guide_colourbar(title.position="top", title.hjust = 0.5))
+  
+  print(fig)
+  
   # OUTPUT DATA TABLE
   dt <- data.table::data.table(rbindlist(data.list))
   dt <- dt[order(sample.id,year,doy)]
   data.table::setcolorder(dt, c('sample.id','latitude','longitude','year','doy','spl.n.obs','spl.fit','spl.frac.max','spl.fit.max','spl.fit.max.doy','si.adjustment','si','si.max.pred'))
   colnames(dt) <- gsub('si',si,colnames(dt))
   dt
+  
 }
