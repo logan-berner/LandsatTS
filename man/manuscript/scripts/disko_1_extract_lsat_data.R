@@ -37,6 +37,6 @@ aoi.pts <- lsat_get_pixel_centers(aoi.poly, plot_map = T)
 
 # Extract a time-series of Landsat surface reflectance measurements for each Landsat pixel
 task_list <- lsat_export_ts(pixel_coords_sf = aoi.pts, startJulian = 152, endJulian = 273,
-                            file_prefix = 'disko', drive_export_dir = 'earth_engine')
+                            file_prefix = 'disko', drive_export_dir = 'earth_engine/lsat_disko')
 
 # END SCRIPT ----------------------------------------------------------------------------------------
