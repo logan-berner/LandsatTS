@@ -186,7 +186,7 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15,
   example.obs.dt <- dt[sample.id %in% example.ids]
   example.curves.dt <- spline.dt[sample.id %in% example.ids]
   
-  fig <- ggplot2::ggplot(example.obs.dt, aes(doy, ndvi)) + 
+  fig <- ggplot2::ggplot(example.obs.dt, aes(doy, si)) + 
     ggplot2::labs(y=paste0('Landsat', toupper(si)), x='Day of Year') + 
     ggplot2::ggtitle('9 random sample locations') + 
     ggplot2::facet_wrap(~sample.id, nrow = 3, ncol = 3, scales = 'free_y') + 
