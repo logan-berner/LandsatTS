@@ -12,15 +12,17 @@
 #' to an existing column in the data.table.
 #' @param window.yrs Number specifying the focal window width in years that is used when pooling data to fit cubic splines (use odd numbers).
 #' @param window.min.obs Minimum number of focal window observations necessary to fit a cubic spline.
-#' @param si.min Minimum value of spectral index necessary for observation to be used when fitting cubic splines
+#' @param si.min Minimum value of spectral index necessary for observation to be used when fitting cubic splines. Defaults to 0.15 which for NDVI is about when plants are present.
 #' @param spar Smoothing parameter passed to smooth.spline(), typically around 0.65 - 0.75 for this application.
 #' @param pcnt.dif.thresh Allowable percent difference (0-100) between individual observations and fitted cubic spline.
 #' Observations that differ by more than this threshold are filtered out and the cubic spline is iteratively refit.
 #' @param spl.fit.outfile (Optional) Name of output csv file containing the fitted cubic splines for each sample site.
 #' Useful for subsequent visualization
 #' @param progress (TRUE/FALSE) Print a progress report?
-#' @return Data.table that provides, for each observation, information on the phenological conditions for that specific day of year during the focal period.
+#' @param test.run (TRUE/FALSE) If TRUE, then algorithm is run using a small random subset of data and only a figure is output. This is used for model parameterization.
+#' @return Data.table that provides, for each observation, information on the phenological conditions for that specific day of year during the focal period. 
 #' These data can then be used to estimate annual maximum spectral index and other growing season metrics using lsat_summarize_growing_season().
+#' A figure is also generated that shows observation points and phenological curves for nine random sample locations. 
 #' @import data.table
 #' @export lsat_fit_phenological_curves
 #'
@@ -38,9 +40,12 @@
 # weight = T
 
 lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15, si.min=0, spar=0.75,
-                                        pcnt.dif.thresh=30, weight=T, spl.fit.outfile=F, progress=T){
+                                        pcnt.dif.thresh=30, weight=T, spl.fit.outfile=F, progress=T, test.run=F){
   dt <- data.table::data.table(dt)
   
+  if (test.run == T){
+    dt <- dt[sample.id %in% sample(unique(dt$sample.id), 9)]
+    }
   # GET SAMPLE sample, DOY, YEAR, AND SPECTRAL INDEX FROM INPUT DATA TABLE
   dt <- dt[, eval(c('sample.id','latitude','longitude','year','doy',si)), with=F]
   dt <- data.table::setnames(dt, si, 'si')
@@ -198,10 +203,12 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15,
   print(fig)
   
   # OUTPUT DATA TABLE
-  dt <- data.table::data.table(rbindlist(data.list))
-  dt <- dt[order(sample.id,year,doy)]
-  data.table::setcolorder(dt, c('sample.id','latitude','longitude','year','doy','spl.n.obs','spl.fit','spl.frac.max','spl.fit.max','spl.fit.max.doy','si.adjustment','si','si.max.pred'))
-  colnames(dt) <- gsub('si',si,colnames(dt))
-  dt
+  if (test.run == F){
+    dt <- data.table::data.table(rbindlist(data.list))
+    dt <- dt[order(sample.id,year,doy)]
+    data.table::setcolorder(dt, c('sample.id','latitude','longitude','year','doy','spl.n.obs','spl.fit','spl.frac.max','spl.fit.max','spl.fit.max.doy','si.adjustment','si','si.max.pred'))
+    colnames(dt) <- gsub('si',si,colnames(dt))
+    dt
+  }
   
 }
