@@ -39,7 +39,7 @@
 # progress=T
 # weight = T
 
-lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15, si.min=0, spar=0.75,
+lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15, si.min=0.15, spar=0.75,
                                         pcnt.dif.thresh=30, weight=T, spl.fit.outfile=F, progress=T, test.run=F){
   dt <- data.table::data.table(dt)
   
