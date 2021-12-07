@@ -39,7 +39,7 @@
 # progress=T
 # weight = T
 
-lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15, si.min=0.15, spar=0.75,
+lsat_fit_phenological_curves = function(dt, si, window.yrs=11, window.min.obs=20, si.min=0.15, spar=0.73,
                                         pcnt.dif.thresh=30, weight=T, spl.fit.outfile=F, progress=T, test.run=F){
   dt <- data.table::data.table(dt)
   
@@ -146,8 +146,10 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15,
       }
     } # end of refitting
     
-    # DROP SOME COLUMNS
-    focal.dt <- focal.dt[, c('n.yrs.from.focal','weight') := NULL]
+    # DROP WEIGHTING COLUMNS
+    if (weight == T){
+      focal.dt <- focal.dt[, c('n.yrs.from.focal','weight') := NULL]
+    }
     
     # CALCULATE SEVERAL PHENOLOGY METRICS FOR EACH SAMPLE SITE
     sample.doy.smry <- focal.dt[, .(min.doy = min(doy), max.doy = max(doy)), by = 'sample.id'] # identify DOY range for each site
@@ -188,7 +190,7 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=9, window.min.obs=15,
   
   fig <- ggplot2::ggplot(example.obs.dt, aes(doy, si)) + 
     ggplot2::labs(y=paste0('Landsat', toupper(si)), x='Day of Year') + 
-    ggplot2::ggtitle('9 random sample locations') + 
+    ggplot2::ggtitle('Nine random sample locations') + 
     ggplot2::facet_wrap(~sample.id, nrow = 3, ncol = 3, scales = 'free_y') + 
     ggplot2::geom_point(aes(fill = year), pch=21, color = 'black', size = 2) + 
     ggplot2::scale_fill_gradientn(name = 'Observation', colours = c('blue','red','gold')) + 
