@@ -4,7 +4,7 @@
 # Author: Logan Berner 
 # Institution: Northern Arizona University, School of Informatics, Computing, and Cyber Systems
 # Date: 2021-11-18
-# URL: https://github.com/logan-berner/lsatTS
+# URL: https://github.com/logan-berner/lsatTS 
 #---------------------------------------------------------------------------------------------------
 
 # Clear workspace

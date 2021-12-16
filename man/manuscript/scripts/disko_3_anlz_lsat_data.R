@@ -14,69 +14,70 @@ rm(list=ls())
 require(data.table)
 require(lsatTS)
 require(ggplot2)
-require(raster)
-require(RStoolbox)
+require(sf)
+setwd('C:/Users/Logan/My Drive/research/code/lsatTS/man/manuscript/')
+
 
 # ANALYZE LANDSAT DATA ------------------------------------------------------------------------
 
 # Read in data files
-lsat.gs.dt <- fread('data/lsat_annual_growing_season_summaries.csv')
+lsat.gs.dt <- fread('output/lsat_annual_growing_season_summaries.csv')
+lsat.gs.dt <- lsat.gs.dt[year >= 2000]
 
 # Compute temporal trends in NDVImax
 lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020)
-ggsave('figures/Disko_NDVImax_trends.jpg', width = 6, height = 3, units = 'in', dpi = 400)
+ggsave('figures/figure 7 disko ndvi max trend distribution.jpg', width = 6, height = 3, units = 'in', dpi = 400)
 
 # Convert to simple feature and write out shapefile
-lsat.trend.sf <- lsat.gs.trend.dt %>% st_as_sf(coords=c('longitude', 'latitude'), crs = st_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
-lsat.trend.sf <- lsat.trend.sf %>% st_transform(crs = st_crs(img.stk))
+lsat.trend.sf <- lsat.trend.dt %>% st_as_sf(coords=c('longitude', 'latitude'), crs = st_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+lsat.trend.sf <- lsat.trend.sf %>% st_transform(crs = 3413)
 st_write(lsat.trend.sf, dsn = 'data/lsat_ndvimax_trends.shp')
 
+# Summarize trends in NDVImax
+round(prop.table(table(lsat.trend.dt$trend.cat)),2)
+mean(lsat.trend.dt$total.change.pcnt)
+median(lsat.trend.dt$total.change.pcnt)
+sd(lsat.trend.dt$total.change.pcnt)
 
-## 4) QC: Data visualisation ----
-ndvi.fig <- ggplot(lsat.gs.dt, aes(year, ndvi.max)) + 
-  ylim(0.25,0.85) + 
+mean(lsat.trend.dt$total.change)
+median(lsat.trend.dt$total.change)
+sd(lsat.trend.dt$total.change)
+
+# Create time series figure for each trend class
+lsat.gs.dt <- lsat.gs.dt[lsat.trend.dt, on = 'sample.id']
+
+lsat.trend.cls.yrly.dt <- lsat.gs.dt[, .(ndvi.max.avg = mean(ndvi.max,na.rm = T), ndvi.max.sd = sd(ndvi.max, na.rm = T),
+                                         n = .N), by = c('trend.cat','year')]
+
+lsat.trend.cls.yrly.dt[, ndvi.max.se := ndvi.max.sd/sqrt(n)]
+
+
+lsat.trend.cls.yrly.dt[, trend.cat := factor(trend.cat, levels = c('browning','no_trend','greening'), 
+                                             labels = c('browning','no trend','greening'))]
+trend.cols <- c('brown','ivory3','green')
+ggplot(lsat.trend.cls.yrly.dt[year != 2003], aes(year, ndvi.max.avg, group = trend.cat, color = trend.cat)) + 
+  ylim(0.40,0.65) + 
   labs(y='Landsat NDVImax', x='Year') + 
-  geom_line(data = lsat.gs.dt, 
-            mapping = aes(year, ndvi.max, group = sample.id, color = sample.id), 
-            alpha = 0.25, 
-            size=0.5) + 
-  #scale_color_gradientn(colours = rainbow(1000)) +
+  geom_ribbon(aes(ymin=ndvi.max.avg-ndvi.max.se,ymax=ndvi.max.avg+ndvi.max.se, fill=trend.cat),alpha=0.3, linetype=0)+
+  geom_line(aes(color = trend.cat), alpha = 1, size=1) + 
+  scale_fill_manual(values = trend.cols, name = 'Trend class') + 
+  scale_color_manual(values = trend.cols, name = 'Trend class')+
   theme_bw() +
-  theme(legend.position="none", 
+  theme(legend.position="right", 
         axis.text=element_text(size=12), 
         axis.title=element_text(size=14),
         plot.title=element_text(hjust = 0.5))
-ndvi.fig
 
+ggsave('figures/figure 8 disko ndvi max time series.jpg', width = 6, height = 4, units = 'in', dpi = 400)
 
-
-# Write out data.table with growing season summaries
-# fwrite(lsat.gs.dt, 'tests/lsat_TS_test_run/lsat_annual_growing_season_summaries.csv')
 
 # END SCRIPT #--------------------------------------------------------------------------------------------------------
 
+xx <- lsat.gs.dt[year == 2003 & trend.cat == 'browning']
+hist(xx$ndvi.max)
+fivenum(xx$ndvi.max)
+mean(xx$ndvi.max)
 
- 
-# img.stk <- stack('data/disko_s2_crop.tif')
-# 
-# img.stk <- stack('data/disko_wv_2019_crop.tif')
-# img.stk <- raster::subset(img.stk, c(2,3,5))
-# img.stk <- raster::shift(img.stk, dx = 100, dy = 30)
-# 
-# ggRGB(img.stk, r = 3, g = 2, b = 1, stretch = 'lin', ggObj = T, coord_equal = F)
-# 
-# ggRGB(img.stk, r = 3, g = 2, b = 1, stretch = 'lin', ggObj = T, coord_equal = F) + 
-#   geom_sf(data = lsat.trend.sf, aes(color = total.change.pcnt)) + 
-#   scale_color_gradient2(low="darkorange4", mid='white', high="darkgreen", limits = c(-50,50), midpoint = 0, name = 'Total change (%)')
-# 
-# ggsave('figures/Disko_NDVImax_trends_landscape.jpg', width = 6, height = 6, units = 'in', dpi = 400)
-# 
-# ggRGB(img.stk, r = 5, g = 3, b = 2, stretch = 'lin', ggObj = T)
-# 
-# ggplot() + geom_sf(data = lsat.trend.sf, aes(color = total.change.pcnt)) + 
-#   scale_color_gradient2(low="darkorange4", mid='white', high="darkgreen", limits = c(-50,50), midpoint = 0)
-# 
-# geom_point(data = lsat.trend.sf, aes(longitude, latitude, color = total.change.pcnt))
-# ggplot(pt_buff)  + theme_light() +
-#   geom_point(data = pts, aes(x = x, y = y), size = 1) +
-#   geom_sf(col = "blue", size = 1.2, fill = "transparent") +
+n.sites.tot <- length(unique(lsat.gs.dt$sample.id))
+n.sites.yrly <- lsat.gs.dt[, .(n.sites = .N), by = 'year']
+n.sites.yrly/n.sites.tot
