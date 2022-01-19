@@ -203,12 +203,18 @@ lsat_calibrate_rf <- function(dt, band.or.si, doy.rng = 152:243, min.obs = 5, tr
     fig.raw <- fig.raw + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange', size=1.5, alpha=0.5) + ggplot2::scale_fill_viridis_c()
     fig.raw <- fig.raw + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=uncal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
     fig.raw <- fig.raw + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
+    fig.raw <- fig.raw + ggplot2::theme(legend.title=ggplot2::element_text(size=10), legend.text=ggplot2::element_text(size=9))
+    fig.raw <- fig.raw + ggplot2::theme(legend.position = c(0.15, 0.8))
+    
     
     # cal figure
     fig.cal <- ggplot2::ggplot(rf.eval.dt, ggplot2::aes_string(x = pred, y = obs))
     fig.cal <- fig.cal + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange', size=1.5, alpha=0.5) + ggplot2::scale_fill_viridis_c()
     fig.cal <- fig.cal + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=cal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
     fig.cal <- fig.cal + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
+    fig.cal <- fig.cal + ggplot2::theme(legend.title=ggplot2::element_text(size=10), legend.text=ggplot2::element_text(size=9))
+    fig.cal <- fig.cal + ggplot2::theme(legend.position = c(0.15, 0.8))
+    
     
     # combine figures
     fig <- ggpubr::ggarrange(fig.raw, fig.cal, ncol = 2)
