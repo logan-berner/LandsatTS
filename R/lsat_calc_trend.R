@@ -11,7 +11,7 @@
 #' @param nyr.min.frac Fraction of years within the time period for which observations must be available if a trend is to be computed
 #' @param sig A p-value significance cutoff used to categories trends (e.g., 0.10)
 #'
-#' @return Data.table with summary of temporal trend by site
+#' @return Data.table with summary of temporal trends by site and a histogram showing summarizing relative changes in vegetation greenness 
 #' @export lsat_calc_trend
 #' @import data.table
 #' @examples # Forthcoming...
@@ -63,13 +63,15 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   trnd.dt[pval <= sig & slope < 0, trend.cat := 'browning']
   trnd.dt[pval > sig, trend.cat := 'no_trend']
   
-  # output.lst[['trend_summary']] <- trnd.dt
+  # histogram of vegetation greenness trends
+  fig <- ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt, fill=..x..)) +
+    ggplot2::geom_histogram(bins = 100, size = 0.25, color = 'gray20') +
+    ggplot2::scale_fill_gradient2(low="darkgoldenrod4", mid='white', high="darkgreen", limits = c(-50,50), midpoint = 0) +
+    ggplot2::labs(y = 'Number of sample sites', x = paste0("Relative change in Landsat ", gsub('.MAX', 'max', toupper(si)), ' from ', min(yrs), ' to ', max(yrs), ' (%)')) +
+    ggplot2::theme_bw() + 
+    ggplot2::theme(legend.position = 'none', axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold")) + 
+    ggplot2::xlim(-50, 50)
   
-  # density plot of slope
-  fig <- ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt)) +
-    ggplot2::geom_density(fill='lightblue') +
-    ggplot2::labs(y='Density', x=paste0("Total change in Landsat ", gsub('.MAX', 'max', toupper(si)), ' from ', min(yrs), ' to ', max(yrs), ' (%)')) + 
-    ggplot2::theme_bw()
   
   # output
   print(fig)
