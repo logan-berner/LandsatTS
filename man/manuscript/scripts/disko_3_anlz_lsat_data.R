@@ -15,7 +15,7 @@ require(data.table)
 require(lsatTS)
 require(ggplot2)
 require(sf)
-setwd('C:/Users/Logan/My Drive/research/code/lsatTS/man/manuscript/')
+setwd('C:/Users/lb968/My Drive/research/code/lsatTS/man/manuscript/')
 
 
 # ANALYZE LANDSAT DATA ------------------------------------------------------------------------
@@ -25,23 +25,14 @@ lsat.gs.dt <- fread('output/lsat_annual_growing_season_summaries.csv')
 lsat.gs.dt <- lsat.gs.dt[year >= 2000]
 
 # Compute temporal trends in NDVImax
-lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020)
-ggsave('figures/figure 7 disko ndvi max trend distribution.jpg', width = 6, height = 3, units = 'in', dpi = 400)
+lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020, legend.position = c(0.65,0.9))
+ggsave('figures/figure 7 disko ndvi max trend distribution.jpg', width = 6, height = 8, units = 'in', dpi = 400)
+# ggsave('figures/figure 7 disko ndvi max trend distribution.jpg', width = 6, height = 3, units = 'in', dpi = 400)
 
 # Convert to simple feature and write out shapefile
 lsat.trend.sf <- lsat.trend.dt %>% st_as_sf(coords=c('longitude', 'latitude'), crs = st_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 lsat.trend.sf <- lsat.trend.sf %>% st_transform(crs = 3413)
 st_write(lsat.trend.sf, dsn = 'data/lsat_ndvimax_trends.shp')
-
-# Summarize trends in NDVImax
-round(prop.table(table(lsat.trend.dt$trend.cat)),2)
-mean(lsat.trend.dt$total.change.pcnt)
-median(lsat.trend.dt$total.change.pcnt)
-sd(lsat.trend.dt$total.change.pcnt)
-
-mean(lsat.trend.dt$total.change)
-median(lsat.trend.dt$total.change)
-sd(lsat.trend.dt$total.change)
 
 # Create time series figure for each trend class
 lsat.gs.dt <- lsat.gs.dt[lsat.trend.dt, on = 'sample.id']
@@ -54,7 +45,7 @@ lsat.trend.cls.yrly.dt[, ndvi.max.se := ndvi.max.sd/sqrt(n)]
 
 lsat.trend.cls.yrly.dt[, trend.cat := factor(trend.cat, levels = c('browning','no_trend','greening'), 
                                              labels = c('browning','no trend','greening'))]
-trend.cols <- c('brown','ivory3','green')
+trend.cols <- c('darkgoldenrod4','ivory3','darkgreen')
 ggplot(lsat.trend.cls.yrly.dt[year != 2003], aes(year, ndvi.max.avg, group = trend.cat, color = trend.cat)) + 
   ylim(0.40,0.65) + 
   labs(y='Landsat NDVImax', x='Year') + 
@@ -63,7 +54,7 @@ ggplot(lsat.trend.cls.yrly.dt[year != 2003], aes(year, ndvi.max.avg, group = tre
   scale_fill_manual(values = trend.cols, name = 'Trend class') + 
   scale_color_manual(values = trend.cols, name = 'Trend class')+
   theme_bw() +
-  theme(legend.position="right", 
+  theme(legend.position=c(0.8, 0.2), 
         axis.text=element_text(size=12), 
         axis.title=element_text(size=14),
         plot.title=element_text(hjust = 0.5))
@@ -72,12 +63,3 @@ ggsave('figures/figure 8 disko ndvi max time series.jpg', width = 6, height = 4,
 
 
 # END SCRIPT #--------------------------------------------------------------------------------------------------------
-
-xx <- lsat.gs.dt[year == 2003 & trend.cat == 'browning']
-hist(xx$ndvi.max)
-fivenum(xx$ndvi.max)
-mean(xx$ndvi.max)
-
-n.sites.tot <- length(unique(lsat.gs.dt$sample.id))
-n.sites.yrly <- lsat.gs.dt[, .(n.sites = .N), by = 'year']
-n.sites.yrly/n.sites.tot

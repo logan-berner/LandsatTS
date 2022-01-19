@@ -14,19 +14,10 @@ rm(list=ls())
 require(data.table)
 require(lsatTS)
 require(ggplot2)
-require(googledrive)
 require(purrr)
 require(R.utils)
-setwd('C:/Users/Logan/My Drive/research/code/lsatTS/man/manuscript/')
 
-# # DOWNLOAD EXPORTED LANDSAT DATA FROM GOOGLE DRIVE ----------------------------------------------
-# folder.url <- "https://drive.google.com/drive/u/0/folders/1m5j1CdLIX8Tb3LgoxUDz-MDgR_tpvA0E"
-# folder <- drive_get(as_id(folder.url))
-# files <- drive_ls(folder, type = "csv")
-# mkdirs('output/lsat_exports/')
-# for (i in 1:nrow(files)){
-#   drive_download(file = as_id(files$id[i]), path = paste0('output/lsat_exports/',files$name[i]))
-# }
+setwd('C:/Users/lb968/My Drive/research/code/lsatTS/man/manuscript/')
 
 # PROCESS LANDSAT DATA ------------------------------------------------------------------------
 
