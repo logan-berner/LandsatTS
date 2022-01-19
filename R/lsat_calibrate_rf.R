@@ -203,8 +203,8 @@ lsat_calibrate_rf <- function(dt, band.or.si, doy.rng = 152:243, min.obs = 5, tr
     fig.raw <- fig.raw + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange', size=1.5, alpha=0.5) + ggplot2::scale_fill_viridis_c()
     fig.raw <- fig.raw + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=uncal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
     fig.raw <- fig.raw + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
-    fig.raw <- fig.raw + ggplot2::theme(legend.title=ggplot2::element_text(size=10), legend.text=ggplot2::element_text(size=9))
-    fig.raw <- fig.raw + ggplot2::theme(legend.position = c(0.15, 0.8))
+    fig.raw <- fig.raw + ggplot2::theme(legend.title=ggplot2::element_text(size=12), legend.text=ggplot2::element_text(size=12))
+    fig.raw <- fig.raw + ggplot2::theme(legend.position = c(0.15, 0.75))
     
     
     # cal figure
@@ -212,8 +212,8 @@ lsat_calibrate_rf <- function(dt, band.or.si, doy.rng = 152:243, min.obs = 5, tr
     fig.cal <- fig.cal + ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + ggplot2::geom_abline(color='orange', size=1.5, alpha=0.5) + ggplot2::scale_fill_viridis_c()
     fig.cal <- fig.cal + ggplot2::theme_bw() + ggplot2::labs(y=lsat7.ylab, x=cal.xlab) + ggplot2::coord_cartesian(ylim=c(axis.min, axis.max), xlim=c(axis.min, axis.max))
     fig.cal <- fig.cal + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
-    fig.cal <- fig.cal + ggplot2::theme(legend.title=ggplot2::element_text(size=10), legend.text=ggplot2::element_text(size=9))
-    fig.cal <- fig.cal + ggplot2::theme(legend.position = c(0.15, 0.8))
+    fig.cal <- fig.cal + ggplot2::theme(legend.title=ggplot2::element_text(size=12), legend.text=ggplot2::element_text(size=12))
+    fig.cal <- fig.cal + ggplot2::theme(legend.position = c(0.15, 0.75))
     
     
     # combine figures
@@ -222,7 +222,7 @@ lsat_calibrate_rf <- function(dt, band.or.si, doy.rng = 152:243, min.obs = 5, tr
     # write out fig or save to list to write later if calibrating more than one satellite
     if (length(sats) == 1){
       fig.name <- paste(outdir, '/', outfile.id, '_', i, '_xval_pred_vs_obs.jpg', sep='')
-      grDevices::jpeg(fig.name, 4.5, 4, units = 'in', res=400)
+      grDevices::jpeg(fig.name, 4, 4, units = 'in', res=400)
       print(fig)
       grDevices::dev.off()
       print(fig)
@@ -235,7 +235,7 @@ lsat_calibrate_rf <- function(dt, band.or.si, doy.rng = 152:243, min.obs = 5, tr
   if (length(sats) == 2){
     fig <- ggpubr::ggarrange(fig.lst[[1]], fig.lst[[2]], ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9)
     fig.name <- paste(outdir, '/', outfile.id,'_xval_pred_vs_obs.jpg', sep='')
-    grDevices::jpeg(fig.name, 9, 7.5, units = 'in', res=400)
+    grDevices::jpeg(fig.name, 8.5, 7.5, units = 'in', res=400)
     print(fig)
     grDevices::dev.off()
     print(fig)
