@@ -41,9 +41,13 @@ lsat_summarize_data_avail <- function(dt){
                                   n.q975 = quantile(n.obs, 0.975)),
                               by = c('year','satellite')]
   
+  yr.sat.smry.dt <- rbind(yr.sat.smry.dt[satellite == 'LANDSAT_5' & year <= 2013],
+                          yr.sat.smry.dt[satellite == 'LANDSAT_7' & year >= 1999],
+                          yr.sat.smry.dt[satellite == 'LANDSAT_8' & year >= 2013])
+  
   fig <- ggplot2::ggplot(yr.sat.smry.dt, aes(x = year, y = n.q500, group = satellite, color = satellite, fill = satellite)) + ggplot2::geom_ribbon(aes(ymin=n.q025, ymax=n.q975), alpha=0.3, color=NA) + 
-    ggplot2::geom_line(lwd = 1.5) + 
-    ggplot2::geom_point(size = 3) + 
+    ggplot2::geom_line(lwd = 1.5, alpha = 0.5) + 
+    ggplot2::geom_point(size = 3, alpha = 0.5) + 
     ggplot2::ylim(c(0,max(yr.sat.smry.dt$n.q975)+max(yr.sat.smry.dt$n.q975)*0.05))+
     ggplot2::labs(y='Number of observations per sample site', x='Year') + 
     ggplot2::ggtitle('Median count with 2.5th and 97.5th percentiles') + 
