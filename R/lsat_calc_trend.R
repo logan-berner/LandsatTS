@@ -38,6 +38,7 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   site.smry <- site.smry[first.yr.abs.dif <= yr.tolerance][, first.yr.abs.dif := NULL]
   site.smry <- site.smry[last.yr.abs.dif <= yr.tolerance][, last.yr.abs.dif := NULL]
   
+  
   # identify sites with observations from atleast a user-specific number of years during the time period
   site.smry <- site.smry[n.yr.obs >= round(length(yrs)*nyr.min.frac)]
 
@@ -63,6 +64,14 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   trnd.dt[pval <= sig & slope < 0, trend.cat := 'browning']
   trnd.dt[pval > sig, trend.cat := 'no_trend']
   
+  # create output message
+  avg <- round(mean(trnd.dt$total.change.pcnt),2)
+  std <- round(sd(trnd.dt$total.change.pcnt),2)
+  pcnts <- round(prop.table(table(trnd.dt$trend.cat)),3)*100
+  msg <- paste0("Mean (SD) relative change of ", avg, " (", std,") % with browning, greening, and no trend at ", pcnts[1], ", ", pcnts[2], ", and ", pcnts[3], " % of sample sites")
+  
+  
+  
   # histogram of vegetation greenness trends
   fig <- ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt, fill=..x..)) +
     ggplot2::geom_histogram(bins = 50, size = 0.25, color = 'gray20') +
@@ -75,6 +84,7 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   
   # output
   print(fig)
+  print(msg)
   trnd.dt
 }
 
