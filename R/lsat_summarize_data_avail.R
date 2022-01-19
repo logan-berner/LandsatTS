@@ -54,7 +54,7 @@ lsat_summarize_data_avail <- function(dt){
     ggplot2::scale_fill_discrete('Satellite') +
     ggplot2::scale_color_discrete('Satellite') +
     ggplot2::theme_bw() + 
-    ggplot2::theme(legend.position = c(0.15, 0.8), axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
+    ggplot2::theme(legend.position = c(0.15, 0.8), axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14))
   
   # return
   print(smry.msg)

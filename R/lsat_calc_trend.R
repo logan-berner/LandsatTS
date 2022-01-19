@@ -65,11 +65,11 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   
   # histogram of vegetation greenness trends
   fig <- ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt, fill=..x..)) +
-    ggplot2::geom_histogram(bins = 100, size = 0.25, color = 'gray20') +
+    ggplot2::geom_histogram(bins = 50, size = 0.25, color = 'gray20') +
     ggplot2::scale_fill_gradient2(low="darkgoldenrod4", mid='white', high="darkgreen", limits = c(-50,50), midpoint = 0) +
     ggplot2::labs(y = 'Number of sample sites', x = paste0("Relative change in Landsat ", gsub('.MAX', 'max', toupper(si)), ' from ', min(yrs), ' to ', max(yrs), ' (%)')) +
     ggplot2::theme_bw() + 
-    ggplot2::theme(legend.position = 'none', axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold")) + 
+    ggplot2::theme(legend.position = 'none', axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14)) + 
     ggplot2::xlim(-50, 50)
   
   

@@ -67,7 +67,7 @@ lsat_evaluate_phenological_max <- function(dt, si, min.frac.of.max = 0.75, zscor
   ylab.pcntdif <- bquote("Difference from observed "~.(toupper(gsub('.xcal','',si)))['max']~" (%)")
   fig <- ggplot2::ggplot(eval.smry.dt, ggplot2::aes(n.obs.fac, pcnt.dif, fill=Processing)) + ggplot2::geom_boxplot(outlier.size=0.7, outlier.color='gray')
   fig <- fig + ggplot2::theme_bw() + ggplot2::labs(y=ylab.pcntdif, x='Number of observations')
-  fig <- fig + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14,face="bold"))
+  fig <- fig + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14))
   print(fig)
   
   # console output
