@@ -16,19 +16,19 @@
 #' @import data.table
 #' @examples # Forthcoming...
 
-lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, sig = 0.10){
+lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, sig = 0.10, legend.position=c(0.8, 0.2), legend.dir = 'horizontal'){
   dt <- data.table::data.table(dt)
   data.table::setnames(dt, si, 'si')
-
+  
   # subset to years of interest
   dt <- dt[year %in% yrs]
-
+  
   # summarize spatial and temporal data by site
   site.smry <- dt[, .(first.yr = min(year), last.yr = max(year), n.yr.obs = .N), 
                   by = c('sample.id','latitude','longitude')]
   
   site.smry[, trend.period := paste0(min(yrs),'to',max(yrs))]
-
+  
   # note which si is being used
   site.smry[, si.name := si]
   
@@ -41,7 +41,7 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   
   # identify sites with observations from atleast a user-specific number of years during the time period
   site.smry <- site.smry[n.yr.obs >= round(length(yrs)*nyr.min.frac)]
-
+  
   # subset data to sites that meet observation criteria
   dt <- dt[sample.id %in% site.smry$sample.id]
   
@@ -49,31 +49,29 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   dt[, year.rescale := year - min(yrs), by = sample.id]
   
   # fit regression models
-  trnd.dt <- dt[, as.list(calc.trends(year.rescale, si)), by = sample.id]
-
+  trend.dt <- dt[, as.list(calc.trends(year.rescale, si)), by = sample.id]
+  
   # combine spatial / temporal and trend details into one data table
-  trnd.dt <- site.smry[trnd.dt, on = 'sample.id']
-
+  trend.dt <- site.smry[trend.dt, on = 'sample.id']
+  
   # compute total change (absolute and percent change)
-  trnd.dt[, total.change := slope * length(yrs)]
-  trnd.dt[, total.change.pcnt := total.change / intercept * 100]
-
+  trend.dt[, total.change := slope * length(yrs)]
+  trend.dt[, total.change.pcnt := total.change / intercept * 100]
+  
   # categorize trends
-  trnd.dt[, trend.cat := character()]
-  trnd.dt[pval <= sig & slope > 0, trend.cat := 'greening']
-  trnd.dt[pval <= sig & slope < 0, trend.cat := 'browning']
-  trnd.dt[pval > sig, trend.cat := 'no_trend']
+  trend.dt[, trend.cat := character()]
+  trend.dt[pval <= sig & slope > 0, trend.cat := 'greening']
+  trend.dt[pval <= sig & slope < 0, trend.cat := 'browning']
+  trend.dt[pval > sig, trend.cat := 'no_trend']
   
   # create output message
-  avg <- round(mean(trnd.dt$total.change.pcnt),2)
-  std <- round(sd(trnd.dt$total.change.pcnt),2)
-  pcnts <- round(prop.table(table(trnd.dt$trend.cat)),3)*100
+  avg <- round(mean(trend.dt$total.change.pcnt),2)
+  std <- round(sd(trend.dt$total.change.pcnt),2)
+  pcnts <- round(prop.table(table(trend.dt$trend.cat)),3)*100
   msg <- paste0("Mean (SD) relative change of ", avg, " (", std,") % with browning, greening, and no trend at ", pcnts[1], ", ", pcnts[2], ", and ", pcnts[3], " % of sample sites")
   
-  
-  
   # histogram of vegetation greenness trends
-  fig <- ggplot2::ggplot(trnd.dt, ggplot2::aes(total.change.pcnt, fill=..x..)) +
+  fig1 <- ggplot2::ggplot(trend.dt, ggplot2::aes(total.change.pcnt, fill=..x..)) +
     ggplot2::geom_histogram(bins = 50, size = 0.25, color = 'gray20') +
     ggplot2::scale_fill_gradient2(low="darkgoldenrod4", mid='white', high="darkgreen", limits = c(-50,50), midpoint = 0) +
     ggplot2::labs(y = 'Number of sample sites', x = paste0("Relative change in Landsat ", gsub('.MAX', 'max', toupper(si)), ' from ', min(yrs), ' to ', max(yrs), ' (%)')) +
@@ -81,11 +79,38 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
     ggplot2::theme(legend.position = 'none', axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14)) + 
     ggplot2::xlim(-50, 50)
   
+  # Create time series figure for each trend class
+  dt <- dt[trend.dt, on = 'sample.id']
+  
+  trend.cls.yrly.dt <- dt[, .(si.avg = mean(si, na.rm = T), si.sd = sd(si, na.rm = T),
+                              n = .N), by = c('trend.cat','year')]
+  
+  trend.cls.yrly.dt[, si.se := si.sd/sqrt(n)]
+  
+  trend.cls.yrly.dt[, trend.cat := factor(trend.cat, levels = c('browning','no_trend','greening'), 
+                                          labels = c('browning','no trend','greening'))]
+  
+  trend.cols <- c('darkgoldenrod4','ivory3','darkgreen')
+  
+  fig2 <- ggplot2::ggplot(trend.cls.yrly.dt, ggplot2::aes(year, si.avg, group = trend.cat, color = trend.cat)) + 
+    ggplot2::labs(y=paste0('Mean Landsat ', gsub('.MAX', 'max', toupper(si))), x='Year') + 
+    ggplot2::geom_ribbon(aes(ymin = si.avg-si.se, ymax = si.avg + si.se, fill=trend.cat),alpha=0.3, linetype=0)+
+    ggplot2::geom_line(aes(color = trend.cat), alpha = 1, size=1) + 
+    ggplot2::scale_fill_manual(values = trend.cols, name = 'Trend class') + 
+    ggplot2::scale_color_manual(values = trend.cols, name = 'Trend class')+
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.position=legend.position, legend.direction=legend.dir,  
+                   axis.text=ggplot2::element_text(size=12), 
+                   axis.title=ggplot2::element_text(size=14),
+                   plot.title=ggplot2::element_text(hjust = 0.5))
+  
+  # combo figure
+  fig <- ggpubr::ggarrange(fig1, fig2, ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9, hjust = -0.1)
   
   # output
   print(fig)
   print(msg)
-  trnd.dt
+  trend.dt
 }
 
 calc.trends <- function(x,y){
