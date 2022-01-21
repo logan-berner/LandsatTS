@@ -186,7 +186,7 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=11, window.min.obs=20
     ggplot2::facet_wrap(~sample.id, nrow = 3, ncol = 3, scales = 'free_y') + 
     ggplot2::geom_point(aes(fill = year), pch=21, color = 'black', size = 2) + 
     ggplot2::scale_fill_gradientn(name = 'Observation', colours = c('blue','red','gold')) + 
-    ggplot2::geom_line(data = example.curves.dt, mapping = ggplot2::aes(doy, spl.fit, group = focal.yr, color = focal.yr), alpha = 0.5) + 
+    ggplot2::geom_line(data = example.curves.dt, mapping = ggplot2::aes(doy, spl.fit, group = focal.yr, color = focal.yr), alpha = 0.75) + 
     ggplot2::scale_color_gradientn(name = 'Curve',  colours = c('blue','red','gold')) + 
     ggplot2::theme_bw() + ggplot2::theme(legend.position = 'right', 
                                          legend.text=ggplot2::element_text(size=12), legend.title=ggplot2::element_text(size=12), 
