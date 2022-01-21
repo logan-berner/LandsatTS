@@ -16,6 +16,8 @@
 #' @param spar Smoothing parameter passed to smooth.spline(), typically around 0.65 - 0.75 for this application.
 #' @param pcnt.dif.thresh Allowable percent difference (0-100) between individual observations and fitted cubic spline.
 #' Observations that differ by more than this threshold are filtered out and the cubic spline is iteratively refit.
+#' @param weight When fitting the cubic splines, should individual observations be weighted by their year of acquisition relative to the focal year? 
+#' If so, each observation is weighted by exp(-0.25*n.yrs.from.focal) when fitting the cubic splines. 
 #' @param spl.fit.outfile (Optional) Name of output csv file containing the fitted cubic splines for each sample site.
 #' Useful for subsequent visualization
 #' @param progress (TRUE/FALSE) Print a progress report?
@@ -28,16 +30,6 @@
 #'
 #' @examples # To come...
 
-# dt=lsat.dt
-# si='ndvi'
-# window.yrs=10
-# window.min.obs=15
-# si.min = 0.15
-# spar=0.75
-# pcnt.dif.thresh=30
-# spl.fit.outfile='output/disko_test.csv'
-# progress=T
-# weight = T
 
 lsat_fit_phenological_curves = function(dt, si, window.yrs=11, window.min.obs=20, si.min=0.15, spar=0.73,
                                         pcnt.dif.thresh=30, weight=T, spl.fit.outfile=F, progress=T, test.run=F){
@@ -194,12 +186,14 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=11, window.min.obs=20
     ggplot2::facet_wrap(~sample.id, nrow = 3, ncol = 3, scales = 'free_y') + 
     ggplot2::geom_point(aes(fill = year), pch=21, color = 'black', size = 2) + 
     ggplot2::scale_fill_gradientn(name = 'Observation', colours = c('blue','red','gold')) + 
-    ggplot2::geom_line(data = example.curves.dt, mapping = aes(doy, spl.fit, group = focal.yr, color = focal.yr), alpha = 0.5) + 
+    ggplot2::geom_line(data = example.curves.dt, mapping = ggplot2::aes(doy, spl.fit, group = focal.yr, color = focal.yr), alpha = 0.5) + 
     ggplot2::scale_color_gradientn(name = 'Curve',  colours = c('blue','red','gold')) + 
     ggplot2::theme_bw() + ggplot2::theme(legend.position = 'right', 
-                                         legend.text=element_text(size=8), legend.title=element_text(size=10), 
-                                         axis.text=element_text(size=12), axis.title=element_text(size=14),
-                                         plot.title=element_text(hjust = 0.5)) + 
+                                         legend.text=ggplot2::element_text(size=12), legend.title=ggplot2::element_text(size=12), 
+                                         axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14),
+                                         plot.title=ggplot2::element_text(hjust = 0.5),
+                                         strip.background = ggplot2::element_rect(fill="black"),
+                                         strip.text = ggplot2::element_text(color = "white", size = 12)) + 
     ggplot2::guides(colour = guide_colourbar(title.position="top", title.hjust = 0.5))
   
   print(fig)
@@ -208,7 +202,7 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=11, window.min.obs=20
   if (test.run == F){
     dt <- data.table::data.table(rbindlist(data.list))
     dt <- dt[order(sample.id,year,doy)]
-    data.table::setcolorder(dt, c('sample.id','latitude','longitude','year','doy','spl.n.obs','spl.fit','spl.frac.max','spl.fit.max','spl.fit.max.doy','si.adjustment','si','si.max.pred'))
+    data.table::setcolorder(dt, c('sample.id','latitude','longitude','year','doy','si','spl.n.obs','spl.fit','spl.frac.max','spl.fit.max','spl.fit.max.doy','si.adjustment','si.max.pred'))
     colnames(dt) <- gsub('si',si,colnames(dt))
     dt
   }
