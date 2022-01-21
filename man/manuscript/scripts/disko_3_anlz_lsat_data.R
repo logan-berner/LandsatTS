@@ -25,7 +25,7 @@ lsat.gs.dt <- fread('output/lsat_annual_growing_season_summaries.csv')
 lsat.gs.dt <- lsat.gs.dt[year >= 2000]
 
 # Compute temporal trends in NDVImax
-lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020, legend.position = c(0.65,0.9))
+lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020, legend.position = c(0.66,0.93))
 ggsave('figures/figure 7 disko ndvi max trend distribution.jpg', width = 6, height = 8, units = 'in', dpi = 400)
 # ggsave('figures/figure 7 disko ndvi max trend distribution.jpg', width = 6, height = 3, units = 'in', dpi = 400)
 

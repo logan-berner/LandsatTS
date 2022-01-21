@@ -42,14 +42,14 @@ lsat.dt <- lsat_calc_spec_index(lsat.dt, si = 'ndvi')
 lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', doy.rng = 151:239, train.with.highlat.data = T, outdir = 'output/ndvi_xcal_smry/', overwrite.col = T)
 
 # Fit phenological models (cubic splines) to each time series
-lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi')
-ggsave('figures/figure 5 disko phenological curves.jpg', width = 8, height = 6, units = 'in', dpi = 400)
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi', test.run = T)
+ggsave('figures/figure 5 disko phenological curves.jpg', width = 9, height = 7, units = 'in', dpi = 400)
 
 # Summarize vegetation index for the "growing season", including estimating annual max vegetation index
 lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, si = 'ndvi', min.frac.of.max = 0.75)
 
 # Evaluate estimates of annual maximum NDVI
-lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, si = 'ndvi', min.obs = 5, reps = 10, min.frac.of.max = 0.75)
+lsat.gs.eval.dt <- lsat_evaluate_phenological_max(lsat.pheno.dt, si = 'ndvi', min.obs = 5, reps = 2, min.frac.of.max = 0.75)
 ggsave('figures/figure 6 Disko NDVImax evaluation.jpg', width = 6, height = 4, units = 'in', dpi = 400)
 
 # Write out data.table with growing season summaries
