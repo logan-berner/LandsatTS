@@ -188,7 +188,7 @@ lsat_export_ts <- function(pixel_coords_sf,
       paste0(sample_id_from, "_original")
     pixel_coords_sf_buffered <- pixel_coords_sf %>%
       sf::st_drop_geometry() %>%
-      full_join(pixel_coords_sf_buffered, .)
+      dplyr::full_join(pixel_coords_sf_buffered, .)
     pixel_coords_sf <- pixel_coords_sf_buffered
   }
 
