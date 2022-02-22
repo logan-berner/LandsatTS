@@ -208,7 +208,8 @@ lsat_export_ts <- function(pixel_coords_sf,
   # Check if this_chunk_only was specified if so remove all other chunks
   if(!is.null(this_chunk_only)){
     pixel_coords_sf <- pixel_coords_sf[
-      sf::st_drop_geometry(pixel_coords_sf)[, chunks_from] == this_chunk_only,]
+      (sf::st_drop_geometry(pixel_coords_sf) %>%
+        as.data.frame() %>% .[, chunks_from]) == this_chunk_only,]
   }
 
   # Status:
@@ -216,7 +217,9 @@ lsat_export_ts <- function(pixel_coords_sf,
              nrow(pixel_coords_sf),
              " pixels",
              " in ",
-             length(unique(sf::st_drop_geometry(pixel_coords_sf)[,chunks_from])),
+             length(unique(sf::st_drop_geometry(pixel_coords_sf) %>%
+                             as.data.frame() %>%
+                             .[,chunks_from])),
              " chunks.\n"))
 
   # Retrieve time-series by chunk
@@ -225,7 +228,9 @@ lsat_export_ts <- function(pixel_coords_sf,
     purrr::map(function(chunk){
       # Status
       cat(paste0("Submitting task to EE for chunk_id: ",
-                 sf::st_drop_geometry(chunk)[,chunks_from][1],
+                 sf::st_drop_geometry(chunk) %>%
+                   as.data.frame() %>%
+                   .[1, chunks_from],
                  ".\n"))
       # Upload chunk to sf to reduce size keep only necessary columns
       ee_chunk <- rgee::sf_as_ee(chunk[,c("geometry",
@@ -263,11 +268,15 @@ lsat_export_ts <- function(pixel_coords_sf,
       chunk_task <- rgee::ee_table_to_drive(
         collection = ee_chunk_export,
         description = paste0("lsatTS_export_",
-                             sf::st_drop_geometry(chunk)[,chunks_from][1]),
+                             sf::st_drop_geometry(chunk) %>%
+                             as.data.frame() %>%
+                               .[1, chunks_from]),
         folder = drive_export_dir,
         fileNamePrefix = paste0(file_prefix,
                                 "_",
-                                sf::st_drop_geometry(chunk)[,chunks_from][1]),
+                                sf::st_drop_geometry(chunk) %>%
+                                  as.data.frame() %>%
+                                  .[1, chunks_from]),
         timePrefix = F,
         fileFormat = "csv")
       # Submit export task
