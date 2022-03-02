@@ -39,7 +39,7 @@ lsat_calc_spec_index <- function(dt, si){
     if (si == 'gndvi'){dt[, gndvi := (nir - green) / (nir + green)]}
     if (si == 'kndvi'){dt[, kndvi := tanh(((nir - red) / (nir + red))^2)]}
     if (si == 'msi'){dt[, msi := swir1 / nir]}
-    if (si == 'nbr'){dt[, nbr := (swir1 - swir2) / (swir1 + swir2)]} 
+    if (si == 'nbr'){dt[, nbr := (nir - swir2) / (nir + swir2)]} 
     if (si == 'ndii'){dt[, ndii := (nir - swir1) / (nir + swir1)]}
     if (si == 'ndmi'){dt[, ndmi := (nir - swir1)/(nir + swir1)]}
     if (si == 'ndvi'){dt[, ndvi := (nir - red) / (nir + red)]}
