@@ -8,7 +8,7 @@
 #' Soil Adjusted Vegetation Index (SAVI; Huete 1998),
 #' Wide Dynamic Range Vegetation Index (WDRVI; Gitelson 2004),
 #' Enhanced Vegetation Index (EVI; Huete et al. 2002),
-#' 2-band EVI (EVI2; Jiang et al. 2008), 
+#' 2-band EVI (EVI2; Jiang et al. 2008),
 #' Near Infrared Vegetation Index (NIRv; Badgley et al. 2017),
 #' Moisture Stress Index (MSI; Rock et al. 1986),
 #' Normalized Difference Water Index (NDWI; McFeeters 1996),
@@ -16,14 +16,14 @@
 #' Normalized Burn Ratio (NBR, Key and Benson 1999),
 #' Normalized Difference Infrared Index (NDII; Hardisky et al. 1983),
 #' Plant Senescence Reflectance Index (PSRI; Merzlyak et al. 1999),
-#' and the Soil-Adjusted Total Vegetation Index (SATVI; Marsett et al. 2006). 
-#' 
+#' and the Soil-Adjusted Total Vegetation Index (SATVI; Marsett et al. 2006).
+#'
 #' @param dt Data.table containing surface reflectance data
 #' @param si Character string specifying abbreviation of the desired spectral index
 #'
 #' @return The input data.table with an appended column containing the spectral index
 #' @import data.table
-#' @export lsat_calc_spectral_index
+#' @export lsat_calc_spec_index
 #'
 #' @examples # my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')
 
@@ -32,14 +32,14 @@ lsat_calc_spec_index <- function(dt, si){
   si <- tolower(si)
   avail.si <- c('evi','evi2','gndvi','kndvi','msi','nbr','nirv','ndii',
                 'ndmi','ndvi','ndwi','psri','satvi','savi','wdrvi')
-  
+
   if (si %in% avail.si){
     if (si == 'evi'){dt[, evi := 2.5  * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)]}
     if (si == 'evi2'){dt[, evi2 := 2.5  * (nir - red) / (nir + 2.5 * red + 1)]}
     if (si == 'gndvi'){dt[, gndvi := (nir - green) / (nir + green)]}
     if (si == 'kndvi'){dt[, kndvi := tanh(((nir - red) / (nir + red))^2)]}
     if (si == 'msi'){dt[, msi := swir1 / nir]}
-    if (si == 'nbr'){dt[, nbr := (nir - swir2) / (nir + swir2)]} 
+    if (si == 'nbr'){dt[, nbr := (nir - swir2) / (nir + swir2)]}
     if (si == 'ndii'){dt[, ndii := (nir - swir1) / (nir + swir1)]}
     if (si == 'ndmi'){dt[, ndmi := (nir - swir1)/(nir + swir1)]}
     if (si == 'ndvi'){dt[, ndvi := (nir - red) / (nir + red)]}
