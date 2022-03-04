@@ -1,5 +1,5 @@
-#' Landsat 8 pixel centres within a buffer around point coordinates
-#'
+#' Landsat 8 pixel centers within a buffer around point coordinates
+#' **This function is currently in development and not intended for use!!!**
 #' Helper function that uses lsat_get_pixel_centers() to determine all Landsat 8
 #' pixel centre coordinates within a buffer around a set of point coordinates.
 #'
@@ -22,6 +22,7 @@
 #'   specified in the sample_id argument.
 # #' @export lsat_get_pixels_in_buffer
 #' @author Jakob J. Assmann
+#' @keywords internal
 #'
 #' @examples
 #'
