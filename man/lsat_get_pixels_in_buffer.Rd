@@ -2,7 +2,10 @@
 % Please edit documentation in R/lsat_get_pixels_in_buffer.R
 \name{lsat_get_pixels_in_buffer}
 \alias{lsat_get_pixels_in_buffer}
-\title{Landsat 8 pixel centres within a buffer around point coordinates}
+\title{Landsat 8 pixel centers within a buffer around point coordinates
+\strong{This function is currently in development and not intended for use!!!}
+Helper function that uses lsat_get_pixel_centers() to determine all Landsat 8
+pixel centre coordinates within a buffer around a set of point coordinates.}
 \usage{
 lsat_get_pixels_in_buffer(
   point_coord_sf,
@@ -35,6 +38,8 @@ appending a numerical counter "_x" to original identifiers in column
 specified in the sample_id argument.
 }
 \description{
+Landsat 8 pixel centers within a buffer around point coordinates
+\strong{This function is currently in development and not intended for use!!!}
 Helper function that uses lsat_get_pixel_centers() to determine all Landsat 8
 pixel centre coordinates within a buffer around a set of point coordinates.
 }
@@ -73,3 +78,4 @@ test_points_sf <- st_sfc(st_point(c(-149.6026, 68.62574)),
 \author{
 Jakob J. Assmann
 }
+\keyword{internal}
