@@ -116,8 +116,13 @@ lsat_export_ts <- function(pixel_coords_sf,
   # Check whether end_date was supplied and if not set to today's.
   if(end_date == "today") end_date <- as.character(Sys.Date())
 
-  # turn s2 off in sf for backwards compatibility
-  sf_use_s2(FALSE)
+  # Turn s2 off in sf for backwards compatibility
+  sf::sf_use_s2(FALSE)
+
+  # Check whether columns exists if column selectors were supplied
+  if((sample_id_from != "sample_id") & !(sample_id_from %in% names(pixel_coords_sf))) {
+    stop("Invalid columns specificed for 'sample_id_from': ", sample_id_from)
+  }
 
   # Prep Landsat Time series
   bands <- list("SR_B1",
@@ -174,8 +179,8 @@ lsat_export_ts <- function(pixel_coords_sf,
                                          "day_of_year"))$
     #.filterBounds(table)
     map(function(image){
-      image = ee$Algorithms$If(image$bandNames()$size()$
-                                 eq(ee$Number(10)),
+      image = rgee::ee$Algorithms$If(image$bandNames()$size()$
+                                 eq(rgee::ee$Number(10)),
                                image,
                                image$addBands(ZERO_IMAGE))
       return(image)})$
@@ -211,7 +216,7 @@ lsat_export_ts <- function(pixel_coords_sf,
   # Check if chunks_from was specified, if not determine chunks
   if(!is.null(chunks_from)){
     if(!(chunks_from %in% colnames(pixel_coords_sf))) {
-      stop("Invalid colum name specified for chunks_from")
+      stop("Invalid colum name specified for chunks_from: ", chunks_from)
     }
   } else {
     n_chunks <- floor(nrow(pixel_coords_sf) / max_chunk_size) + 1
@@ -223,6 +228,13 @@ lsat_export_ts <- function(pixel_coords_sf,
 
   # Check if this_chunk_only was specified if so remove all other chunks
   if(!is.null(this_chunk_only)){
+    if(!(this_chunk_only %in% (pixel_coords_sf %>%
+                               sf::st_drop_geometry() %>%
+                               as.data.frame() %>%
+                               .[,chunks_from]))){
+      stop("Could not find chunk specified: ",
+                  this_chunk_only)
+    }
     pixel_coords_sf <- pixel_coords_sf[
       (sf::st_drop_geometry(pixel_coords_sf) %>%
         as.data.frame() %>% .[, chunks_from]) == this_chunk_only,]
