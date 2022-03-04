@@ -1,22 +1,26 @@
-test_that("lsat_export_ts works", {
+test_that("lsat_export_ts basic functionality works", {
   # Initialize rgee
   rgee::ee_Initialize()
 
+  cat("Generating test points ...\n")
+
   # Set test points
-  test_points_sf <- sf::st_sfc(sf::st_point(c(-149.6026, 68.62574)),
-                               sf::st_point(c(-149.6003, 68.62524)),
-                               sf::st_point(c(-75.78057, 78.87038)),
-                               sf::st_point(c(-75.77098, 78.87256)),
-                               sf::st_point(c(-20.56182, 74.47670)),
-                               sf::st_point(c(-20.55376, 74.47749)),
-                               crs = 4326)
-  test_points_sf <- sf::st_sf(geometry = test_points_sf)
-  test_points_sf$site <- c("toolik_1",
-                           "toolik_2",
-                           "ellesmere_1",
-                           "ellesmere_1",
-                           "zackenberg_1",
-                           "zackenberg_2")
+  test_points_sf <- matrix(c(-149.6026, 68.62574,
+                             -149.6003, 68.62524,
+                             -75.78057, 78.87038,
+                             -75.77098, 78.87256,
+                             -20.56182, 74.47670,
+                             -20.55376, 74.47749),
+                           byrow = T, ncol = 2,
+                           dimnames = list(NULL, c("long", "lat"))) %>%
+    as.data.frame() %>%
+    sf::st_as_sf(coords = c("long", "lat"), crs = 4326)
+  test_points_sf$sample_id <- c("toolik_1",
+                                "toolik_2",
+                                "ellesmere_1",
+                                "ellesmere_1",
+                                "zackenberg_1",
+                                "zackenberg_2")
 
   test_points_sf$region <- c("toolik", "toolik",
                              "ellesmere", "ellesmere",
@@ -25,12 +29,12 @@ test_that("lsat_export_ts works", {
   # Export time-series using lsat_export_ts()
   task_list <- lsat_export_ts(test_points_sf)
 
-  # Monitor task completion
-  cat("Waiting for export from EE to finish...")
-  task_status <- rgee::ee_monitoring(task_list[[1]])
-  task_status <- rgee::ee_monitoring()
-  task_status <- gsub(".*\\((.*)\\).*", "\\1", task_status)
-  testthat::expect_equal(task_status, "COMPLETED")
+  # Confirm that this worked
+  task_list %>% lapply(function(x) x$active()) %>% unlist() %>% unique() %>%
+    expect_equal(TRUE)
+
+  # Cancel tasks
+  task_list %>% lapply(function(x) x$cancel())
 
   # the following code does not work as ee_drive_to_local can only be used
   # in and interactive session
@@ -43,4 +47,125 @@ test_that("lsat_export_ts works", {
   #
   # # Check for equivalence
   # testthat::expect_equal(output_file, control_file)
+})
+
+test_that("lsat_export_ts chunk division works", {
+  # Initialize rgee
+  rgee::ee_Initialize()
+
+  cat("Generating test points ...\n")
+
+  # Set test points
+  test_points_sf <- matrix(c(-149.6026, 68.62574,
+                           -149.6003, 68.62524,
+                           -75.78057, 78.87038,
+                           -75.77098, 78.87256,
+                           -20.56182, 74.47670,
+                           -20.55376, 74.47749),
+                           byrow = T, ncol = 2,
+                           dimnames = list(NULL, c("long", "lat"))) %>%
+    as.data.frame() %>%
+    sf::st_as_sf(coords = c("long", "lat"), crs = 4326)
+  test_points_sf$sample_id <- c("toolik_1",
+                           "toolik_2",
+                           "ellesmere_1",
+                           "ellesmere_1",
+                           "zackenberg_1",
+                           "zackenberg_2")
+
+  test_points_sf$region <- c("toolik", "toolik",
+                             "ellesmere", "ellesmere",
+                             "zackenberg", "zackenberg")
+
+  # Export time-series by region using lsat_export_ts()
+  cat("Testing export with default settings:\n")
+  task_list <- lsat_export_ts(test_points_sf)
+
+  # Confirm that this worked
+  task_list %>% lapply(function(x) x$active()) %>% unlist() %>% unique() %>%
+    expect_equal(TRUE)
+
+  # Cancel tasks
+  task_list %>% lapply(function(x) x$cancel())
+
+  cat("Cancelling tasks...\n")
+})
+
+test_that("lsat_export_ts chunk division works", {
+  # Initialize rgee
+  rgee::ee_Initialize()
+
+  cat("Generating test points ...\n")
+
+  # Set test points
+  test_points_sf <- matrix(c(-149.6026, 68.62574,
+                             -149.6003, 68.62524,
+                             -75.78057, 78.87038,
+                             -75.77098, 78.87256,
+                             -20.56182, 74.47670,
+                             -20.55376, 74.47749),
+                           byrow = T, ncol = 2,
+                           dimnames = list(NULL, c("long", "lat"))) %>%
+    as.data.frame() %>%
+    sf::st_as_sf(coords = c("long", "lat"), crs = 4326)
+  test_points_sf$sample_id <- c("toolik_1",
+                                "toolik_2",
+                                "ellesmere_1",
+                                "ellesmere_1",
+                                "zackenberg_1",
+                                "zackenberg_2")
+
+  test_points_sf$region <- c("toolik", "toolik",
+                             "ellesmere", "ellesmere",
+                             "zackenberg", "zackenberg")
+
+  ## Export time-series by region using lsat_export_ts()
+  cat("Testing export by region:\n")
+  task_list <- lsat_export_ts(test_points_sf,
+                              chunks_from = "region")
+  # Confirm that this worked
+  task_list %>% lapply(function(x) x$active()) %>% unlist() %>% unique() %>%
+    expect_equal(TRUE)
+
+  # Cancel tasks
+  cat("Cancelling tasks...\n")
+  task_list %>% lapply(function(x) x$cancel())
+
+  ## Export time-series for one chunk by region using lsat_export_ts()
+  cat("Testing export by region for one chunk only:\n")
+  task_list <- lsat_export_ts(test_points_sf,
+                              chunks_from = "region",
+                              this_chunk_only = "ellesmere")
+  # Confirm that this worked
+  task_list %>% lapply(function(x) x$active()) %>% unlist() %>% unique() %>%
+    expect_equal(TRUE)
+  task_list %>% length() %>% expect_equal(1)
+
+  # Cancel tasks
+  cat("Cancelling tasks...\n")
+  task_list %>% lapply(function(x) x$cancel())
+
+  ## Export time-series by chunk size using lsat_export_ts()
+  cat("Testing export by setting chunmax_chunk_size to 2:\n")
+  task_list <- lsat_export_ts(test_points_sf,
+                              max_chunk_size = 2)
+  # Confirm that this worked
+  task_list %>% lapply(function(x) x$active()) %>% unlist() %>% unique() %>%
+    expect_equal(TRUE)
+
+  # Cancel tasks
+  cat("Cancelling tasks...\n")
+  task_list %>% lapply(function(x) x$cancel())
+
+  # Test expected errors
+  cat("Testing error messages\n")
+
+  # Main argument not an sf object
+  expect_error(lsat_export_ts("ASFASDF"))
+  expect_error(lsat_export_ts(test_points_sf,
+                              chunks_from = "not_a_column"))
+  expect_error(lsat_export_ts(test_points_sf,
+                              chunks_from = "region",
+                              this_chunk_only = "not_a_chunk"))
+
 })
