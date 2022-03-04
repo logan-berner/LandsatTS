@@ -1,5 +1,5 @@
 Package: lsatTS
-Title: An R package for deriving vegetation greenness time series using Landsat satellite data
+Title: An R package to facilitate retrieval, cleaning, cross-calibration, and phenological modeling of Landsat time-series data
 Version: 0.8.0
 Authors@R: 
     c(
@@ -29,7 +29,7 @@ Authors@R:
            email = "",
            comment = c(ORCID = "0000-0002-6326-4308"))
            )
-Description: Building upon the workflow developed for Berner et al. 2020 the lsatTS package helps you to: 1) Export surface reflectance time-series for the whole Landsat record based on point coordinates ("sites"); 2) Clean and cross-calibrate Landsat; and 3) Derive growing season characteristics such as the annual maximum NDVI.
+Description: This software package facilitates sample-based time series analysis of surface reflectance and spectral indices derived from Landsat sensors. The package includes functions that enable the extraction of the full Landsat record for point sample locations or small study regions using the Google Earth Engine accessed directly from R. Moreover, the package includes functions for (1) rigorous data cleaning, (2) cross-sensor calibration with machine learning, (3) phenological modeling, and (4) time series analysis. 
 License: Modified MIT
 Encoding: UTF-8
 LazyData: true
@@ -39,22 +39,6 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
-    magrittr,
-    dplyr,
-    tidyr,
-    rgee,
-    sf,
-    crayon,
-    mapview,
-    purrr,
-    data.table,
-    ggplot2,
-    R.utils,
-    stats,
-    stringr,
-    ggpubr,
-    ranger,
-    zoo,
-    zyp
+    magrittr, dplyr, tidyr, rgee, sf, crayon, mapview, purrr, data.table, ggplot2, R.utils, stats, stringr, ggpubr, ranger, zoo, zyp
 Depends: 
-    R (>= 2.10)
+    R (>= 3.50)
