@@ -2,8 +2,7 @@
 % Please edit documentation in R/lsat_get_pixel_centers.R
 \name{lsat_get_pixel_centers}
 \alias{lsat_get_pixel_centers}
-\title{Get Landsat 8 pixels centers within a polygon or around a point coordinate
-with a buffer}
+\title{Get Landsat 8 pixel centers for a polygon or a buffered point}
 \usage{
 lsat_get_pixel_centers(
   polygon_sf,
@@ -20,56 +19,54 @@ lsat_get_pixel_centers(
 feature containing a simple feature collection of type 'sfc_POINT' with a
 single point.}
 
-\item{pixel_prefix}{Prefix for the generated pixel ids. Defaults to
-"pixel".}
+\item{pixel_prefix}{Prefix for the generated pixel identifiers (output column
+"sample_id"). Defaults to "pixel".}
 
-\item{pixel_prefix_from}{Optional, column name in simple feature to specify
-pixel_prefix. Overrides "pixel_prefix" argument.}
+\item{pixel_prefix_from}{Optional, a column name in the simple feature to specify
+the pixel_prefix. Overrides the "pixel_prefix" argument.}
 
 \item{buffer}{Buffer surrounding the geometry to be included. Specified in m.
-Defaults to 15 m, the nominal Landsat pixel size.}
+Defaults to 15 m - the nominal half-width of a Landsat pixel.}
 
 \item{plot_map}{Optional, default is FALSE. If TRUE the retrieved pixel
 centers and the polygon are plotted on a summer Landsat 8 image
 (grey-scale red band) using mapview. If a character is supplied an
 additional output to a file is generated (png, pdf, and jpg supported, see
 mapview::mapshot). Note: Both slow down the execution of this function
-dramatically, especially for large polygons. Only useful in interactive
-sessions.}
+notably, especially for large polygons! Only use in interactive R sessions.}
 
 \item{lsat_WRS2_scene_bounds}{File path to the Landsat WRS2 path row scene
 boundaries. If not specified the boundaries are downloaded to a temporary
-file when the function is executed the first time during a session. To
+file when the function is executed for the first time during a session. To
 avoid future downloads, the file may be downloaded manually and it's file
-pathe specified using this argument.
+path specified using this argument.
 The file can be found here:
-https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml
+https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/ \cr
+atoms/files/WRS-2_bound_world_0.kml
 See also:
-https://www.usgs.gov/core-science-systems/nli/landsat/landsat-shapefiles-and-kml-files}
+https://www.usgs.gov/core-science-systems/nli/landsat/ \cr
+landsat-shapefiles-and-kml-files}
 }
 \value{
-sfc of point geometries for Landsat 8 pixel centers within the
-polygon or the buffer around the point coordinate. For use in
+sf object of point geometries for Landsat 8 pixel centers within the
+polygon or the buffer around the point coordinate specified. For use in
 lsat_export_ts().
 }
 \description{
 A convenience helper function that determines the Landsat 8 grid (pixel)
-centers within a polygon and an optional buffer. It can also be applied to
-a single point to retrieve all pixels within a surrounding buffer.
-}
-\details{
+centers within a polygon plus an optional buffer. It can also be applied to a
+single point to retrieve all pixels within a buffer. \cr\cr
 Does not work for large polygons. The default maximum number of pixels set by
-the GEE is 10000000. Consider whether extraction for a large polygon is a
-good idea, if yes split the polygon into manageable chunks.
-
+EE is 10000000 this should not be exceeded. Consider whether extraction for a
+large polygon is a good idea, if yes split the polygon into manageable chunks.
+\cr\cr
 For the unlikely case that a polygon exceeds the boundaries of the Landsat
 tile closest to the polygon's center, the polygon is clipped at the
 boundaries of the Landsat tile and a warning is issued. Again, if this is the
-case, consider processing smaller polygons instead.
-
-Please note that the approximation of tile overlap with polygon generates a
-warning by sf that the coordinates are assumed to be planar. This can be
-ignored.
+case, consider processing smaller polygons instead. \cr\cr
+Please note: The approximation of the tile overlap with the polygon generates
+a warning by the sf package that the coordinates are assumed to be planar.
+This can be ignored.
 }
 \examples{
 # Using sf, dplyr, rgee and purr
