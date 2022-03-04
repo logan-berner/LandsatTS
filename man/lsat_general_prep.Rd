@@ -7,14 +7,14 @@
 lsat_general_prep(dt)
 }
 \arguments{
-\item{dt}{Data.table containing Landsat data extracted from Google Earth Engine.}
+\item{dt}{Data.table with Landsat data exported from Google Earth Engine using lsat_export_ts()}
 }
 \value{
 Data.table with formatted and scaled values.
 }
 \description{
-This function parses the (1) Landsat satellite; (2) Landsat collection; (3) year; and (4) day of year from the Landsat ID.
-The function also renames and rescales bands 1 - 7, taking into account differences between Landsat 5 / 7 and 8
+This function parses sample site coordinates and time period of each measurement, scales band values, and formats
+column names as needed for subsequent analysis using the lsatTS package.
 }
 \examples{
 # parsed.dt <- lsat_general_prep(gee.dt)

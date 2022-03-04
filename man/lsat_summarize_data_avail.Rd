@@ -2,19 +2,21 @@
 % Please edit documentation in R/lsat_summarize_data_avail.R
 \name{lsat_summarize_data_avail}
 \alias{lsat_summarize_data_avail}
-\title{Summarize Availability of Landsat data by Site}
+\title{Summarize Availability of Landsat for each Sample Site}
 \usage{
 lsat_summarize_data_avail(dt)
 }
 \arguments{
-\item{dt}{Data.table with columns named "site" and "year"}
+\item{dt}{Data.table with columns named "sample.id" and "year"}
 }
 \value{
 Data.table summarizing for each site the first, last, and number of years with observations,
-the minimum and maximum number of observations in a year, the total number of observations across years.
+the minimum and maximum number of observations in a year, and the total number of observations across years.
+Also returns a figure showing the median (2.5 and 97.5 percentiles) number of observations per sample site across years
+for each Landsat satellite.
 }
 \description{
-This little function summarizes the temporal period and availability of observations at each site
+This little function summarizes the temporal period and availability of observations at each sample site
 }
 \examples{
 # summary.dt <- lsat_summarize_data_avail(dt)

@@ -4,12 +4,21 @@
 \alias{lsat_calc_trend}
 \title{Calculate non-parametric vegetation greenness trends}
 \usage{
-lsat_calc_trend(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, sig = 0.1)
+lsat_calc_trend(
+  dt,
+  si,
+  yrs,
+  yr.tolerance = 1,
+  nyr.min.frac = 0.66,
+  sig = 0.1,
+  legend.position = c(0.8, 0.2),
+  legend.dir = "horizontal"
+)
 }
 \arguments{
 \item{dt}{Data.table with columns including site, year, and the vegetation index of interest}
 
-\item{vi}{Vegetation index (e.g., NDVI) for which to assess trend}
+\item{si}{Spectral index (e.g., NDVI) for which to assess trend}
 
 \item{yrs}{A sequence of years (time period) over which to assess trends (e.g., 2000:2020)}
 
@@ -20,7 +29,7 @@ lsat_calc_trend(dt, vi, yrs, yr.tolerance = 1, nyr.min.frac = 0.7, sig = 0.1)
 \item{sig}{A p-value significance cutoff used to categories trends (e.g., 0.10)}
 }
 \value{
-Data.table with summary of temporal trend by site
+Data.table with summary of temporal trends by site and a histogram showing summarizing relative changes in vegetation greenness
 }
 \description{
 This function computes a temporal trend in annual time series of vegetation greenness for each sampling site

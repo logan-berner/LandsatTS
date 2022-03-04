@@ -6,7 +6,7 @@
 \usage{
 lsat_evaluate_phenological_max(
   dt,
-  vi,
+  si,
   min.frac.of.max = 0.75,
   zscore.thresh = 3,
   min.obs = 6,
@@ -17,10 +17,10 @@ lsat_evaluate_phenological_max(
 \arguments{
 \item{dt}{Data.table output from lsat_fit_phenologic_curves().}
 
-\item{vi}{Character string specifying the vegetation index (e.g., NDVI) to evaluate.}
+\item{si}{Character string specifying the spectral index (e.g., NDVI) to evaluate.}
 
 \item{min.frac.of.max}{Numeric threshold (0-1) that defines the "growing season" as the seasonal window when the
-phenological curves indicate the VI is within a specified fraction of the maximum VI. In otherwords, an observation
+phenological curves indicate the VI is within a specified fraction of the maximum VI. In other words, an observation
 is considered to be from the "growing season" when the VI is within a user-specified fraction of the curve-fit growing season maximum VI.}
 
 \item{zscore.thresh}{Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.}

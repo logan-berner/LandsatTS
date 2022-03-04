@@ -2,7 +2,8 @@
 % Please edit documentation in R/lsat_get_pixel_centers.R
 \name{lsat_get_pixel_centers}
 \alias{lsat_get_pixel_centers}
-\title{Landsat 8 pixels centers within a polygon}
+\title{Get Landsat 8 pixels centers within a polygon or around a point coordinate
+with a buffer}
 \usage{
 lsat_get_pixel_centers(
   polygon_sf,
@@ -14,35 +15,61 @@ lsat_get_pixel_centers(
 )
 }
 \arguments{
-\item{polygon_sf}{Simple feature with a simple feature collection of type "sfc_POLYGON" containing a single polygon geometry.}
+\item{polygon_sf}{Simple feature with a simple feature collection of type
+"sfc_POLYGON" containing a single polygon geometry. Alternatively, a simple
+feature containing a simple feature collection of type 'sfc_POINT' with a
+single point.}
 
-\item{pixel_prefix}{Optional prefix for the generated pixel ids. Defaults to "pixel".}
+\item{pixel_prefix}{Prefix for the generated pixel ids. Defaults to
+"pixel".}
 
-\item{pixel_prefix_from}{Optional, column name in simple feature to specify pixel_prefix. Overrides "pixel_prefix".}
+\item{pixel_prefix_from}{Optional, column name in simple feature to specify
+pixel_prefix. Overrides "pixel_prefix" argument.}
 
-\item{buffer}{Buffer surrounding the geometry to be included. Specified in m.}
+\item{buffer}{Buffer surrounding the geometry to be included. Specified in m.
+Defaults to 15 m, the nominal Landsat pixel size.}
 
-\item{plot_map}{Optional. If TRUE the retrieved pixel centers and the polygon are plotted on a mid-season Landsat 8 image (grey-scale red band) in the mapview. If a character is supplied an addtional output to a file is generated (png, pdf, and jpg supported, see mapview::mapshot). Both slow down the execution of this funciton dramatically, especially for large polygons.}
+\item{plot_map}{Optional, default is FALSE. If TRUE the retrieved pixel
+centers and the polygon are plotted on a summer Landsat 8 image
+(grey-scale red band) using mapview. If a character is supplied an
+additional output to a file is generated (png, pdf, and jpg supported, see
+mapview::mapshot). Note: Both slow down the execution of this function
+dramatically, especially for large polygons. Only useful in interactive
+sessions.}
 
-\item{lsat_WRS2_scene_bounds}{File path to the Landsat WRS2 path row scene boundaries. If not specified these are downloaded to a temporary file. To speed up this function consider downloading the file manually and specifiying the file path in this argument. The file can be found here: https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml}
+\item{lsat_WRS2_scene_bounds}{File path to the Landsat WRS2 path row scene
+boundaries. If not specified the boundaries are downloaded to a temporary
+file when the function is executed the first time during a session. To
+avoid future downloads, the file may be downloaded manually and it's file
+pathe specified using this argument.
+The file can be found here:
+https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/atoms/files/WRS-2_bound_world_0.kml
+See also:
+https://www.usgs.gov/core-science-systems/nli/landsat/landsat-shapefiles-and-kml-files}
 }
 \value{
-sfc of point geometries for Landsat 8 pixel centers within the polygon for use in lsat_download_ts
+sfc of point geometries for Landsat 8 pixel centers within the
+polygon or the buffer around the point coordinate. For use in
+lsat_export_ts().
 }
 \description{
 A convenience helper function that determines the Landsat 8 grid (pixel)
-centers within a polygon and a surrounding buffer.
+centers within a polygon and an optional buffer. It can also be applied to
+a single point to retrieve all pixels within a surrounding buffer.
 }
 \details{
-Does not work for large polygons. The default maximum number of pixels set by the GEE is 10000000.
-Consider whether extractions for a large polygon is a good idea.
-Split the polygon into manageable chuncks. For the unlikely case that a polygon
-exceeds the boundaries of the Landsat tile closest to the polygon's centre,
-the polygon is clipped ot the boundaries of the Landsat tile and a warning is issued.
-Again, consider processing smaller polygons.
+Does not work for large polygons. The default maximum number of pixels set by
+the GEE is 10000000. Consider whether extraction for a large polygon is a
+good idea, if yes split the polygon into manageable chunks.
 
-Please note that approximation of tile overlap with polygon generates a warning
-by sf that the coordinates are assumed to be planar. This can be ignored.
+For the unlikely case that a polygon exceeds the boundaries of the Landsat
+tile closest to the polygon's center, the polygon is clipped at the
+boundaries of the Landsat tile and a warning is issued. Again, if this is the
+case, consider processing smaller polygons instead.
+
+Please note that the approximation of tile overlap with polygon generates a
+warning by sf that the coordinates are assumed to be planar. This can be
+ignored.
 }
 \examples{
 # Using sf, dplyr, rgee and purr
@@ -55,14 +82,15 @@ library(purrr)
 ee_Initialize()
 
 # Specify a region to retrieve pixel centers for
-test_poly <- st_polygon(
-list(matrix(c(-138.90125, 69.58413,
+test_poly_sf <- list(matrix(c(-138.90125, 69.58413,
               -138.88988, 69.58358,
               -138.89147, 69.58095,
               -138.90298, 69.57986,
               -138.90125, 69.58413),
-            ncol = 2, byrow = TRUE)))
-test_poly_sf <- st_sf(st_sfc(test_poly, crs = 4326))
+            ncol = 2, byrow = TRUE)) \%>\%
+           st_polygon() \%>\%
+           st_sfc(crs = 4326) \%>\%
+           st_sf()
 
 # Retrieve pixel centers and plot to mapview
 pixels <- lsat_get_pixel_centers(test_poly_sf, plot_map = TRUE)
@@ -88,7 +116,8 @@ toolik <- st_polygon(list(matrix(c(-149.60686, 68.62364,
                                    -149.59918, 68.62364,
                                    -149.60686, 68.62364),
                                    ncol = 2, byrow = TRUE)))
-test_regions_sf <- st_sfc(ellesmere, zackenberg, toolik, crs = 4326) \%>\% st_sf() \%>\%
+test_regions_sf <- st_sfc(ellesmere, zackenberg, toolik, crs = 4326) \%>\%
+  st_sf() \%>\%
   mutate(region = c("ellesmere", "zackenberg", "toolik"))
 
 # Split and map lsat_get_pixel_centers using dplyr and purrr

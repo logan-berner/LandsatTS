@@ -9,13 +9,13 @@ lsat_calc_spec_index(dt, si)
 \arguments{
 \item{dt}{Data.table containing surface reflectance data}
 
-\item{si}{Character string specifying abbreviation of the desired spetral index}
+\item{si}{Character string specifying abbreviation of the desired spectral index}
 }
 \value{
-The input data.table with an appended colunm containing the spectral index
+The input data.table with an appended column containing the spectral index
 }
 \description{
-This function computes some widely used spectral indices.
+This function computes some widely used spectral vegetation indices.
 Only one index can be computed at a time. Current indices include the:
 Normalized Difference Vegetation Index (NDVI; Rouse et al. 1974),
 kernel NDVI (kNDVI; Camp-Valls et al. 2020),
