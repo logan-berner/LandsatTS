@@ -26,7 +26,7 @@ lsat.gs.dt <- lsat.gs.dt[year >= 2000]
 
 # Compute temporal trends in NDVImax
 lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020, legend.position = c(0.66,0.93))
-ggsave('figures/figure 7 disko ndvi max trend distribution.jpg', width = 6, height = 8, units = 'in', dpi = 400)
+ggsave('figures/figure_7_disko_ndvi_max_trend_distribution.jpg', width = 6, height = 8, units = 'in', dpi = 400)
 # ggsave('figures/figure 7 disko ndvi max trend distribution.jpg', width = 6, height = 3, units = 'in', dpi = 400)
 
 # Convert to simple feature and write out shapefile
@@ -59,7 +59,7 @@ ggplot(lsat.trend.cls.yrly.dt[year != 2003], aes(year, ndvi.max.avg, group = tre
         axis.title=element_text(size=14),
         plot.title=element_text(hjust = 0.5))
 
-ggsave('figures/figure 8 disko ndvi max time series.jpg', width = 6, height = 4, units = 'in', dpi = 400)
+ggsave('figures/figure_8_disko_ndvi_max_time_series.jpg', width = 6, height = 4, units = 'in', dpi = 400)
 
 
 # END SCRIPT #--------------------------------------------------------------------------------------------------------
