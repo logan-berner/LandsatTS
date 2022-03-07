@@ -117,6 +117,27 @@ lsat_export_ts <- function(pixel_coords_sf,
   # Turn s2 off in sf for backwards compatibility
   sf::sf_use_s2(FALSE)
 
+  # Check whether pixel_coords_sf is an sf object with an sfc of points
+  if(!("sfc_POINT" %in% class(sf::st_geometry(pixel_coords_sf)))) {
+    stop("Invalid argument supplied for pixel_coords_sf!\n",
+         "Please supply an object with 'sfc_POINT' geometries.")
+  }
+  # Check wether number of point coordinates exceeds 100 000
+  if(length(sf::st_geometry(pixel_coords_sf)) > 100000){
+    cat(crayon::red("Warning: Extraction requested for more than 100000 point locations!\n"))
+    warning("Extraction requested for more than 100000 point locations!")
+    answer <- readline("Would you like to continue nonetheless? (not recommended!) [y/n]: ")
+    if(answer == "n"){
+      cat("Okay, stopping extraction.\n")
+      return(NULL)
+    } else if(answer == "y"){
+      cat("Okay, continuing...\n")
+    } else {
+      cat("Invalid answer, stopping extraction.\n")
+      return(NULL)
+    }
+  }
+
   # Check whether columns exists if column selectors were supplied
   if((sample_id_from != "sample_id") & !(sample_id_from %in% names(pixel_coords_sf))) {
     stop("Invalid columns specificed for 'sample_id_from': ", sample_id_from)

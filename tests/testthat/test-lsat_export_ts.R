@@ -168,4 +168,19 @@ test_that("lsat_export_ts chunk division works", {
                               chunks_from = "region",
                               this_chunk_only = "not_a_chunk"))
 
+  # Main argument has too many points (> 100000)
+  test_points_sf <- matrix(c(-149.6026, 68.62574,
+                             -149.6003, 68.62524,
+                             -75.78057, 78.87038,
+                             -75.77098, 78.87256,
+                             -20.56182, 74.47670,
+                             -20.55376, 74.47749),
+                           byrow = T, ncol = 2,
+                           dimnames = list(NULL, c("long", "lat"))) %>%
+    replicate(ceiling(100000 / 6), . , simplify = F) %>%
+    do.call("rbind", .) %>%
+    as.data.frame() %>%
+    sf::st_as_sf(coords = c("long", "lat"), crs = 4326)
+    test_points_sf$sample_id <- 1:nrow(test_points_sf)
+    expect_warning(lsat_export_ts(test_points_sf))
 })
