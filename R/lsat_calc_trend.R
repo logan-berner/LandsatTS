@@ -1,22 +1,39 @@
 #' Calculate non-parametric vegetation greenness trends
 #'
-#' @description This function computes a temporal trend in annual time series of vegetation greenness for each sampling site
-#' over a user-specificed time period. This is a wrapper for the zyp.yuepilon() function from the zyp package.
-#' This function will iteratively pre-whiten a time series (i.e., remove temporal autocorrelation) and then compute
-#' Mann-Kendall trend tests and Theil-Sen slope indicators.
+#' @description This function computes a temporal trend in annual time series 
+#' of vegetation greenness for each sampling site over a user-specificed time 
+#' period. This is a wrapper for the zyp.yuepilon() function from the zyp package.
+#' This function will iteratively pre-whiten a time series (i.e., remove temporal autocorrelation)
+#' and then compute Mann-Kendall trend tests and Theil-Sen slope indicators.
 #' @param dt Data.table with columns including site, year, and the vegetation index of interest
 #' @param si Spectral index (e.g., NDVI) for which to assess trend
 #' @param yrs A sequence of years (time period) over which to assess trends (e.g., 2000:2020)
-#' @param yr.tolerance The number of years that a site's first/last years of observations can differ from the start/end of the user-specified time period ('yrs') for a trend to be computed
-#' @param nyr.min.frac Fraction of years within the time period for which observations must be available if a trend is to be computed
+#' @param yr.tolerance The number of years that a site's first/last years of 
+#'    observations can differ from the start/end of the user-specified 
+#'    time period ('yrs') for a trend to be computed
+#' @param nyr.min.frac Fraction of years within the time period for which observations 
+#'     must be available if a trend is to be computed
 #' @param sig A p-value significance cutoff used to categories trends (e.g., 0.10)
-#'
-#' @return Data.table with summary of temporal trends by site and a histogram showing summarizing relative changes in vegetation greenness 
+#' @param legend.position Legend position for output plot, specified as x and y vector (0-1)   
+#' @param legend.direction Legend direction for output plot, either "horizontal" or "vertical"
+#' @return Data.table with summary of temporal trends by site and a multi-panel figure with:
+#'     (1) a histogram of relative changes in vegetation greenness among sample sites
+#'     (2) a time-series plot of mean vegetation greenness for sample sites grouped
+#'         by trend category     
+#' 
 #' @export lsat_calc_trend
 #' @import data.table
 #' @examples # Forthcoming...
 
-lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, sig = 0.10, legend.position=c(0.8, 0.2), legend.dir = 'horizontal'){
+lsat_calc_trend <- function(dt, 
+                            si, 
+                            yrs, 
+                            yr.tolerance = 1, 
+                            nyr.min.frac = 0.66, 
+                            sig = 0.10, 
+                            legend.position=c(0.8, 0.2), 
+                            legend.direction = 'horizontal'){
+  
   dt <- data.table::data.table(dt)
   data.table::setnames(dt, si, 'si')
   
@@ -39,13 +56,15 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   site.smry <- site.smry[last.yr.abs.dif <= yr.tolerance][, last.yr.abs.dif := NULL]
   
   
-  # identify sites with observations from atleast a user-specific number of years during the time period
+  # identify sites with observations from atleast a
+  # user-specific number of years during the time period
   site.smry <- site.smry[n.yr.obs >= round(length(yrs)*nyr.min.frac)]
   
   # subset data to sites that meet observation criteria
   dt <- dt[sample.id %in% site.smry$sample.id]
   
-  # rescale year so that the regression intercept is the first year of the analysis time period
+  # rescale year so that the regression intercept is the 
+  # first year of the analysis time period
   dt[, year.rescale := year - min(yrs), by = sample.id]
   
   # fit regression models
@@ -68,15 +87,24 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   avg <- round(mean(trend.dt$total.change.pcnt),2)
   std <- round(sd(trend.dt$total.change.pcnt),2)
   pcnts <- round(prop.table(table(trend.dt$trend.cat)),3)*100
-  msg <- paste0("Mean (SD) relative change of ", avg, " (", std,") % with browning, greening, and no trend at ", pcnts[1], ", ", pcnts[2], ", and ", pcnts[3], " % of sample sites")
+  print.msg <- paste0("Mean (SD) relative change of ", avg, " (", std,
+                      ") % with browning, greening, and no trend at ", 
+                      pcnts[1], ", ", pcnts[2], ", and ", pcnts[3],
+                      " % of sample sites")
   
   # histogram of vegetation greenness trends
   fig1 <- ggplot2::ggplot(trend.dt, ggplot2::aes(total.change.pcnt, fill=..x..)) +
     ggplot2::geom_histogram(bins = 50, size = 0.25, color = 'gray20') +
-    ggplot2::scale_fill_gradient2(low="darkgoldenrod4", mid='white', high="darkgreen", limits = c(-50,50), midpoint = 0) +
-    ggplot2::labs(y = 'Number of sample sites', x = paste0("Relative change in Landsat ", gsub('.MAX', 'max', toupper(si)), ' from ', min(yrs), ' to ', max(yrs), ' (%)')) +
+    ggplot2::scale_fill_gradient2(low="darkgoldenrod4", mid='white', high="darkgreen", 
+                                  limits = c(-50,50), midpoint = 0) +
+    ggplot2::labs(y = 'Number of sample sites', 
+                  x = paste0("Relative change in Landsat ", 
+                             gsub('.MAX', 'max', toupper(si)),
+                             ' from ', min(yrs), ' to ', max(yrs), ' (%)')) +
     ggplot2::theme_bw() + 
-    ggplot2::theme(legend.position = 'none', axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14)) + 
+    ggplot2::theme(legend.position = 'none', 
+                   axis.text=ggplot2::element_text(size=12), 
+                   axis.title=ggplot2::element_text(size=14)) + 
     ggplot2::xlim(-50, 50)
   
   # Create time series figure for each trend class
@@ -92,28 +120,34 @@ lsat_calc_trend <- function(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, 
   
   trend.cols <- c('darkgoldenrod4','ivory3','darkgreen')
   
-  fig2 <- ggplot2::ggplot(trend.cls.yrly.dt, ggplot2::aes(year, si.avg, group = trend.cat, color = trend.cat)) + 
+  fig2 <- ggplot2::ggplot(trend.cls.yrly.dt, 
+                          ggplot2::aes(year, si.avg, group = trend.cat, color = trend.cat)) + 
     ggplot2::labs(y=paste0('Mean Landsat ', gsub('.MAX', 'max', toupper(si))), x='Year') + 
-    ggplot2::geom_ribbon(aes(ymin = si.avg-si.se, ymax = si.avg + si.se, fill=trend.cat),alpha=0.3, linetype=0)+
+    ggplot2::geom_ribbon(aes(ymin = si.avg-si.se, ymax = si.avg + si.se, fill=trend.cat), 
+                         alpha=0.3, linetype=0)+
     ggplot2::geom_line(aes(color = trend.cat), alpha = 1, size=1) + 
     ggplot2::scale_fill_manual(values = trend.cols, name = 'Trend class') + 
     ggplot2::scale_color_manual(values = trend.cols, name = 'Trend class')+
     ggplot2::theme_bw() +
-    ggplot2::theme(legend.position=legend.position, legend.direction=legend.dir,  
+    ggplot2::theme(legend.position=legend.position, legend.direction=legend.direction,  
                    axis.text=ggplot2::element_text(size=12), 
                    axis.title=ggplot2::element_text(size=14),
                    plot.title=ggplot2::element_text(hjust = 0.5))
   
   # combo figure
-  fig <- ggpubr::ggarrange(fig1, fig2, ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9, hjust = -0.1)
+  fig <- ggpubr::ggarrange(fig1, fig2, ncol = 1, nrow = 2, 
+                           labels = c('(a)','(b)'), vjust=0.9, hjust = -0.1)
   
   # output
   print(fig)
-  print(msg)
+  print(print.msg)
   trend.dt
 }
 
 calc.trends <- function(x,y){
   xx <- zyp::zyp.yuepilon(y,x) ## note the order of x and y are switched in this call!!!
-  return(data.table(slope=round(xx['trend'],5), intercept=round(xx['intercept'],5), tau=round(xx['tau'],3), pval=round(xx['sig'],4)))
+  return(data.table(slope=round(xx['trend'],5), 
+                    intercept=round(xx['intercept'],5), 
+                    tau=round(xx['tau'],3), 
+                    pval=round(xx['sig'],4)))
 }
