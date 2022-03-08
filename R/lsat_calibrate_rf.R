@@ -52,6 +52,8 @@
 #'    is determined for each sample and then the lowest 2.5 and highest 97.5 percentiles are trimmed.
 #' @param overwrite.col (True/False) Overwrite existing column or (by default)
 #'    append cross-calibrated data as a new column?
+#' @param write.output (True/False) Should RF models and evaluation content be written to disk?
+#'    Either way, evaluation table and figure are printed in the console.  
 #' @param outfile.id Identifier used when naming output files. Defaults to the input band,
 #'    but can be specified if needed such as when performing Monte Carlo simulations.
 #' @param outdir Output directory (created if necessary) to which multiple files will be written.
@@ -66,11 +68,13 @@
 #'    is your specified band or spectral index
 #' @import data.table
 #' @export lsat_calibrate_rf
-#' @author Logan T. Berner
-#' @examples 
-#' lsat.dt <- lsat_xcal_rf(lsat.dt, 
-#'                         band = 'ndvi',
-#'                         outdir ='data/lsat_sample_data/sensor_xcal/ndvi/')
+#' @examples
+#' data(lsat.example.dt)
+#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_clean_data(lsat.dt)
+#' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+#' lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
+#' lsat.dt
 
 lsat_calibrate_rf <- function(dt, 
                               band.or.si, 
@@ -81,25 +85,34 @@ lsat_calibrate_rf <- function(dt,
                               frac.train = 0.75,
                               trim = T,
                               overwrite.col = F,
+                              write.output = T,
                               outfile.id=band.or.si, 
-                              outdir){
+                              outdir = NULL){
   
-  R.utils::mkdirs(outdir) # create output directory
+  # IDENTIFY SATELLITES, BUILD OUTPUT LISTS AND DATA FRAMES, ETC ==============
   dt <- data.table::data.table(dt)
   sats <- dt[,unique(satellite)] # which satellites are in the data set?
   sats <- sats[-which(sats %in% 'LANDSAT_7')]
   dt$xcal <- numeric() # populate this field later in script
   model.lst <- list()  # list to store random forest models
   fig.lst <- list() # list to store output figures
+  
+  # create data.frame to store model evaluation metrics
   model.eval.df <- data.frame(matrix(data = NA, nrow = length(sats), ncol = 12))
   colnames(model.eval.df) <- c('band.or.si','sat','orig.bias','orig.bias.pcnt',
                                'rf.r2','rf.rmse','rf.n','xval.r2','xval.rmse','xval.n', 
                                'xval.bias','xval.bias.pcnt')
   model.eval.df$sat <- sats
   
+  # create output directory if writing output
+  if (write.output == T){
+    R.utils::mkdirs(outdir)
+  }
+  
+  # BEGIN CROSS-CALIBRATION ==================================================
   for (i in sats){
     if (train.with.highlat.data == T){
-      # if true, use internal data for model fitting
+      # if true, fit random forest models using internal data
       xcal.dt <- lsat.xcal.dt[satellite == i | satellite == 'LANDSAT_7']
       xcal.dt <- xcal.dt[doy %in% doy.rng] # get obs from specified time of year
       
@@ -168,7 +181,7 @@ lsat_calibrate_rf <- function(dt,
     if (train.with.highlat.data == T){
       if (band.or.si %in% c('blue','green','red','nir','swir1','swir2') == F){
         xcal.dt <- lsat_calc_spec_index(xcal.dt, band.or.si)
-      }
+      } 
     }
     
     # compute median band.or.si / VI value for the 15-day seasonal window at each sample
@@ -186,7 +199,7 @@ lsat_calibrate_rf <- function(dt,
     if (trim == T){
       rf.data.dt[, dif.pcnt := get(band.or.si) - get(paste('LANDSAT_7',band.or.si,sep='.'))]
       rf.data.dt[, dif.pcnt.rank := dplyr::percent_rank(dif.pcnt)]
-      rf.data.dt <- rf.data.dt[dif.pcnt.rank > 0.025 & dif.pcnt.rank < 0.95]
+      rf.data.dt <- rf.data.dt[dif.pcnt.rank > 0.025 & dif.pcnt.rank < 0.975]
       rf.data.dt <- rf.data.dt[, dif.pcnt := NULL]
       rf.data.dt <- rf.data.dt[, dif.pcnt.rank := NULL]
     }
@@ -216,16 +229,21 @@ lsat_calibrate_rf <- function(dt,
     rf.pred <- stats::predict(rf.xcal, sat.dt)
     dt <- dt[satellite == i, xcal := rf.pred$predictions]
     
-    # save model to disk
-    outname <- paste(outdir,'/', outfile.id, '_', i, '_xcal_rf.RData', sep='')
-    saveRDS(rf.xcal, outname)
+    # (optional) save model to disk
+    if (write.output == T){
+      rf.outname <- paste(outdir,'/', outfile.id, '_', i, '_xcal_rf.RData', sep='')
+      saveRDS(rf.xcal, rf.outname)
+    }
     
     # evaluate model using cross-validation and internal rf metrics, 
     # saving summaries to data table
     rf.eval.dt[, eval(paste("LANDSAT_7", band.or.si, 'pred', sep='.')) := 
                  stats::predict(rf.xcal, rf.eval.dt)$predictions]
-    file.name <- paste(outdir, '/', outfile.id,'_', i, '_xcal_rf_eval_data.csv', sep='')
-    data.table::fwrite(rf.eval.dt, file.name)
+    
+    if (write.output == T){
+      file.name <- paste(outdir, '/', outfile.id,'_', i, '_xcal_rf_eval_data.csv', sep='')
+      data.table::fwrite(rf.eval.dt, file.name)
+    }
     
     target.vals <- rf.eval.dt[[paste('LANDSAT_7.',band.or.si,sep='')]]
     orig.vals <- rf.eval.dt[[band.or.si]]
@@ -304,50 +322,50 @@ lsat_calibrate_rf <- function(dt,
                      axis.text=ggplot2::element_text(size=12), 
                      axis.title=ggplot2::element_text(size=14,face="bold"))
     
-    # combine figures
+    # combine figures and store in list
     fig <- ggpubr::ggarrange(fig.raw, fig.cal, ncol = 2)
-    
-    # write out fig or save to list to write later if calibrating more than one satellite
+    fig.lst[[i]] <- fig
+  }
+  
+  # write out fig or save to list to write later if calibrating more than one satellite
+  if (write.output == T){
     if (length(sats) == 1){
+      fig <- fig.list[[1]]
       fig.name <- paste(outdir, '/', outfile.id, '_', i, '_xval_pred_vs_obs.jpg', sep='')
       grDevices::jpeg(fig.name, 4, 4, units = 'in', res=400)
       print(fig)
       grDevices::dev.off()
+    } else if (length(sats) == 2){
+      fig <- ggpubr::ggarrange(fig.lst[[1]], fig.lst[[2]], 
+                               ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9)
+      fig.name <- paste(outdir, '/', outfile.id,'_xval_pred_vs_obs.jpg', sep='')
+      grDevices::jpeg(fig.name, 8.0, 7.5, units = 'in', res=400)
       print(fig)
+      grDevices::dev.off()
     } else {
-      fig.lst[[i]] <- fig
+      print('Modify to accommodate plotting more satellites!')
     }
   }
   
-  # write out composite figure
-  if (length(sats) == 2){
-    fig <- ggpubr::ggarrange(fig.lst[[1]], fig.lst[[2]], 
-                             ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9)
-    fig.name <- paste(outdir, '/', outfile.id,'_xval_pred_vs_obs.jpg', sep='')
-    grDevices::jpeg(fig.name, 8.0, 7.5, units = 'in', res=400)
-    print(fig)
-    grDevices::dev.off()
-    print(fig)
-  } else {
-    print('Modify to accommodate plotting more satellites!')
+  # (optional) save model evaluation summary table
+  if (write.output == T){
+    outfile <- paste(outdir, '/', outfile.id, '_xcal_rf_eval.csv', sep='')
+    write.table(model.eval.df, outfile, sep = ',', row.names = F, col.names = T)
   }
   
-  
-  # print out and save model evaluation summary table
-  print(model.eval.df)
-  outfile <- paste(outdir, '/', outfile.id, '_xcal_rf_eval.csv', sep='')
-  write.table(model.eval.df, outfile, sep = ',', row.names = F, col.names = T)
-  
-  # output rf models and updated data table
+  # fill in xcal column values for Landsat 7 using original values
   dt[satellite == 'LANDSAT_7', xcal:= get(band.or.si)]
   
-  # overwrite original column with cross-calibrated data or return new column?  
-  if (overwrite.col == F){
-    data.table::setnames(dt, 'xcal', eval(paste(band.or.si, 'xcal', sep='.')))
-  } else {
+  # (optional) overwrite original column with cross-calibrated data or return new column
+  if (overwrite.col == T){
     dt[, eval(band.or.si) := NULL]
     data.table::setnames(dt, 'xcal', eval(band.or.si))
+  } else {
+    data.table::setnames(dt, 'xcal', eval(paste(band.or.si, 'xcal', sep='.')))
   }
   
+  # stuff to return to the console
+  print(fig)
+  print(model.eval.df)
   dt
 }
