@@ -24,7 +24,7 @@
 #' @export lsat_calc_trend
 #' @import data.table
 #' @examples 
-#' #' data(lsat.example.dt)
+#' data(lsat.example.dt)
 #' lsat.dt <- lsat_general_prep(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
 #' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
