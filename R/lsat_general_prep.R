@@ -1,13 +1,17 @@
 #' Prepare Landsat Data
 #'
-#' @description This function parses sample site coordinates and time period of each measurement, scales band values, and formats
-#' column names as needed for subsequent analysis using the lsatTS package.     
+#' @description This function parses sample site coordinates and time period of each measurement, 
+#'     scales band values, and formats column names as needed for subsequent analysis using the 
+#'     lsatTS package.
 #' @param dt Data.table with Landsat data exported from Google Earth Engine using lsat_export_ts()
 #' @return Data.table with formatted and scaled values.
 #' @import data.table
 #' @export lsat_general_prep
 #'
-#' @examples # parsed.dt <- lsat_general_prep(gee.dt)
+#' @examples 
+#' data(lsat.example.dt)
+#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt
 
 lsat_general_prep <- function(dt){
 

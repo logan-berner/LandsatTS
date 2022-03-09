@@ -18,14 +18,19 @@
 #' Plant Senescence Reflectance Index (PSRI; Merzlyak et al. 1999),
 #' and the Soil-Adjusted Total Vegetation Index (SATVI; Marsett et al. 2006).
 #'
-#' @param dt Data.table containing surface reflectance data
-#' @param si Character string specifying abbreviation of the desired spectral index
+#' @param dt Data.table containing surface reflectance data.
+#' @param si Character string specifying abbreviation of the desired spectral index.
 #'
-#' @return The input data.table with an appended column containing the spectral index
+#' @return The input data.table with an appended column containing the spectral index.
 #' @import data.table
 #' @export lsat_calc_spec_index
 #'
-#' @examples # my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')
+#' @examples
+#' data(lsat.example.dt)
+#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_clean_data(lsat.dt)
+#' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+#' lsat.dt
 
 lsat_calc_spec_index <- function(dt, si){
   dt <- data.table::data.table(dt)

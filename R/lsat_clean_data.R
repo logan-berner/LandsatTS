@@ -22,8 +22,10 @@
 #' @export lsat_clean_data
 #'
 #' @examples 
-#' lsat.clean.dt <- lsat_clean_dt(lsat.dt)
-#' lsat.clean.dt
+#' data(lsat.example.dt)
+#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_clean_data(lsat.dt)
+#' lsat.dt
 
 lsat_clean_data <- function(dt, 
                             cloud.max=80, 

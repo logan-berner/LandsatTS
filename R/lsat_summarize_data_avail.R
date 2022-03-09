@@ -1,14 +1,22 @@
 #' Summarize Availability of Landsat for each Sample Site
-#' @description This little function summarizes the temporal period and availability of observations at each sample site
-#' @param dt Data.table with columns named "sample.id" and "year"
-#' @return Data.table summarizing for each site the first, last, and number of years with observations,
-#' the minimum and maximum number of observations in a year, and the total number of observations across years.
-#' Also returns a figure showing the median (2.5 and 97.5 percentiles) number of observations per sample site across years
-#' for each Landsat satellite. 
+#' 
+#' @description This little function summarizes the temporal period and availability 
+#'    of observations at each sample site.
+#' @param dt Data.table with columns named "sample.id" and "year".
+#' @return Data.table summarizing for each site the first, last, and number of years 
+#'    with observations, the minimum and maximum number of observations in a year, and 
+#'    the total number of observations across years. Also returns a figure showing the 
+#'    median (2.5 and 97.5 percentiles) number of observations per sample site across years 
+#'    for each Landsat satellite. 
 #' @import data.table
 #' @export lsat_summarize_data_avail
 #'
-#' @examples # summary.dt <- lsat_summarize_data_avail(dt)
+#' @examples
+#' data(lsat.example.dt)
+#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_clean_data(lsat.dt)
+#' lsat_summarize_data_avail(lsat.dt)
+
 
 lsat_summarize_data_avail <- function(dt){
   dt <- data.table::data.table(dt)

@@ -1,25 +1,48 @@
 #' Evaluate Estimates of Annual Phenological Maximum
-#' @description Assess how the number of annual Landsat observations impacts estimates of annual maximum vegetation greenness derived from raw observations and
-#' phenological modeling. The algorithm computes annual maximum vegetation greenness using site x years with a user-specific number of observations and then
-#' compares these with estimates derived when using progressively smaller subsets of observations. This lets you determine the degree to which
-#' annual estimates of maximum vegetation greenness are impacted by the number of available observations.
-#' @param dt Data.table output from lsat_fit_phenologic_curves().
+
+#' @description Assess how the number of annual Landsat observations impacts 
+#' estimates of annual maximum vegetation greenness derived from raw observations and
+#' phenological modeling. The algorithm computes annual maximum vegetation greenness 
+#' using site x years with a user-specific number of observations and then compares 
+#' these with estimates derived when using progressively smaller subsets of observations. 
+#' This lets the user determine the degree to which annual estimates of maximum vegetation 
+#' greenness are impacted by the number of available observations.
+#' @param dt Data.table output from lsat_fit_phenological_curves().
 #' @param si Character string specifying the spectral index (e.g., NDVI) to evaluate.
-#' @param min.frac.of.max Numeric threshold (0-1) that defines the "growing season" as the seasonal window when the
-#' phenological curves indicate the VI is within a specified fraction of the maximum VI. In other words, an observation
-#' is considered to be from the "growing season" when the VI is within a user-specified fraction of the curve-fit growing season maximum VI.
-#' @param min.obs Minimum number of observations needed for a site x year to be included in the evaluation (Default = 10)
+#' @param min.frac.of.max Numeric threshold (0-1) that defines the "growing season" as 
+#'  the seasonal window when the phenological curves indicate the VI is within a specified 
+#'  fraction of the maximum VI. In other words, an observation is considered to be from 
+#'  the "growing season" when the VI is within a user-specified fraction of the curve-fit 
+#'  growing season maximum VI.
+#' @param min.obs Minimum number of observations needed for a site x year to be included 
+#'     in the evaluation (Default = 10)
 #' @param reps Number of times to bootstrap the assessment (Default = 10)
-#' @param zscore.thresh Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.
-#' @param outdir If desired, specify the output directory where evaluation data and figure should be written. If left as NA, then no output is only displayed
-#' in the console and not written to disk.
+#' @param zscore.thresh Numeric threshold specifying the Z-score value beyond which individual 
+#'     observations are filtered before computing the maximum VI.
+#' @param outdir If desired, specify the output directory where evaluation data and figure 
+#'     should be written. If left as NA, then no output is only displayed in the console 
+#'     and not written to disk.
 #'
 #' @return Data.table
 #' @import data.table
 #' @export lsat_evaluate_phenological_max
-#' @examples # Forthcoming...
+#' @examples
+#' data(lsat.example.dt)
+#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_clean_data(lsat.dt)
+#' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+#' # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
+#' lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi) 
+#' lsat_evaluate_phenological_max(lsat.pheno.dt)
 
-lsat_evaluate_phenological_max <- function(dt, si, min.frac.of.max = 0.75, zscore.thresh = 3, min.obs = 6, reps = 10, outdir = NA){
+
+lsat_evaluate_phenological_max <- function(dt, 
+                                           si, 
+                                           min.frac.of.max = 0.75, 
+                                           zscore.thresh = 3, 
+                                           min.obs = 6, 
+                                           reps = 10, 
+                                           outdir = NA){
 
   colnames(dt) <- gsub(si, 'si', colnames(dt))
 
@@ -30,8 +53,12 @@ lsat_evaluate_phenological_max <- function(dt, si, min.frac.of.max = 0.75, zscor
   dt <- dt[, n.obs.gs := .N, by = c('sample.id','year')]
   dt <- dt[n.obs.gs > min.obs]
 
-  # identify and filter out obs-level predictions of max si that are anomalously high or low relative to other obs from that site x year
-  dt <- dt[, ':='(avg = mean(si.max.pred), sd = stats::sd(si.max.pred), n=.N), by = c('sample.id','year')]
+  # identify and filter out obs-level predictions of max si that are 
+  # anomalously high or low relative to other obs from that site x year
+  dt <- dt[, ':='(avg = mean(si.max.pred), 
+                  sd = stats::sd(si.max.pred), 
+                  n=.N), 
+           by = c('sample.id','year')]
   dt <- dt[, abs.zscore := abs((si.max.pred - avg )/sd)]
   dt <- dt[abs.zscore <= zscore.thresh]
 
@@ -45,7 +72,10 @@ lsat_evaluate_phenological_max <- function(dt, si, min.frac.of.max = 0.75, zscor
     for (j in 1:reps){
       rep.dt <- dt[,.SD[sample(.N, i)], by=c('sample.id','year')]
       rep.dt <- rep.dt[,':='(n.obs=i, rep=j)]
-      rep.dt <- rep.dt[, .(si.max.obs = data.table::first(si.max.obs), si.max.uncor = stats::quantile(si,0.9), si.max.cor = stats::median(si.max.pred)), by = c('n.obs','rep','sample.id','year')]
+      rep.dt <- rep.dt[, .(si.max.obs = data.table::first(si.max.obs), 
+                           si.max.uncor = stats::quantile(si,0.9), 
+                           si.max.cor = stats::median(si.max.pred)), 
+                       by = c('n.obs','rep','sample.id','year')]
       rep.dt <- rep.dt[si.max.cor < si.max.uncor, si.max.cor := si.max.uncor]
       rep.dt[, si.uncor.pcntdif := (si.max.uncor - si.max.obs)/si.max.obs*100]
       rep.dt[, si.cor.pcntdif := (si.max.cor - si.max.obs)/si.max.obs*100]
@@ -58,16 +88,24 @@ lsat_evaluate_phenological_max <- function(dt, si, min.frac.of.max = 0.75, zscor
   eval.dt <- na.omit(eval.dt)
 
   # summarize across iterations
-  eval.smry.dt <- eval.dt[,.(si.uncor.pcntdif.med = stats::median(si.uncor.pcntdif, na.rm=T), si.cor.pcntdif.med = stats::median(si.cor.pcntdif, na.rm=T)), by = c('sample.id','year','n.obs')]
-  eval.smry.dt <- melt.data.table(eval.smry.dt, id.vars=c('sample.id','year','n.obs'), value.name='pcnt.dif', variable.name='Processing')
+  eval.smry.dt <- eval.dt[,.(si.uncor.pcntdif.med = stats::median(si.uncor.pcntdif, na.rm=T), 
+                             si.cor.pcntdif.med = stats::median(si.cor.pcntdif, na.rm=T)), 
+                          by = c('sample.id','year','n.obs')]
+  eval.smry.dt <- melt.data.table(eval.smry.dt, 
+                                  id.vars=c('sample.id','year','n.obs'), 
+                                  value.name='pcnt.dif', variable.name='Processing')
   eval.smry.dt$n.obs.fac <- as.factor(eval.smry.dt$n.obs)
   eval.smry.dt$Processing <- factor(eval.smry.dt$Processing, labels = c('Raw','Modeled'))
 
   # EVALUATION PLOT
   ylab.pcntdif <- bquote("Difference from observed "~.(toupper(gsub('.xcal','',si)))['max']~" (%)")
-  fig <- ggplot2::ggplot(eval.smry.dt, ggplot2::aes(n.obs.fac, pcnt.dif, fill=Processing)) + ggplot2::geom_boxplot(outlier.size=0.7, outlier.color='gray')
-  fig <- fig + ggplot2::theme_bw() + ggplot2::labs(y=ylab.pcntdif, x='Number of observations')
-  fig <- fig + ggplot2::theme(legend.position="right", axis.text=ggplot2::element_text(size=12), axis.title=ggplot2::element_text(size=14))
+  fig <- ggplot2::ggplot(eval.smry.dt, ggplot2::aes(n.obs.fac, pcnt.dif, fill=Processing)) + 
+    ggplot2::geom_boxplot(outlier.size=0.7, outlier.color='gray') + 
+    ggplot2::theme_bw() + 
+    ggplot2::labs(y=ylab.pcntdif, x='Number of observations') + 
+    ggplot2::theme(legend.position="right", 
+                   axis.text=ggplot2::element_text(size=12), 
+                   axis.title=ggplot2::element_text(size=14))
   print(fig)
   
   # console output

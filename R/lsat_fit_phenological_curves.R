@@ -1,44 +1,80 @@
 #' Characterize Land Surface Phenology using Vegetation Index Time Series
 #'
 #' @description
-#' This function characterizes seasonal land surface phenology at each sample site using time series of spectral vegetation indices (e.g., NDVI).
-#' The underlying algorithm was constructed to facilitate estimating annual maximum vegetation greenness (spectral index)
-#' The function returns information about typical phenology at a sample site and about the timing of an individual observation relative.
-#' Please note that this function was designed for situations where the seasonal phenology is hump shaped. If you are using a spectral index that is 
-#' typically negative (e.g., Normalized Difference Water Index) then multiply the index by -1 before running this function, then back-transform
+#' This function characterizes seasonal land surface phenology at each sample site using 
+#' time series of spectral vegetation indices (e.g., NDVI). The underlying algorithm was
+#' constructed to facilitate estimating annual maximum vegetation greenness (spectral index)
+#' The function returns information about typical phenology at a sample site and about 
+#' the timing of an individual observation relative. Please note that this function was 
+#' designed for situations where the seasonal phenology is hump shaped. If you are using
+#' a spectral index that is typically negative (e.g., Normalized Difference Water Index) 
+#' then multiply the index by -1 before running this function, then back-transform
 #' your index after running the lsat_summarize_growing_seasons() function.   
 #' @param dt Data.table with a multi-year time series a vegetation index
-#' @param si Character string specifying the spectral index (e.g., NDVI) to use for determining surface phenology. This must correspond
-#' to an existing column in the data.table.
-#' @param window.yrs Number specifying the focal window width in years that is used when pooling data to fit cubic splines (use odd numbers).
-#' @param window.min.obs Minimum number of focal window observations necessary to fit a cubic spline.
-#' @param si.min Minimum value of spectral index necessary for observation to be used when fitting cubic splines. Defaults to 0.15 which for NDVI is about when plants are present.
-#' @param spar Smoothing parameter passed to smooth.spline(), typically around 0.65 - 0.75 for this application.
-#' @param pcnt.dif.thresh Allowable percent difference (0-100) between individual observations and fitted cubic spline.
-#' Observations that differ by more than this threshold are filtered out and the cubic spline is iteratively refit.
-#' @param weight When fitting the cubic splines, should individual observations be weighted by their year of acquisition relative to the focal year? 
-#' If so, each observation is weighted by exp(-0.25*n.yrs.from.focal) when fitting the cubic splines. 
-#' @param spl.fit.outfile (Optional) Name of output csv file containing the fitted cubic splines for each sample site.
-#' Useful for subsequent visualization
+#' @param si Character string specifying the spectral index (e.g., NDVI) to use for 
+#'     determining surface phenology. This must correspond to an existing column 
+#'     in the data.table.
+#' @param window.yrs Number specifying the focal window width in years that is used when 
+#'     pooling data to fit cubic splines (use odd numbers).
+#' @param window.min.obs Minimum number of focal window observations necessary to fit 
+#'     a cubic spline.
+#' @param si.min Minimum value of spectral index necessary for observation to be used 
+#'     when fitting cubic splines. Defaults to 0.15 which for NDVI is about when plants are present.
+#' @param spar Smoothing parameter typically around 0.70 - 0.80 for this application.
+#'     A higher value means a less flexible spline.
+#' @param pcnt.dif.thresh Allowable percent difference (0-100) between individual 
+#'     observations and fitted cubic spline. Observations that differ by more than 
+#'     this threshold are filtered out and the cubic spline is iteratively refit.
+#' @param weight When fitting the cubic splines, should individual observations be 
+#'     weighted by their year of acquisition relative to the focal year? 
+#'     If so, each observation is weighted by exp(-0.25*n.yrs.from.focal) when fitting the cubic splines. 
+#' @param spl.fit.outfile (Optional) Name of output csv file containing the fitted 
+#'     cubic splines for each sample site. Useful for subsequent visualization.
 #' @param progress (TRUE/FALSE) Print a progress report?
-#' @param test.run (TRUE/FALSE) If TRUE, then algorithm is run using a small random subset of data and only a figure is output. This is used for model parameterization.
-#' @return Data.table that provides, for each observation, information on the phenological conditions for that specific day of year during the focal period. 
-#' These data can then be used to estimate annual maximum spectral index and other growing season metrics using lsat_summarize_growing_season().
-#' A figure is also generated that shows observation points and phenological curves for nine random sample locations. 
+#' @param test.run (TRUE/FALSE) If TRUE, then algorithm is run using a small random 
+#'     subset of data and only a figure is output. This is used for model parameterization.
+#' @return Data.table that provides, for each observation, information on the phenological 
+#'     conditions for that specific day of year during the focal period. 
+#'     These data can then be used to estimate annual maximum spectral index 
+#'     and other growing season metrics using lsat_summarize_growing_season().
+#'     A figure is also generated that shows observation points and phenological 
+#'     curves for nine random sample locations. 
 #' @import data.table
 #' @export lsat_fit_phenological_curves
 #'
-#' @examples # To come...
+#' @examples
+#' data(lsat.example.dt)
+#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_clean_data(lsat.dt)
+#' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+#' # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
+#' lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi) 
+#' lsat.pheno.dt
 
-
-lsat_fit_phenological_curves = function(dt, si, window.yrs=11, window.min.obs=20, si.min=0.15, spar=0.73,
-                                        pcnt.dif.thresh=30, weight=T, spl.fit.outfile=F, progress=T, test.run=F){
+lsat_fit_phenological_curves = function(dt, 
+                                        si, 
+                                        window.yrs=11, 
+                                        window.min.obs=20, 
+                                        si.min=0.15, 
+                                        spar=0.75,
+                                        pcnt.dif.thresh=30, 
+                                        weight=T, 
+                                        spl.fit.outfile=F, 
+                                        progress=T, 
+                                        test.run=F){
   dt <- data.table::data.table(dt)
   
+  # (OPTIONAL) SUBSAMPLE SITES IF RUNNING IN TEST MODE
+  n.sites <- length(unique(dt$sample.id))
   if (test.run == T){
-    dt <- dt[sample.id %in% sample(unique(dt$sample.id), 9)]
+    if (n.sites < 9){
+      stop(paste0('Your data set only has ', n.sites, ' sample sites, so do not run in test mode'))
+    } else {
+      dt <- dt[sample.id %in% sample(unique(dt$sample.id), 9)]
     }
-  # GET SAMPLE sample, DOY, YEAR, AND SPECTRAL INDEX FROM INPUT DATA TABLE
+  }
+  
+  # GET SAMPLE ID, DOY, YEAR, AND SPECTRAL INDEX FROM INPUT DATA TABLE
   dt <- dt[, eval(c('sample.id','latitude','longitude','year','doy',si)), with=F]
   dt <- data.table::setnames(dt, si, 'si')
   dt <- dt[order(sample.id,doy)]
@@ -176,15 +212,19 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=11, window.min.obs=20
   }
   
   # OUTPUT FIGURE
-  example.ids <- sample(unique(dt$sample.id), 9)
+  if (n.sites > 9){
+    example.ids <- sample(unique(dt$sample.id), 9, replace = F)
+  } else {
+    example.ids <- sample(unique(dt$sample.id), n.sites, replace = F)
+  }
   example.obs.dt <- dt[sample.id %in% example.ids]
   example.curves.dt <- spline.dt[sample.id %in% example.ids]
   
-  fig <- ggplot2::ggplot(example.obs.dt, aes(doy, si)) + 
+  fig <- ggplot2::ggplot(example.obs.dt, ggplot2::aes(doy, si)) + 
     ggplot2::labs(y=paste0('Landsat ', toupper(si)), x='Day of Year') + 
     ggplot2::ggtitle('Nine random sample locations') + 
     ggplot2::facet_wrap(~sample.id, nrow = 3, ncol = 3, scales = 'free_y') + 
-    ggplot2::geom_point(aes(fill = year), pch=21, color = 'black', size = 2) + 
+    ggplot2::geom_point(ggplot2::aes(fill = year), pch=21, color = 'black', size = 2) + 
     ggplot2::scale_fill_gradientn(name = 'Observation', colours = c('blue','red','gold')) + 
     ggplot2::geom_line(data = example.curves.dt, mapping = ggplot2::aes(doy, spl.fit, group = focal.yr, color = focal.yr), alpha = 0.75) + 
     ggplot2::scale_color_gradientn(name = 'Curve',  colours = c('blue','red','gold')) + 
@@ -194,7 +234,7 @@ lsat_fit_phenological_curves = function(dt, si, window.yrs=11, window.min.obs=20
                                          plot.title=ggplot2::element_text(hjust = 0.5),
                                          strip.background = ggplot2::element_rect(fill="black"),
                                          strip.text = ggplot2::element_text(color = "white", size = 12)) + 
-    ggplot2::guides(colour = guide_colourbar(title.position="top", title.hjust = 0.5))
+    ggplot2::guides(colour = ggplot2::guide_colourbar(title.position="top", title.hjust = 0.5))
   
   print(fig)
   

@@ -87,7 +87,7 @@ lsat_calibrate_rf <- function(dt,
                               overwrite.col = F,
                               write.output = T,
                               outfile.id=band.or.si, 
-                              outdir = NULL){
+                              outdir = NA){
   
   # IDENTIFY SATELLITES, BUILD OUTPUT LISTS AND DATA FRAMES, ETC ==============
   dt <- data.table::data.table(dt)

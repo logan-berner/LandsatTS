@@ -23,7 +23,16 @@
 #' 
 #' @export lsat_calc_trend
 #' @import data.table
-#' @examples # Forthcoming...
+#' @examples 
+#' #' data(lsat.example.dt)
+#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_clean_data(lsat.dt)
+#' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+#' # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
+#' lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi) 
+#' lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, si = 'ndvi)
+#' lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020)
+#' lsat.trend.dt
 
 lsat_calc_trend <- function(dt, 
                             si, 
@@ -83,15 +92,6 @@ lsat_calc_trend <- function(dt,
   trend.dt[pval <= sig & slope < 0, trend.cat := 'browning']
   trend.dt[pval > sig, trend.cat := 'no_trend']
   
-  # create output message
-  avg <- round(mean(trend.dt$total.change.pcnt),2)
-  std <- round(sd(trend.dt$total.change.pcnt),2)
-  pcnts <- round(prop.table(table(trend.dt$trend.cat)),3)*100
-  print.msg <- paste0("Mean (SD) relative change of ", avg, " (", std,
-                      ") % with browning, greening, and no trend at ", 
-                      pcnts[1], ", ", pcnts[2], ", and ", pcnts[3],
-                      " % of sample sites")
-  
   # histogram of vegetation greenness trends
   fig1 <- ggplot2::ggplot(trend.dt, ggplot2::aes(total.change.pcnt, fill=..x..)) +
     ggplot2::geom_histogram(bins = 50, size = 0.25, color = 'gray20') +
@@ -114,20 +114,25 @@ lsat_calc_trend <- function(dt,
                               n = .N), by = c('trend.cat','year')]
   
   trend.cls.yrly.dt[, si.se := si.sd/sqrt(n)]
+  trend.cls.yrly.dt[is.na(si.se), si.se := 0]
   
   trend.cls.yrly.dt[, trend.cat := factor(trend.cat, levels = c('browning','no_trend','greening'), 
                                           labels = c('browning','no trend','greening'))]
   
-  trend.cols <- c('darkgoldenrod4','ivory3','darkgreen')
+  trend.cls.yrly.dt[, trend.cat := droplevels.factor(trend.cat)]
+  
+  trend.cols <- data.table(trend.cat = c('browning','no trend','greening'),
+                           cols = c('darkgoldenrod4','ivory3','darkgreen'))
+  trend.cols <- trend.cols[trend.cat %in% trend.cls.yrly.dt$trend.cat]
   
   fig2 <- ggplot2::ggplot(trend.cls.yrly.dt, 
                           ggplot2::aes(year, si.avg, group = trend.cat, color = trend.cat)) + 
     ggplot2::labs(y=paste0('Mean Landsat ', gsub('.MAX', 'max', toupper(si))), x='Year') + 
-    ggplot2::geom_ribbon(aes(ymin = si.avg-si.se, ymax = si.avg + si.se, fill=trend.cat), 
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = si.avg-si.se, ymax = si.avg + si.se, fill=trend.cat), 
                          alpha=0.3, linetype=0)+
-    ggplot2::geom_line(aes(color = trend.cat), alpha = 1, size=1) + 
-    ggplot2::scale_fill_manual(values = trend.cols, name = 'Trend class') + 
-    ggplot2::scale_color_manual(values = trend.cols, name = 'Trend class')+
+    ggplot2::geom_line(ggplot2::aes(color = trend.cat), alpha = 1, size=1) + 
+    ggplot2::scale_fill_manual(values = trend.cols$cols, name = 'Trend class') + 
+    ggplot2::scale_color_manual(values = trend.cols$cols, name = 'Trend class')+
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position=legend.position, legend.direction=legend.direction,  
                    axis.text=ggplot2::element_text(size=12), 
@@ -138,9 +143,23 @@ lsat_calc_trend <- function(dt,
   fig <- ggpubr::ggarrange(fig1, fig2, ncol = 1, nrow = 2, 
                            labels = c('(a)','(b)'), vjust=0.9, hjust = -0.1)
   
+  # create output message about average relative change 
+  avg <- round(mean(trend.dt$total.change.pcnt),2)
+  std <- round(sd(trend.dt$total.change.pcnt),2)
+  print.avg.msg <- paste0("Mean (SD) relative change of ", avg,
+                          " (", std, ") % across the ", nrow(trend.dt), 
+                          ' sample sites')
+  
+  
+  trend.freqs.dt <- trend.dt[, .(n = .N), trend.cat]
+  trend.freqs.dt[, N := sum(n)][, pcnt := round(n/N * 100)]
+  trend.freqs.dt <- trend.freqs.dt[, N := NULL]
+  names(trend.freqs.dt) <- c('Trend category','Number of sites','Percent of sites')
+  
   # output
   print(fig)
-  print(print.msg)
+  print(print.avg.msg)
+  print(trend.freqs.dt)
   trend.dt
 }
 
