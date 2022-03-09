@@ -12,7 +12,7 @@ lsat_calc_trend(
   nyr.min.frac = 0.66,
   sig = 0.1,
   legend.position = c(0.8, 0.2),
-  legend.dir = "horizontal"
+  legend.direction = "horizontal"
 )
 }
 \arguments{
@@ -22,21 +22,40 @@ lsat_calc_trend(
 
 \item{yrs}{A sequence of years (time period) over which to assess trends (e.g., 2000:2020)}
 
-\item{yr.tolerance}{The number of years that a site's first/last years of observations can differ from the start/end of the user-specified time period ('yrs') for a trend to be computed}
+\item{yr.tolerance}{The number of years that a site's first/last years of
+observations can differ from the start/end of the user-specified
+time period ('yrs') for a trend to be computed}
 
-\item{nyr.min.frac}{Fraction of years within the time period for which observations must be available if a trend is to be computed}
+\item{nyr.min.frac}{Fraction of years within the time period for which observations
+must be available if a trend is to be computed}
 
 \item{sig}{A p-value significance cutoff used to categories trends (e.g., 0.10)}
+
+\item{legend.position}{Legend position for output plot, specified as x and y vector (0-1)}
+
+\item{legend.direction}{Legend direction for output plot, either "horizontal" or "vertical"}
 }
 \value{
-Data.table with summary of temporal trends by site and a histogram showing summarizing relative changes in vegetation greenness
+Data.table with summary of temporal trends by site and a multi-panel figure with:
+(1) a histogram of relative changes in vegetation greenness among sample sites
+(2) a time-series plot of mean vegetation greenness for sample sites grouped
+by trend category
 }
 \description{
-This function computes a temporal trend in annual time series of vegetation greenness for each sampling site
-over a user-specificed time period. This is a wrapper for the zyp.yuepilon() function from the zyp package.
-This function will iteratively pre-whiten a time series (i.e., remove temporal autocorrelation) and then compute
-Mann-Kendall trend tests and Theil-Sen slope indicators.
+This function computes a temporal trend in annual time series
+of vegetation greenness for each sampling site over a user-specificed time
+period. This is a wrapper for the zyp.yuepilon() function from the zyp package.
+This function will iteratively pre-whiten a time series (i.e., remove temporal autocorrelation)
+and then compute Mann-Kendall trend tests and Theil-Sen slope indicators.
 }
 \examples{
-# Forthcoming...
+#' data(lsat.example.dt)
+lsat.dt <- lsat_general_prep(lsat.example.dt)
+lsat.dt <- lsat_clean_data(lsat.dt)
+lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+# lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi) 
+lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, si = 'ndvi)
+lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020)
+lsat.trend.dt
 }

@@ -15,32 +15,37 @@ lsat_evaluate_phenological_max(
 )
 }
 \arguments{
-\item{dt}{Data.table output from lsat_fit_phenologic_curves().}
+\item{dt}{Data.table output from lsat_fit_phenological_curves().}
 
 \item{si}{Character string specifying the spectral index (e.g., NDVI) to evaluate.}
 
-\item{min.frac.of.max}{Numeric threshold (0-1) that defines the "growing season" as the seasonal window when the
-phenological curves indicate the VI is within a specified fraction of the maximum VI. In other words, an observation
-is considered to be from the "growing season" when the VI is within a user-specified fraction of the curve-fit growing season maximum VI.}
+\item{min.frac.of.max}{Numeric threshold (0-1) that defines the "growing season" as
+the seasonal window when the phenological curves indicate the VI is within a specified
+fraction of the maximum VI. In other words, an observation is considered to be from
+the "growing season" when the VI is within a user-specified fraction of the curve-fit
+growing season maximum VI.}
 
-\item{zscore.thresh}{Numeric threshold specifying the Z-score value beyond which individual observations are filtered before computing the maximum VI.}
+\item{zscore.thresh}{Numeric threshold specifying the Z-score value beyond which individual
+observations are filtered before computing the maximum VI.}
 
-\item{min.obs}{Minimum number of observations needed for a site x year to be included in the evaluation (Default = 10)}
+\item{min.obs}{Minimum number of observations needed for a site x year to be included
+in the evaluation (Default = 10)}
 
 \item{reps}{Number of times to bootstrap the assessment (Default = 10)}
 
-\item{outdir}{If desired, specify the output directory where evaluation data and figure should be written. If left as NA, then no output is only displayed
-in the console and not written to disk.}
+\item{outdir}{If desired, specify the output directory where evaluation data and figure
+should be written. If left as NA, then no output is only displayed in the console
+and not written to disk.}
 }
 \value{
 Data.table
 }
 \description{
-Assess how the number of annual Landsat observations impacts estimates of annual maximum vegetation greenness derived from raw observations and
-phenological modeling. The algorithm computes annual maximum vegetation greenness using site x years with a user-specific number of observations and then
-compares these with estimates derived when using progressively smaller subsets of observations. This lets you determine the degree to which
-annual estimates of maximum vegetation greenness are impacted by the number of available observations.
-}
-\examples{
-# Forthcoming...
+Assess how the number of annual Landsat observations impacts
+estimates of annual maximum vegetation greenness derived from raw observations and
+phenological modeling. The algorithm computes annual maximum vegetation greenness
+using site x years with a user-specific number of observations and then compares
+these with estimates derived when using progressively smaller subsets of observations.
+This lets the user determine the degree to which annual estimates of maximum vegetation
+greenness are impacted by the number of available observations.
 }

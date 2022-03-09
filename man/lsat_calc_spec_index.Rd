@@ -7,12 +7,12 @@
 lsat_calc_spec_index(dt, si)
 }
 \arguments{
-\item{dt}{Data.table containing surface reflectance data}
+\item{dt}{Data.table containing surface reflectance data.}
 
-\item{si}{Character string specifying abbreviation of the desired spectral index}
+\item{si}{Character string specifying abbreviation of the desired spectral index.}
 }
 \value{
-The input data.table with an appended column containing the spectral index
+The input data.table with an appended column containing the spectral index.
 }
 \description{
 This function computes some widely used spectral vegetation indices.
@@ -34,5 +34,9 @@ Plant Senescence Reflectance Index (PSRI; Merzlyak et al. 1999),
 and the Soil-Adjusted Total Vegetation Index (SATVI; Marsett et al. 2006).
 }
 \examples{
-# my.dt <- lsat_calc_spec_index(my.dt, 'ndvi')
+data(lsat.example.dt)
+lsat.dt <- lsat_general_prep(lsat.example.dt)
+lsat.dt <- lsat_clean_data(lsat.dt)
+lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+lsat.dt
 }

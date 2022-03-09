@@ -27,7 +27,8 @@ lsat_clean_data(
 
 \item{filter.cfmask.water}{(TRUE/FALSE) Remove observations with CFmask flag = water.}
 
-\item{filter.jrc.water}{(TRUE/FALSE) Remove observations that were ever innundated based on JRC Global Surface Water Dataset.}
+\item{filter.jrc.water}{(TRUE/FALSE) Remove observations that were ever innundated
+based on JRC Global Surface Water Dataset.}
 }
 \value{
 A data.table that includes Landsat observations that met the quality control criteria.
@@ -38,8 +39,12 @@ This function filters out observations that exhibit:
 (2) imposibly high reflectance (>1.0) and abnormally low reflectance (<0.005);
 (3) scene cloud cover above a user-defined threshold;
 (4) geometric uncertainty exceeding a user-defined threshold.
-More information about Landsat Quality Bands here https://landsat.usgs.gov/collectionqualityband
+More information about Landsat Quality Bands here:
+https://landsat.usgs.gov/collectionqualityband
 }
 \examples{
-# lsat.dt <- lsat_clean_dt(lsat.dt, cloud.max=80, geom.max=30, sza.max=60, filter.snow = T, filter.water = T)
+data(lsat.example.dt)
+lsat.dt <- lsat_general_prep(lsat.example.dt)
+lsat.dt <- lsat_clean_data(lsat.dt)
+lsat.dt
 }

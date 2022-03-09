@@ -13,9 +13,12 @@ lsat_general_prep(dt)
 Data.table with formatted and scaled values.
 }
 \description{
-This function parses sample site coordinates and time period of each measurement, scales band values, and formats
-column names as needed for subsequent analysis using the lsatTS package.
+This function parses sample site coordinates and time period of each measurement,
+scales band values, and formats column names as needed for subsequent analysis using the
+lsatTS package.
 }
 \examples{
-# parsed.dt <- lsat_general_prep(gee.dt)
+data(lsat.example.dt)
+lsat.dt <- lsat_general_prep(lsat.example.dt)
+lsat.dt
 }

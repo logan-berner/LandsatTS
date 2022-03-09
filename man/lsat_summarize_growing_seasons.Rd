@@ -16,20 +16,31 @@ lsat_summarize_growing_seasons(
 
 \item{si}{Character string specifying the vegetation index to summarize (e.g., NDVI).}
 
-\item{min.frac.of.max}{Numeric threshold (0-1) that defines the "growing season" as the seasonal window when the
-phenological curves indicate the SI is within a specified fraction of the maximum SI. In other words, an observation
-is considered to be from the "growing season" when the SI is within a user-specified fraction of the curve-fit growing season maximum SI.}
+\item{min.frac.of.max}{Numeric threshold (0-1) that defines the "growing season" as
+the seasonal window when the phenological curves indicate the SI is within a
+specified fraction of the maximum SI. In other words, an observation
+is considered to be from the "growing season" when the SI is within a
+user-specified fraction of the curve-fit growing season maximum SI.}
 
-\item{zscore.thresh}{Numeric threshold specifying the Z-score value beyond which individual observations are filtered before summarizing growing season SI.}
+\item{zscore.thresh}{Numeric threshold specifying the Z-score value beyond
+which individual observations are filtered before summarizing growing season SI.}
 }
 \value{
 Data.table summarizing annual growing season conditions based on a vegetation index.
 }
 \description{
-This function not only computes mean, median, and 90th percentile of a spectral index (SI)
-using observations for a user-specified "growing season," but also estimates the annual maximum VI and associated day of year
+This function not only computes mean, median, and 90th percentile
+of a spectral index (SI) using observations for a user-specified
+"growing season," but also estimates the annual maximum VI and associated day of year
 using phenology modeling and growing season observations.
 }
 \examples{
-# Forthcoming...
+data(lsat.example.dt)
+lsat.dt <- lsat_general_prep(lsat.example.dt)
+lsat.dt <- lsat_clean_data(lsat.dt)
+lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+# lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi) 
+lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, si = 'ndvi)
+lsat.gs.dt
 }
