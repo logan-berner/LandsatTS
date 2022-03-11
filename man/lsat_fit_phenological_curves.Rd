@@ -72,3 +72,12 @@ a spectral index that is typically negative (e.g., Normalized Difference Water I
 then multiply the index by -1 before running this function, then back-transform
 your index after running the lsat_summarize_growing_seasons() function.
 }
+\examples{
+data(lsat.example.dt)
+lsat.dt <- lsat_general_prep(lsat.example.dt)
+lsat.dt <- lsat_clean_data(lsat.dt)
+lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+# lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi') 
+lsat.pheno.dt
+}

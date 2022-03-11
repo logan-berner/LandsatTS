@@ -54,8 +54,8 @@ lsat.dt <- lsat_general_prep(lsat.example.dt)
 lsat.dt <- lsat_clean_data(lsat.dt)
 lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
 # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
-lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi) 
-lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, si = 'ndvi)
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi') 
+lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, si = 'ndvi')
 lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020)
 lsat.trend.dt
 }
