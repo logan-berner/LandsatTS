@@ -49,7 +49,7 @@ This function will iteratively pre-whiten a time series (i.e., remove temporal a
 and then compute Mann-Kendall trend tests and Theil-Sen slope indicators.
 }
 \examples{
-#' data(lsat.example.dt)
+data(lsat.example.dt)
 lsat.dt <- lsat_general_prep(lsat.example.dt)
 lsat.dt <- lsat_clean_data(lsat.dt)
 lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
