@@ -65,9 +65,7 @@ PhantomJS. If so, you will be prompted to do so using
 `webshot::install_phantomjs()`. You can find out more
 [here](https://wch.github.io/webshot/articles/intro.html).*
 
-[
-*t**o**t**o**p*
-](#content)
+[\[to top\]](#content)
 
 ## 2. Prepare sites and extract Landsat data
 
@@ -283,9 +281,7 @@ map(task_list, ee_monitoring)
 temp_files <- map(task_list, ee_drive_to_local)
 ```
 
-[
-*t**o**t**o**p*
-](#content)
+[\[to top\]](#content)
 
 ## 3. Clean and cross-calibrate Landsat data
 
@@ -403,9 +399,7 @@ lsat.dt <- lsat_calibrate_rf(lsat.dt, band = 'ndvi', doy.rng = 151:242, min.obs 
 # lsat.dt <- lsat.dt[, ndvi.xcal := NULL)
 ```
 
-[
-*t**o**t**o**p*
-](#content)
+[\[to top\]](#content)
 
 ## 4. Quantify growing season characteristics
 
@@ -485,9 +479,7 @@ Mann-Kendall trend tests and Theil-Sen slope indicators.
 lsat.trnds.dt <- lsat_calc_trend(lsat.gs.dt, vi = 'ndvi.max', 2000:2020, sig = 0.1)
 ```
 
-[
-*t**o**t**o**p*
-](#content)
+[\[to top\]](#content)
 
 ## 5. Citation
 
@@ -507,9 +499,7 @@ Warming Explains Widespread but Not Uniform Greening in the Arctic
 Tundra Biome. Nature Communications 11, no. 1: 4621.
 <https://doi.org/10.1038/s41467-020-18479-5>.
 
-[
-*t**o**t**o**p*
-](#content)
+[\[to top\]](#content)
 
 ## 6. Contact
 
@@ -519,9 +509,7 @@ Email Logan at: <Logan.Berner@nau.edu>
 
 Email Jakob at: <j.assmann@bio.au.dk>
 
-[
-*t**o**t**o**p*
-](#content)
+[\[to top\]](#content)
 
 ## 7. Contributions
 
@@ -536,9 +524,7 @@ publication and wrote the documentation.
 
 Thank you to all the testers: Tester A, Tester B and Tester C.
 
-[
-*t**o**t**o**p*
-](#content)
+[\[to top\]](#content)
 
 ## 8. References
 
@@ -550,27 +536,51 @@ Software, <https://github.com/r-spatial/rgee/>.
 
 **Peer-reviewed publications that have used `lsatTS` functions:**
 
-1.  Berner LT, et al. (2020) Summer warming explains widespread but not
-    uniform greening in the Arctic tundra biome. Nature Communications
-    11:4621. <https://www.nature.com/articles/s41467-020-18479-5>
+Berner, L.T., Massey, R., Jantz, P., Forbes, B.C., Macias-Fauria, M.,
+Myers-Smith, I.H., Kumpula, T., Gauthier, G., Andreu-Hayles, L.,
+Gaglioti, B., Burns, P.J., Zetterberg, P., D’Arrigo, R., Goetz, S.J.,
+2020. Summer warming explains widespread but not uniform greening in the
+Arctic tundra biome. Nature Communications 11, 4621.
 
-2.  Gaglioti B, Berner LT, Jones BM, Orndahl KM, Williams AP,
-    Andreu‐Hayles L, D’Arrigo R, Goetz SJ, Mann DH (2021) Tussocks
-    enduring or shrubs greening: Alternate responses to changing fire
-    regimes in the Noatak River Valley, Alaska. Journal of Geophysical
-    Research: Biogeosciences 126:e2020JG006009.
-    <https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/2020JG006009>
+Berner, L.T., Goetz, S.J., 2022. Satellite observations document trends
+consistent with a boreal forest biome shift. Global Change Biology 00,
+1-18.
 
-3.  Verdonen M, Berner LT, Forbes BC, Kumpula T (2020) Periglacial
-    vegetation dynamics in Arctic Russia: decadal analysis of tundra
-    regeneration on landslides with time series satellite imagery.
-    Environmental Research Letters 15:105020.
-    <https://iopscience.iop.org/article/10.1088/1748-9326/abb500>
+Boyd, M.A., Berner, L.T., Doak, P., Goetz, S.J., Rogers, B.M., Wagner,
+D., Walker, X.J., Mack, M.C., 2019. Impacts of climate and insect
+herbivory on productivity and physiology of trembling aspen (Populus
+tremuloides) in Alaskan boreal forests. Environmental Research Letters
+14, 085010.
+
+Boyd, M.A., Berner, L.T., Foster, A.C., Goetz, S.J., Rogers, B.M.,
+Walker, X.J., Mack, M.C., 2021. Historic declines in growth portend
+trembling aspen death during a contemporary leaf miner outbreak in
+Alaska. Ecosphere 12, e03569.
+
+Gaglioti, B., Berner, L.T., Jones, B.M., Orndahl, K.M., Williams, A.P.,
+Andreu‐Hayles, L., D’Arrigo, R., Goetz, S.J., Mann, D.H., 2021. Tussocks
+enduring or shrubs greening: Alternate responses to changing fire
+regimes in the Noatak River Valley, Alaska. Journal of Geophysical
+Research: Biogeosciences 126, e2020JG006009.
+
+Mekonnen, Z.A., Riley, W.J., Berner, L.T., Bouskill, N.J., Torn, M.S.,
+Iwahana, G., Breen, A.L., Myers-Smith, I.H., Criado, M.G., Liu, Y.,
+Euskirchen, E.S., Goetz, S.J., Mack, M.C., Grant, R.F., 2021. Arctic
+tundra shrubification: a review of mechanisms and impacts on ecosystem
+carbon balance. Environmental Research Letters 16, 053001.
+
+Verdonen, M., Berner, L.T., Forbes, B.C., Kumpula, T., 2020. Periglacial
+vegetation dynamics in Arctic Russia: decadal analysis of tundra
+regeneration on landslides with time series satellite imagery.
+Environmental Research Letters 15, 105020.
+
+Walker, X.J., Alexander, H.D., Berner, L.T., Boyd, M.A., Loranty, M.M.,
+Natali, S.M., Mack, M.C., 2021. Positive response of tree productivity
+to warming is reversed by increased tree density at the Arctic
+tundra-taiga ecotone. Canadian Journal of Forest Research 51, 1323-1338.
 
 ## 9. License
 
 [MIT LICENSE](LICENSE)
 
-[
-*t**o**t**o**p*
-](#content)
+[\[to top\]](#content)
