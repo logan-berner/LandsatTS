@@ -2,7 +2,7 @@
 % Please edit documentation in R/lsat_calibrate_rf.R
 \name{lsat_calibrate_rf}
 \alias{lsat_calibrate_rf}
-\title{Cross-Calibrate Landsat Sensors using Random Forests Models}
+\title{Cross-calibrate Landsat sensors using Random Forests models}
 \usage{
 lsat_calibrate_rf(
   dt,
@@ -20,19 +20,19 @@ lsat_calibrate_rf(
 )
 }
 \arguments{
-\item{dt}{Data.table containing the band or spectral index to cross calibrate.}
+\item{dt}{Data.table containing the band or spectral index to cross-calibrate.}
 
 \item{band.or.si}{Character string matching the column name of the band or spectral
 index to cross-calibrate.}
 
-\item{doy.rng}{Sequence of numbers specifying the Days of Year (Julian Days)
+\item{doy.rng}{Sequence of numbers specifying the Days of Year
 to use for model development.}
 
 \item{min.obs}{Minimum number of paired, seasonally-matched observations
 from Landsat 7 and Landsat 5/8 required to include a sampling sample.}
 
-\item{train.with.highlat.data}{Should the RF models be trained using an
-internal high-latitude dataset that sampled the Arctic and  Boreal biomes?}
+\item{train.with.highlat.data}{(True/False) Should the RF models be trained using an
+internal high-latitude dataset that sampled the Arctic and Boreal biomes?}
 
 \item{add.predictors}{Vector of additional predictors to use in the Random Forest models.
 These should be time-invariant and match column names.}
@@ -40,8 +40,10 @@ These should be time-invariant and match column names.}
 \item{frac.train}{Fraction of samples to use for training the random forest models.
 The remaining samples are used for model cross-validation.}
 
-\item{trim}{(True/False) If true, then the percent difference between satellites
-is determined for each sample and then the lowest 2.5 and highest 97.5 percentiles are trimmed.}
+\item{trim}{(True/False) If true, then for each sample site the percent difference
+in spectral indices between satellites is determined. The lowest 2.5 and highest 97.5
+percentiles are then trimmed. This is meant to reduce potential differences that
+are not directly attributable to the sensors, but rather to exogenous factors.}
 
 \item{overwrite.col}{(True/False) Overwrite existing column or (by default)
 append cross-calibrated data as a new column?}
@@ -54,19 +56,19 @@ but can be specified if needed such as when performing Monte Carlo simulations.}
 
 \item{outdir}{Output directory (created if necessary) to which multiple files will be written.
 The files include:
-(1) fitted random forest models as R objects
-(2) evaluation data in a csv file
-(3) summary of model cross-validation in a csv file
+(1) fitted random forest models as R objects,
+(2) evaluation data in a csv file,
+(3) summary of model cross-validation in a csv file, and
 (4) multi-panel scatter plot comparing sensors pre- and post-calibration in jpeg format.
 If cross-calibrating both Landsat 5 and 8, then the function returns files for both sensors.}
 }
 \value{
 The input data.table with an appended column titled band.xcal, where "band"
-is your specified band or spectral index
+is your specified band or spectral index.
 }
 \description{
 There are systematic differences in spectral indices (e.g., NDVI) among Landsat 5, 7, and 8
-(Landsat Collection 1). It is important to address these differences before assessing temporal
+(Landsat Collection 2). It is important to address these differences before assessing temporal
 trends in spectral data. Failure to address these differences can, for instance, introduce
 artificial positive trends into NDVI time-series that are based on measurements from multiple
 Landsat sensors (Ju and Masek 2016, Roy et al. 2016, Berner et al. 2020). This function
@@ -74,28 +76,30 @@ cross-calibrates individual bands or spectral indices from Landsat 5/8 to match 
 Landsat 7 is used as a benchmark because it temporally overlaps with the other two sensors.
 Cross-calibration can only be performed on one band or spectral index at a time. The approach
 involves determining the typical reflectance at a sample during a portion of the growing
-season using Landsat 7 and Landsat 5/8 data that were collected the same years. A random
-forest model is then trained to predict Landsat 7 reflectance from Landsat 5/8 reflectance.
-To account for potential seasonal and regional differences between sensors, the random
-forest models also include as covariates the midpoint of each 15-day period (day of year)
-and the spatial coordinates of each sampling sample. This approach can handle non-linear
-relationships, but is most suitable when working with data from 100s to preferably 1000s
-of sampling samples.
+season site using Landsat 7 and Landsat 5/8 data that were collected the same years. A Random
+Forest model is then trained to predict Landsat 7 reflectance from Landsat 5/8 reflectance.
+To account for potential seasonal and regional differences between sensors, the Random
+Forest models also include as covariates the midpoint of each 15-day period (day of year),
+the spatial coordinates of each sample sample, and potentially other use-specified variables.
+This approach is most suitable when working with data from 100s to preferably 1000s
+of sample samples.
 
 The specific steps to cross-calibrating sensors include:
 (1) Identify the years when both Landsat 7 and Landsat 5/8 measured surface reflectance
-at a sampling sample.
+at a sample sample.
 (2) Pool the reflectance measurements across those years and compute 15-day moving median
 reflectance over the course of the growing season for each sensor and sampling sample.
 (3) Exclude 15-day periods with fewer than a specified number of measurements from both
 sets of sensors and then randomly select one remaining 15-day period from each
-sampling sample.
+sample sample.
 (4) Split the data into sets for model training and evaluation.
 (5) Train Random Forest models that predict Landsat 7 reflectance based on Landsat 5/8
 reflectance. The models also account for potential seasonal and regional
 differences between sensors by including as covariates the midpoint of each
 15-day period (day of year) and the spatial coordinates of each sampling sample.
-(6) Fit the random forest models using the ranger package.
+The models are trained using the ranger function from the ranger package
+(Wright and Ziegler, 2017).
+(6) Apply the fitted Random Forest models to cross-calibrate measurements.
 
 See Berner et al. (2020) for a full description of the approach.
 }

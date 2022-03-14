@@ -2,12 +2,12 @@
 % Please edit documentation in R/lsat_general_prep.R
 \name{lsat_general_prep}
 \alias{lsat_general_prep}
-\title{Prepare Landsat Data}
+\title{Prepare Landsat data for analysis}
 \usage{
 lsat_general_prep(dt)
 }
 \arguments{
-\item{dt}{Data.table with Landsat data exported from Google Earth Engine using lsat_export_ts()}
+\item{dt}{Data.table with Landsat data exported from Google Earth Engine using lsat_export_ts().}
 }
 \value{
 Data.table with formatted and scaled values.

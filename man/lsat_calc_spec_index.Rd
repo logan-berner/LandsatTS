@@ -2,7 +2,7 @@
 % Please edit documentation in R/lsat_calc_spec_index.R
 \name{lsat_calc_spec_index}
 \alias{lsat_calc_spec_index}
-\title{Calculate Spectral Indices}
+\title{Calculate spectral indices}
 \usage{
 lsat_calc_spec_index(dt, si)
 }

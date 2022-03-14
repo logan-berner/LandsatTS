@@ -2,7 +2,7 @@
 % Please edit documentation in R/lsat_clean_data.R
 \name{lsat_clean_data}
 \alias{lsat_clean_data}
-\title{Clean Landsat Data}
+\title{Clean Landsat surface reflectance data}
 \usage{
 lsat_clean_data(
   dt,
@@ -23,24 +23,26 @@ lsat_clean_data(
 
 \item{sza.max}{Maximum allowable solar zenith angle (degrees).}
 
-\item{filter.cfmask.snow}{(TRUE/FALSE) Remove observations with CFmask flag = snow.}
+\item{filter.cfmask.snow}{(TRUE/FALSE) Remove measurements with CFmask flag = snow.}
 
-\item{filter.cfmask.water}{(TRUE/FALSE) Remove observations with CFmask flag = water.}
+\item{filter.cfmask.water}{(TRUE/FALSE) Remove measurements with CFmask flag = water.}
 
-\item{filter.jrc.water}{(TRUE/FALSE) Remove observations that were ever innundated
-based on JRC Global Surface Water Dataset.}
+\item{filter.jrc.water}{(TRUE/FALSE) Remove sample sites that were ever innundated
+based on the maximum surface water extent variable from the
+JRC Global Surface Water Dataset.}
 }
 \value{
-A data.table that includes Landsat observations that met the quality control criteria.
+A data.table that includes Landsat measurements that met the quality control criteria.
 }
 \description{
-This function filters out observations that exhibit:
-(1) clouds and optionally water and snow;
-(2) imposibly high reflectance (>1.0) and abnormally low reflectance (<0.005);
+This function enables users to filter out surface reflectance
+measurements that exhibit:
+(1) clouds, cloud shadows, snow, or water flagged by the CFMask algorithm;
+(2) surface water over the Landsat record;
+(2) impossibly high reflectance (>1.0) and abnormally low reflectance (<0.005);
 (3) scene cloud cover above a user-defined threshold;
-(4) geometric uncertainty exceeding a user-defined threshold.
-More information about Landsat Quality Bands here:
-https://landsat.usgs.gov/collectionqualityband
+(4) geometric uncertainty above a user-defined threshold;
+(5) solar zenith angle above a user-defined threshold.
 }
 \examples{
 data(lsat.example.dt)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/lsat_fit_phenological_curves.R
 \name{lsat_fit_phenological_curves}
 \alias{lsat_fit_phenological_curves}
-\title{Characterize Land Surface Phenology using Vegetation Index Time Series}
+\title{Characterize land surface phenology using spectral vegetation index time series}
 \usage{
 lsat_fit_phenological_curves(
   dt,
@@ -19,7 +19,7 @@ lsat_fit_phenological_curves(
 )
 }
 \arguments{
-\item{dt}{Data.table with a multi-year time series a vegetation index}
+\item{dt}{Data.table with a multi-year time series a vegetation index.}
 
 \item{si}{Character string specifying the spectral index (e.g., NDVI) to use for
 determining surface phenology. This must correspond to an existing column
@@ -32,7 +32,9 @@ pooling data to fit cubic splines (use odd numbers).}
 a cubic spline.}
 
 \item{si.min}{Minimum value of spectral index necessary for observation to be used
-when fitting cubic splines. Defaults to 0.15 which for NDVI is about when plants are present.}
+when fitting cubic splines. Defaults to 0.15 which for NDVI is about when plants
+are present. Note that si.min must be >= 0 because the underlying spline fitting
+function will error out if provided negative values.}
 
 \item{spar}{Smoothing parameter typically around 0.70 - 0.80 for this application.
 A higher value means a less flexible spline.}
@@ -63,11 +65,15 @@ curves for nine random sample locations.
 }
 \description{
 This function characterizes seasonal land surface phenology at each sample site using
-time series of spectral vegetation indices (e.g., NDVI). The underlying algorithm was
-constructed to facilitate estimating annual maximum vegetation greenness (spectral index)
+flexible cubic splines that are iteratively fit to time series of spectral vegetation indices
+(e.g., NDVI). This function facilitates estimating annual maximum NDVI and other
+spectral vegetation indices with lsat_summarize_growing_seasons(). For each site,
+cubic splines are iteratively fit to measurements pooled over years within a moving
+window that has a user-specified width. Each cubic spline is iteratively fit, with
+each iteration checking if there are outliers and, if so, excluding outliers and refitting.
 The function returns information about typical phenology at a sample site and about
-the timing of an individual observation relative. Please note that this function was
-designed for situations where the seasonal phenology is hump shaped. If you are using
+the relative phenological timing of each individual measuremenent. This function was
+designed for situations where the seasonal phenology is hump-shaped. If you are using
 a spectral index that is typically negative (e.g., Normalized Difference Water Index)
 then multiply the index by -1 before running this function, then back-transform
 your index after running the lsat_summarize_growing_seasons() function.
