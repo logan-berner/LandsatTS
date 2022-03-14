@@ -1,25 +1,27 @@
 #' Calculate non-parametric vegetation greenness trends
 #'
-#' @description This function computes a temporal trend in annual time series 
-#' of vegetation greenness for each sampling site over a user-specificed time 
-#' period. This is a wrapper for the zyp.yuepilon() function from the zyp package.
-#' This function will iteratively pre-whiten a time series (i.e., remove temporal autocorrelation)
-#' and then compute Mann-Kendall trend tests and Theil-Sen slope indicators.
-#' @param dt Data.table with columns including site, year, and the vegetation index of interest
-#' @param si Spectral index (e.g., NDVI) for which to assess trend
-#' @param yrs A sequence of years (time period) over which to assess trends (e.g., 2000:2020)
+#' @description This function evaluates and summarizes interannual trends in 
+#' vegetation greenness for sample sites over a user-specificed time period. 
+#' Potential interannual trends in vegetation greenness are assessed using 
+#' Mann-Kendall trend tests and Theil-Sen slope indicators after prewhitening
+#' each time series. This trend assessment relies on the zyp.yuepilon() function 
+#' from the zyp package, which provides further details. 
+#' @param dt Data.table with columns including site, year, and the vegetation index of interest.
+#' @param si Spectral index for which to assess trend (e.g., NDVI).
+#' @param yrs A sequence of years over which to assess trends (e.g., 2000:2020).
 #' @param yr.tolerance The number of years that a site's first/last years of 
 #'    observations can differ from the start/end of the user-specified 
-#'    time period ('yrs') for a trend to be computed
+#'    time period ('yrs') for a trend to be computed.
 #' @param nyr.min.frac Fraction of years within the time period for which observations 
-#'     must be available if a trend is to be computed
+#'     must be available if a trend is to be computed.
 #' @param sig A p-value significance cutoff used to categories trends (e.g., 0.10)
-#' @param legend.position Legend position for output plot, specified as x and y vector (0-1)   
+#' @param legend.position Legend position for output plot, specified as a vector with x and y values
+#'    ranging from 0 to 1.   
 #' @param legend.direction Legend direction for output plot, either "horizontal" or "vertical"
 #' @return Data.table with summary of temporal trends by site and a multi-panel figure with:
-#'     (1) a histogram of relative changes in vegetation greenness among sample sites
+#'     (1) a histogram of relative changes in vegetation greenness among sample sites and
 #'     (2) a time-series plot of mean vegetation greenness for sample sites grouped
-#'         by trend category     
+#'         by trend category.     
 #' 
 #' @export lsat_calc_trend
 #' @import data.table

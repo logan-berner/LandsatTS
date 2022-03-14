@@ -1,9 +1,9 @@
-#' Prepare Landsat Data
+#' Prepare Landsat data for analysis
 #'
 #' @description This function parses sample site coordinates and time period of each measurement, 
 #'     scales band values, and formats column names as needed for subsequent analysis using the 
 #'     lsatTS package.
-#' @param dt Data.table with Landsat data exported from Google Earth Engine using lsat_export_ts()
+#' @param dt Data.table with Landsat data exported from Google Earth Engine using lsat_export_ts().
 #' @return Data.table with formatted and scaled values.
 #' @import data.table
 #' @export lsat_general_prep

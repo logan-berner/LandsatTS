@@ -1,9 +1,9 @@
-#' Summarize Availability of Landsat for each Sample Site
+#' Summarize availability of Landsat data for each sample site
 #' 
 #' @description This little function summarizes the temporal period and availability 
 #'    of observations at each sample site.
 #' @param dt Data.table with columns named "sample.id" and "year".
-#' @return Data.table summarizing for each site the first, last, and number of years 
+#' @return Data.table summarizing for each sample site the first, last, and number of years 
 #'    with observations, the minimum and maximum number of observations in a year, and 
 #'    the total number of observations across years. Also returns a figure showing the 
 #'    median (2.5 and 97.5 percentiles) number of observations per sample site across years 

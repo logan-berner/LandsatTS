@@ -1,4 +1,4 @@
-#' Calculate Spectral Indices
+#' Calculate spectral indices
 #'
 #' @description This function computes some widely used spectral vegetation indices.
 #' Only one index can be computed at a time. Current indices include the:
@@ -32,7 +32,8 @@
 #' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
 #' lsat.dt
 
-lsat_calc_spec_index <- function(dt, si){
+lsat_calc_spec_index <- function(dt, 
+                                 si){
   dt <- data.table::data.table(dt)
   si <- tolower(si)
   avail.si <- c('evi','evi2','gndvi','kndvi','msi','nbr','nirv','ndii',
