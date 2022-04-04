@@ -37,7 +37,7 @@ lsat_calc_spec_index <- function(dt,
   dt <- data.table::data.table(dt)
   si <- tolower(si)
   avail.si <- c('evi','evi2','gndvi','kndvi','msi','nbr','nirv','ndii',
-                'ndmi','ndvi','ndwi','psri','satvi','savi','wdrvi')
+                'ndmi','ndvi','ndvsi','ndwi','psri','satvi','savi','wdrvi')
 
   if (si %in% avail.si){
     if (si == 'evi'){dt[, evi := 2.5  * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)]}
@@ -49,6 +49,7 @@ lsat_calc_spec_index <- function(dt,
     if (si == 'ndii'){dt[, ndii := (nir - swir1) / (nir + swir1)]}
     if (si == 'ndmi'){dt[, ndmi := (nir - swir1)/(nir + swir1)]}
     if (si == 'ndvi'){dt[, ndvi := (nir - red) / (nir + red)]}
+    if (si == 'ndvsi'){dt[, ndvsi := (swir1 - red) / (swir1 + red)]}
     if (si == 'ndwi'){dt[, ndwi := (green - nir) / (green + nir)]}
     if (si == 'nirv'){dt[, nirv := (nir * (nir - red)) / (nir + red)]}
     if (si == 'psri'){dt[, psri := (red - blue) / nir]}
