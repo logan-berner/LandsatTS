@@ -58,7 +58,7 @@ lsat_calc_spec_index <- function(dt,
     if (si == 'wdrvi'){dt[, wdrvi := (0.2*nir - red) / (0.2*nir + red)]}
     dt
   } else {
-    dt
     print('The requested SI is not currently available...')
+    dt
   }
 }
