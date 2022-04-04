@@ -332,23 +332,25 @@ lsat_calibrate_rf <- function(dt,
   }
   
   # write out fig or save to list to write later if calibrating more than one satellite
-  if (write.output == T){
-    if (length(sats) == 1){
-      fig <- fig.list[[1]]
+  if (length(sats) == 1){
+    fig <- fig.list[[1]]
+    if (write.output == T){
       fig.name <- paste(outdir, '/', outfile.id, '_', i, '_xval_pred_vs_obs.jpg', sep='')
       grDevices::jpeg(fig.name, 4, 4, units = 'in', res=400)
       print(fig)
       grDevices::dev.off()
-    } else if (length(sats) == 2){
-      fig <- ggpubr::ggarrange(fig.lst[[1]], fig.lst[[2]], 
-                               ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9)
+    }
+  } else if (length(sats) == 2){
+    fig <- ggpubr::ggarrange(fig.lst[[1]], fig.lst[[2]], 
+                             ncol = 1, nrow = 2, labels = c('(a)','(b)'), vjust=0.9)
+    if (write.output == T){
       fig.name <- paste(outdir, '/', outfile.id,'_xval_pred_vs_obs.jpg', sep='')
       grDevices::jpeg(fig.name, 8.0, 7.5, units = 'in', res=400)
       print(fig)
       grDevices::dev.off()
-    } else {
-      print('Modify to accommodate plotting more satellites!')
     }
+  } else {
+    print('Modify to accommodate plotting more satellites!')
   }
   
   # (optional) save model evaluation summary table
