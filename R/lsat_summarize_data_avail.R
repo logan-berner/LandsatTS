@@ -53,7 +53,7 @@ lsat_summarize_data_avail <- function(dt){
                           yr.sat.smry.dt[satellite == 'LANDSAT_7' & year >= 1999],
                           yr.sat.smry.dt[satellite == 'LANDSAT_8' & year >= 2013])
   
-  fig <- ggplot2::ggplot(yr.sat.smry.dt, aes(x = year, y = n.q500, group = satellite, color = satellite, fill = satellite)) + ggplot2::geom_ribbon(aes(ymin=n.q025, ymax=n.q975), alpha=0.3, color=NA) + 
+  fig <- ggplot2::ggplot(yr.sat.smry.dt, ggplot2::aes(x = year, y = n.q500, group = satellite, color = satellite, fill = satellite)) + ggplot2::geom_ribbon(aes(ymin=n.q025, ymax=n.q975), alpha=0.3, color=NA) + 
     ggplot2::geom_line(lwd = 1.5, alpha = 0.5) + 
     ggplot2::geom_point(size = 3, alpha = 0.5) + 
     ggplot2::ylim(c(0,max(yr.sat.smry.dt$n.q975)+max(yr.sat.smry.dt$n.q975)*0.05))+
