@@ -14,6 +14,7 @@ rm(list=ls())
 
 # Load required R packages
 require(sf)
+require(geosphere)
 require(lsatTS)
 require(rgee)
 require(dplyr)
