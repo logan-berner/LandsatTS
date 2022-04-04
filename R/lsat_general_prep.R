@@ -13,6 +13,10 @@
 #' lsat.dt <- lsat_general_prep(lsat.example.dt)
 #' lsat.dt
 
+data.files <- list.files('C:/Users/Logan/My Drive/earth_engine/', full.names = T, pattern = 'serdp')
+dt <- do.call("rbind", lapply(data.files, fread))
+
+
 lsat_general_prep <- function(dt){
 
   # type cast
@@ -44,14 +48,11 @@ lsat_general_prep <- function(dt){
   lsat57.dt <- dt[c("LANDSAT_5", "LANDSAT_7")] # landsat 5 or 7
   lsat57.bands <- c('blue','green','red','nir','swir1','swir2')
   colnames(lsat57.dt)[which(colnames(lsat57.dt) %in% paste('sr.b',c(1:5,7),sep=''))] <- lsat57.bands
-  # lsat57.bands <- c('blue','green','red','nir','swir1','swir2')
-  # colnames(lsat57.dt)[which(colnames(lsat57.dt) %in% paste('sr.b',c(1:5,7),sep=''))] <- lsat57.bands
-
+  lsat57.dt <- lsat57.dt[, sr.b6 := NULL]
+  
   lsat8.dt <- dt["LANDSAT_8"] # landsat 8
-  lsat8.bands <- c('ublue','blue','green','red','nir','swir2')
-  colnames(lsat8.dt)[which(colnames(lsat8.dt) %in% paste('sr.b',c(1:5,7),sep=''))] <- lsat8.bands
-  # lsat8.bands <- c('ublue','blue','green','red','nir','swir1','swir2')
-  # colnames(lsat8.dt)[which(colnames(lsat8.dt) %in% paste('b',c(1:7),sep=''))] <- lsat8.bands
+  lsat8.bands <- c('ublue','blue','green','red','nir','swir1','swir2')
+  colnames(lsat8.dt)[which(colnames(lsat8.dt) %in% paste('sr.b',c(1:7),sep=''))] <- lsat8.bands
 
   # merge back together
   dt <- rbind(lsat57.dt, lsat8.dt, fill=T)
