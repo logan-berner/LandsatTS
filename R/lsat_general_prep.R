@@ -13,10 +13,6 @@
 #' lsat.dt <- lsat_general_prep(lsat.example.dt)
 #' lsat.dt
 
-data.files <- list.files('C:/Users/Logan/My Drive/earth_engine/', full.names = T, pattern = 'serdp')
-dt <- do.call("rbind", lapply(data.files, fread))
-
-
 lsat_general_prep <- function(dt){
 
   # type cast
@@ -33,6 +29,7 @@ lsat_general_prep <- function(dt){
   setnames(dt, 'spacecraft.id','satellite')
 
   # parse year and day of year
+  dt[, date.acquired := data.table::as.IDate(date.acquired)] # incase file read using read.csv
   dates <- as.POSIXlt(dt$date.acquired, format = '%Y%m%d')
   dt$year <- dates$year+1900
   dt$doy <- dates$yday
