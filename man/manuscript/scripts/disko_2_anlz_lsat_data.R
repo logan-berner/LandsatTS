@@ -17,7 +17,7 @@ require(ggplot2)
 require(purrr)
 require(R.utils)
 
-setwd('C:/Users/lb968/My Drive/research/code/lsatTS/man/manuscript/')
+setwd('C:/Users/Logan/My Drive/research/code/lsatTS/man/manuscript/')
 
 # PROCESS LANDSAT DATA ------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ lsat.dt <- lsat_calc_spec_index(lsat.dt, si = 'ndvi')
 lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', doy.rng = 151:239, train.with.highlat.data = T, outdir = 'output/ndvi_xcal_smry/', overwrite.col = T)
 
 # Fit phenological models (cubic splines) to each time series
-lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi', test.run = T)
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi', test.run = F)
 ggsave('figures/figure_5_disko_phenological_curves.jpg', width = 9, height = 7, units = 'in', dpi = 400)
 
 # Summarize vegetation index for the "growing season", including estimating annual max vegetation index
@@ -54,5 +54,14 @@ ggsave('figures/figure_6_disko_ndvi_max_evaluation.jpg', width = 6, height = 4, 
 
 # Write out data.table with growing season summaries
 fwrite(lsat.gs.dt, 'output/lsat_annual_growing_season_summaries.csv')
+
+# Compute temporal trends in NDVImax
+lsat.trend.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', yrs = 2000:2020, legend.position = c(0.66,0.93))
+ggsave('figures/figure_7_disko_ndvi_max_trend_distribution.jpg', width = 6, height = 8, units = 'in', dpi = 400)
+
+# Convert trend data table to simple feature and write out shapefile
+lsat.trend.sf <- lsat.trend.dt %>% st_as_sf(coords=c('longitude', 'latitude'), crs = st_crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+lsat.trend.sf <- lsat.trend.sf %>% st_transform(crs = 3413)
+st_write(lsat.trend.sf, dsn = 'data/lsat_ndvimax_trends.shp')
 
 # END SCRIPT #--------------------------------------------------------------------------------------------------------
