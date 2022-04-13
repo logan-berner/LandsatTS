@@ -32,9 +32,9 @@
 #' lsat.dt <- lsat_general_prep(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
 #' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
-#' # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
+#' # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = FALSE)
 #' lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi') 
-#' lsat_evaluate_phenological_max(lsat.pheno.dt)
+#' lsat_evaluate_phenological_max(lsat.pheno.dt, si = 'ndvi')
 
 
 lsat_evaluate_phenological_max <- function(dt, 
