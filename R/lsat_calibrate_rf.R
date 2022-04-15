@@ -77,7 +77,7 @@
 #' lsat.dt <- lsat_general_prep(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
 #' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
-#' # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = FALSE)
+#' lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', train.with.highlat.data = T, write.output = FALSE)
 #' lsat.dt
 
 lsat_calibrate_rf <- function(dt, 
@@ -214,13 +214,28 @@ lsat_calibrate_rf <- function(dt,
     rf.data.dt <- rf.data.dt[add.preds.dt, on = 'sample.id']
     rf.data.dt <- na.omit(rf.data.dt)
     
-    # subset training and evaluation data
+    # subset samples for training and evaluation data
     samples <- unique(rf.data.dt$sample.id)
     n.samples <- length(samples)
+    
     samples.train <- sample(samples, round(n.samples * frac.train), replace = F)
     samples.eval <- samples[samples %in% samples.train == F]
+    
     rf.train.dt <- rf.data.dt[sample.id %in% samples.train]
     rf.eval.dt <- rf.data.dt[sample.id %in% samples.eval]
+
+    # check whether there are an adequate number of samples
+    n.samples.train <- length(samples.train)
+    if (n.samples.train < 25){
+      stop.msg <- strwrap(paste0('You are trying to train random forest models with data from only ', 
+                                 n.samples.train, ' sample sites, which is too little data.
+                         If your sample sites are in the Arctic or Boreal biomes, then set
+                         train.with.highlat.data = T to train the models with internal data.
+                         If not, then extract Landsat data for more samples sites and re-try.'),
+                          prefix = ' ', initial = '')
+      dt
+      stop(stop.msg )
+    }
     
     # fit random forest
     form.lhs <- paste('LANDSAT_7.', band.or.si, ' ~ ', sep='')
