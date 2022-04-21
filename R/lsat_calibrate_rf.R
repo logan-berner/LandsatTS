@@ -140,6 +140,21 @@ lsat_calibrate_rf <- function(dt,
                                                   value.name = "year")
       
       xcal.dt <- xcal.dt[sample.yr.dt, on = c('sample.id','year','satellite')]
+      
+      # check whether there are an adequate number of samples; if not, then stop.
+      n.sites <- length(unique(xcal.dt$sample.id))
+      if (n.sites < 100){
+        stop.msg <- strwrap(paste0('Your dataset has ', n.sites, ' sample sites with temporally 
+                                   overlapping measurements from LANDSAT_7 and ', i,'. This is not 
+                                   enough data to cross-calibrate the sensors. Either set min.obs 
+                                   lower, set train.with.highlat.data = T if working in the Arctic
+                                   or Boreal biome, or extract Landsat data from more sample sites... 
+                                   The function will now stop!'),
+                            prefix = ' ', initial = '')
+        
+        dt
+        stop(stop.msg )
+      }
     }
     
     # identify and subset random 15-day seasonal windows for which obs are available 
@@ -226,19 +241,6 @@ lsat_calibrate_rf <- function(dt,
     rf.train.dt <- rf.data.dt[sample.id %in% samples.train]
     rf.eval.dt <- rf.data.dt[sample.id %in% samples.eval]
 
-    # check whether there are an adequate number of samples
-    n.samples.train <- length(samples.train)
-    if (n.samples.train < 25){
-      stop.msg <- strwrap(paste0('You are trying to train random forest models with data from only ', 
-                                 n.samples.train, ' sample sites, which is too little data.
-                         If your sample sites are in the Arctic or Boreal biomes, then set
-                         train.with.highlat.data = T to train the models with internal data.
-                         If not, then extract Landsat data for more samples sites and re-try.'),
-                          prefix = ' ', initial = '')
-      dt
-      stop(stop.msg )
-    }
-    
     # fit random forest
     form.lhs <- paste('LANDSAT_7.', band.or.si, ' ~ ', sep='')
     form.rhs <- paste(c(eval(band.or.si), 'doy', add.predictors), collapse = ' + ')
