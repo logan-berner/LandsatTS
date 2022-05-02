@@ -19,6 +19,8 @@ require(lsatTS)
 require(rgee)
 require(dplyr)
 require(R.utils)
+require(data.table)
+
 sf::sf_use_s2(FALSE)
 mkdirs('data-raw/tmp/')
 
@@ -60,16 +62,22 @@ dist <- distm(coords) # distance matrix
 clusters <- hclust(as.dist(dist), method="complete")
 sample.pts$cluster <- cutree(clusters, h=1000000)
 
+# quick map 
+plot(sample.pts)
+
+# write out shapefile
+st_write(sample.pts, 'data-raw/arctic_boreal_random_sample_pts_n10000.shp')
 
 # EXTRACT LANDSAT DATA FOR SAMPLE POINTS =========================================================================
 ee_Initialize()
-task_list <- lsat_export_ts(pixel_coords_sf = sample.pts, chunks_from = 'cluster', startJulian = 122, endJulian = 274,
-                            file_prefix = 'highlat', drive_export_dir = 'earth_engine')
+task_list <- lsat_export_ts(pixel_coords_sf = sample.pts, chunks_from = 'cluster', startJulian = 121, endJulian = 273, 
+                            start_date = 1999-04-19, file_prefix = 'highlat', drive_export_dir = 'earth_engine')
 
 
 # WAIT FOR EXTRACTION TO FINISH THEN GRAB FILES ==================================================================
 # Create a list of data files exported from GEE and then read them in to R as a data.table object 
-data.files <- list.files('data-raw/tmp/earth_engine_export/', full.names = T, pattern = 'highlat')
+mkdirs('data-raw/earth_engine_export')
+data.files <- list.files('data-raw/earth_engine_export/', full.names = T, pattern = 'highlat')
 lsat.dt <- do.call("rbind", lapply(data.files, fread))
 
 
@@ -82,7 +90,7 @@ lsat.dt <- lsat_clean_data(lsat.dt)
 
 # For Landsat 5/8, identify and subset years when scenes were also collected by Landsat 7
 xcal.list <- list()
-sats <- dt[,unique(satellite)]
+sats <- lsat.dt[,unique(satellite)]
 sats <- sats[-which(sats %in% 'LANDSAT_7')]
 
 for (i in sats){
@@ -103,7 +111,7 @@ lsat.xcal.dt  <- lsat.xcal.dt[, keep.cols, with = F]
 
 
 # WRITE OUT FOR INTERNAL USE =========================================================================================
-usethis::use_data(lsat.xcal.dt, internal = TRUE)
+usethis::use_data(lsat.xcal.dt, internal = TRUE, overwrite = T)
 
 # clean up
 unlink('data-raw/tmp', recursive = T)
