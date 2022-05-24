@@ -170,8 +170,8 @@ lsat_get_pixel_centers <- function(polygon_sf,
       lsat_WRS2_scene_bounds <- tempfile(pattern = "lsat_WRS2_scene_bounds_",
                                          fileext = ".kml")
       R.utils::setOption("lsat_WRS2_scene_bounds", lsat_WRS2_scene_bounds)
-      wrs2_usgs_path <- paste0("https://prd-wret.s3.us-west-2.amazonaws.com/",
-                               "assets/palladium/production/atoms/files/",
+      wrs2_usgs_path <- paste0("https://d9-wret.s3.us-west-2.amazonaws.com/",
+                               "assets/palladium/production/s3fs-public/atoms/files/",
                                "WRS-2_bound_world_0.kml")
       utils::download.file(wrs2_usgs_path, lsat_WRS2_scene_bounds)
       if(!file.exists(lsat_WRS2_scene_bounds)) {
@@ -179,8 +179,10 @@ lsat_get_pixel_centers <- function(polygon_sf,
              "please specify file path!")
         }
       warning("Argument 'lsat_WRS2_scene_bounds' was not specified!",
-                     " To avoid download in future, save file locally and",
-                     " specify argument (see help).")
+                     " To avoid download in future, consider saving the file ",
+                     " locally and specifying location as argument (see help).")
+    } else {
+      cat("WRS2 boundaries found in local environment.\n")
     }
   }
 
