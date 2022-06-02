@@ -5,3 +5,4 @@
 *.Rproj
 *.DS_Store
 data-raw/earth_engine_export/
+man/manuscript/output/
