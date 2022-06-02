@@ -2,7 +2,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data
-
+Version: 1.0.1 | [Changelog](NEWS.md)
 <!-- badges: start -->
 <!-- badges: end -->
 
