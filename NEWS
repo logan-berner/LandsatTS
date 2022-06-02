@@ -1,0 +1,5 @@
+1.0.1
+- Bug fix to address error caused by change in the URL for the WRS2 geometries hosted by USGS. See Issue #35: https://github.com/logan-berner/lsatTS/issues/35
+
+1.0.0
+- First public release of lsatTS.
