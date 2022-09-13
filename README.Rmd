@@ -173,7 +173,7 @@ test_points_sf <- st_sfc(sf::st_point(c(-149.6026, 68.62574)),
                           sf::st_point(c(-20.56182, 74.47670)),
                           sf::st_point(c(-20.55376, 74.47749)), crs = 4326) %>%
    st_sf() %>%
-   mutate(site = c("toolik_1",
+   mutate(sample_id = c("toolik_1",
                        "toolik_2",
                        "ellesmere_1",
                        "ellesmere_1",
