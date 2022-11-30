@@ -278,11 +278,11 @@ temp_files <- map(task_list, ee_drive_to_local)
 ## 3. Clean and cross-calibrate Landsat data
 
 ![](man/figures/fig_2_cross_calibration.jpg) **Prepare the exported
-Landsat data for analysis using lsat_general_prep()**
+Landsat data for analysis using lsat_format_data()**
 
 After exporting Landsat data from Earth Engine, it is then necessary
 prepare the data for analysis. First, read the exported data into R
-using `data.table::fread()` and then use the `lsat_general_prep()`
+using `data.table::fread()` and then use the `lsat_format_data()`
 function to parse necessary information, rename columns, and scale band
 values.
 
@@ -296,7 +296,7 @@ lsat.dt <- do.call("rbind", lapply(files_exported_from_EE, fread))
 
 # setnames(lsat.dt, 'my_unique_location_column','sample.id') 
 
-lsat.dt <- lsat_general_prep(lsat.dt)
+lsat.dt <- lsat_format_data(lsat.dt)
 ```
 
 **Clean the surface reflectance data using lsat_clean_data()**
