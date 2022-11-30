@@ -533,51 +533,58 @@ Software, <https://github.com/r-spatial/rgee/>.
 
 **Peer-reviewed publications that have used `LandsatTS` functions:**
 
-1)  Berner, L.T., Massey, R., Jantz, P., Forbes, B.C., Macias-Fauria,
-    M., Myers-Smith, I.H., Kumpula, T., Gauthier, G., Andreu-Hayles, L.,
-    Gaglioti, B., Burns, P.J., Zetterberg, P., D’Arrigo, R., Goetz,
-    S.J., 2020. Summer warming explains widespread but not uniform
-    greening in the Arctic tundra biome. Nature Communications 11, 4621.
+***2022***
 
-2)  Berner, L.T., Goetz, S.J., 2022. Satellite observations document
-    trends consistent with a boreal forest biome shift. Global Change
-    Biology 00, 1-18.
+Berner, L.T., Goetz, S.J., 2022. Satellite observations document trends
+consistent with a boreal forest biome shift. Global Change Biology 28,
+3275–3292.
 
-3)  Boyd, M.A., Berner, L.T., Doak, P., Goetz, S.J., Rogers, B.M.,
-    Wagner, D., Walker, X.J., Mack, M.C., 2019. Impacts of climate and
-    insect herbivory on productivity and physiology of trembling aspen
-    (Populus tremuloides) in Alaskan boreal forests. Environmental
-    Research Letters 14, 085010.
+Foster et al, 2022. Disturbances in North American boreal forest and
+Arctic tundra: impacts, interactions, and responses. Environmental
+Research Letters 17, 113001.
 
-4)  Boyd, M.A., Berner, L.T., Foster, A.C., Goetz, S.J., Rogers, B.M.,
-    Walker, X.J., Mack, M.C., 2021. Historic declines in growth portend
-    trembling aspen death during a contemporary leaf miner outbreak in
-    Alaska. Ecosphere 12, e03569.
+***2021***
 
-5)  Gaglioti, B., Berner, L.T., Jones, B.M., Orndahl, K.M., Williams,
-    A.P., Andreu‐Hayles, L., D’Arrigo, R., Goetz, S.J., Mann,
-    D.H., 2021. Tussocks enduring or shrubs greening: Alternate
-    responses to changing fire regimes in the Noatak River Valley,
-    Alaska. Journal of Geophysical Research: Biogeosciences 126,
-    e2020JG006009.
+Boyd, M.A., Berner, L.T., Foster, A.C., Goetz, S.J., Rogers, B.M.,
+Walker, X.J., Mack, M.C., 2021. Historic declines in growth portend
+trembling aspen death during a contemporary leaf miner outbreak in
+Alaska. Ecosphere 12, e03569.
 
-6)  Mekonnen, Z.A., Riley, W.J., Berner, L.T., Bouskill, N.J., Torn,
-    M.S., Iwahana, G., Breen, A.L., Myers-Smith, I.H., Criado, M.G.,
-    Liu, Y., Euskirchen, E.S., Goetz, S.J., Mack, M.C., Grant,
-    R.F., 2021. Arctic tundra shrubification: a review of mechanisms and
-    impacts on ecosystem carbon balance. Environmental Research Letters
-    16, 053001.
+Gaglioti, B., Berner, L.T., Jones, B.M., Orndahl, K.M., Williams, A.P.,
+Andreu‐Hayles, L., D’Arrigo, R., Goetz, S.J., Mann, D.H., 2021. Tussocks
+enduring or shrubs greening: Alternate responses to changing fire
+regimes in the Noatak River Valley, Alaska. Journal of Geophysical
+Research: Biogeosciences 126, e2020JG006009.
 
-7)  Verdonen, M., Berner, L.T., Forbes, B.C., Kumpula, T., 2020.
-    Periglacial vegetation dynamics in Arctic Russia: decadal analysis
-    of tundra regeneration on landslides with time series satellite
-    imagery. Environmental Research Letters 15, 105020.
+Mekonnen, Z.A., Riley, W.J., Berner, L.T., Bouskill, N.J., Torn, M.S.,
+Iwahana, G., Breen, A.L., Myers-Smith, I.H., Criado, M.G., Liu, Y.,
+Euskirchen, E.S., Goetz, S.J., Mack, M.C., Grant, R.F., 2021. Arctic
+tundra shrubification: a review of mechanisms and impacts on ecosystem
+carbon balance. Environmental Research Letters 16, 053001.
 
-8)  Walker, X.J., Alexander, H.D., Berner, L.T., Boyd, M.A., Loranty,
-    M.M., Natali, S.M., Mack, M.C., 2021. Positive response of tree
-    productivity to warming is reversed by increased tree density at the
-    Arctic tundra-taiga ecotone. Canadian Journal of Forest Research 51,
-    1323-1338.
+Walker, X.J., Alexander, H.D., Berner, L.T., Boyd, M.A., Loranty, M.M.,
+Natali, S.M., Mack, M.C., 2021. Positive response of tree productivity
+to warming is reversed by increased tree density at the Arctic
+tundra-taiga ecotone. Canadian Journal of Forest Research 51, 1323-1338.
+
+***2020 and earlier***
+
+Berner, L.T., Massey, R., Jantz, P., Forbes, B.C., Macias-Fauria, M.,
+Myers-Smith, I.H., Kumpula, T., Gauthier, G., Andreu-Hayles, L.,
+Gaglioti, B., Burns, P.J., Zetterberg, P., D’Arrigo, R., Goetz, S.J.,
+2020. Summer warming explains widespread but not uniform greening in the
+Arctic tundra biome. Nature Communications 11, 4621.
+
+Boyd, M.A., Berner, L.T., Doak, P., Goetz, S.J., Rogers, B.M., Wagner,
+D., Walker, X.J., Mack, M.C., 2019. Impacts of climate and insect
+herbivory on productivity and physiology of trembling aspen (Populus
+tremuloides) in Alaskan boreal forests. Environmental Research Letters
+14, 085010.
+
+Verdonen, M., Berner, L.T., Forbes, B.C., Kumpula, T., 2020. Periglacial
+vegetation dynamics in Arctic Russia: decadal analysis of tundra
+regeneration on landslides with time series satellite imagery.
+Environmental Research Letters 15, 105020.
 
 ## 9. License
 
