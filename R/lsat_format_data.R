@@ -1,19 +1,20 @@
-#' Prepare Landsat data for analysis
+#' Formats Landsat data for analysis
 #'
-#' @description This function parses sample site coordinates and time period of each measurement, 
+#' @description This function takes Landsat data exported from GEE and formats it 
+#'     for subsequent use. The function parses sample site coordinates and time period of each measurement, 
 #'     scales band values, and formats column names as needed for subsequent analysis using the 
-#'     lsatTS package.
+#'     LandsatTS package.
 #' @param dt Data.table with Landsat data exported from Google Earth Engine using lsat_export_ts().
 #' @return Data.table with formatted and scaled values.
 #' @import data.table
-#' @export lsat_general_prep
+#' @export lsat_format_data
 #'
 #' @examples 
 #' data(lsat.example.dt)
-#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_format_data(lsat.example.dt)
 #' lsat.dt
 
-lsat_general_prep <- function(dt){
+lsat_format_data <- function(dt){
 
   # type cast
   dt <- data.table::data.table(dt)
