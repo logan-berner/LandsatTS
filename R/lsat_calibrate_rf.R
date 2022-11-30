@@ -105,7 +105,7 @@ lsat_calibrate_rf <- function(dt,
   
   # create data.frame to store model evaluation metrics
   model.eval.df <- data.frame(matrix(data = NA, nrow = length(sats), ncol = 12))
-  colnames(model.eval.df) <- c('band.or.si','sat','orig.bias','orig.bias.pcnt',
+  colnames(model.eval.df) <- c('band.or.si','sat','uncal.bias','uncal.bias.pcnt',
                                'rf.r2','rf.rmse','rf.n','xval.r2','xval.rmse','xval.n', 
                                'xval.bias','xval.bias.pcnt')
   model.eval.df$sat <- sats
@@ -272,8 +272,8 @@ lsat_calibrate_rf <- function(dt,
     orig.vals <- rf.eval.dt[[band.or.si]]
     xcal.vals <- rf.eval.dt[[paste('LANDSAT_7.', band.or.si, '.pred', sep='')]]
     
-    orig.bias <- round(median(orig.vals - target.vals), 3)
-    orig.bias.pcnt <- round(median((orig.vals - target.vals) / target.vals * 100), 1)
+    uncal.bias <- round(median(orig.vals - target.vals), 3)
+    uncal.bias.pcnt <- round(median((orig.vals - target.vals) / target.vals * 100), 1)
     
     lm.form <- stats::formula(paste("LANDSAT_7.", band.or.si, ' ~ LANDSAT_7.',
                                     band.or.si,'.pred', sep=''))
@@ -284,8 +284,8 @@ lsat_calibrate_rf <- function(dt,
     xval.bias.pcnt <- round(median((xcal.vals - target.vals) / target.vals * 100), 1)
     
     model.eval.df$band.or.si <- band.or.si
-    model.eval.df$orig.bias[model.eval.df$sat == i] <- orig.bias
-    model.eval.df$orig.bias.pcnt[model.eval.df$sat == i] <- orig.bias.pcnt 
+    model.eval.df$uncal.bias[model.eval.df$sat == i] <- uncal.bias
+    model.eval.df$uncal.bias.pcnt[model.eval.df$sat == i] <- uncal.bias.pcnt 
     model.eval.df$rf.r2[model.eval.df$sat == i] <- round(rf.xcal$r.squared,3)
     model.eval.df$rf.rmse[model.eval.df$sat == i] <- round(sqrt(rf.xcal$prediction.error),3)
     model.eval.df$rf.n[model.eval.df$sat == i] <- rf.xcal$num.samples
