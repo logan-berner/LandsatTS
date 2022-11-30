@@ -1,6 +1,6 @@
-Package: lsatTS
+Package: LandsatTS
 Title: An R package to facilitate retrieval, cleaning, cross-calibration, and phenological modeling of Landsat time-series data
-Version: 1.0.1
+Version: 1.0.2
 Authors@R:
     c(
     person(given = "Logan T.",
@@ -29,7 +29,7 @@ License: Modified MIT
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.2
 Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

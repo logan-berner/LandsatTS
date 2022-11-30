@@ -3,6 +3,7 @@
 export("%>%")
 export(lsat_calc_spec_index)
 export(lsat_calc_trend)
+export(lsat_calibrate_poly)
 export(lsat_calibrate_rf)
 export(lsat_clean_data)
 export(lsat_evaluate_phenological_max)

@@ -13,12 +13,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-# lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data
+# LandsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data
 <!-- badges: start -->
 <!-- badges: end -->
 **Logan T. Berner, Jakob J. Assmann, Signe Normand and Scott Goetz**
 
-The **lsatTS** package helps you to:
+The **LandsatTS** package helps you to:
 
 - Export whole Landsat record time series based on point coordinates ("sites").
 - Quality screen surface reflectance measurements from Landsat.
@@ -43,7 +43,7 @@ You can install the package using `devtools` as follows:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("logan-berner/lsatTS")
+devtools::install_github("logan-berner/LandsatTS")
 ```
 
 For the preparation and extractions scripts you will also have to make sure you have the `rgee` package installed, fully  configured and the Earth Engine initialized for the current R session. You can find out how to do that on the [rgee website](https://r-spatial.github.io/rgee/).   
@@ -75,14 +75,14 @@ library(data.table)
 library(stringr)
 library(rgee)
 
-# Load lsatTS package
-library(lsatTS)
+# Load LandsatTS package
+library(LandsatTS)
 
 # Intialize the Earth Engine with rgee
 ee_Initialize()
 
 ```
-Note: If you have trouble initializing the Earth Engine, please consult the rgee website or forum. Some `lsatTS` users have reported that they need to initialize by specifying their email address and using the `drive` option: `ee.Initialize(email = "myemail", drive = TRUE)`
+Note: If you have trouble initializing the Earth Engine, please consult the rgee website or forum. Some `LandsatTS` users have reported that they need to initialize by specifying their email address and using the `drive` option: `ee.Initialize(email = "myemail", drive = TRUE)`
 
 **Getting pixel centers using lsat_get_pixel_centers()**
 
@@ -222,7 +222,7 @@ temp_files <- map(task_list, ee_drive_to_local)
 
 After exporting Landsat data from Earth Engine, it is then necessary prepare the data for analysis. First, read the exported data into R using `data.table::fread()` and then use the `lsat_general_prep()` function to parse necessary information, rename columns, and scale band values. 
 
-*Please note:* All lsatTS functions depend on there being a column called "sample.id" that uniquely identifies each location. If this column is not called 'sample.id' in your dataset, then make sure to modify your column name accordingly. 
+*Please note:* All LandsatTS functions depend on there being a column called "sample.id" that uniquely identifies each location. If this column is not called 'sample.id' in your dataset, then make sure to modify your column name accordingly. 
 
 ``` {r eval = FALSE}
 lsat.dt <- do.call("rbind", lapply(files_exported_from_EE, fread))
@@ -336,7 +336,7 @@ lsat.trnds.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', 2000:2020, sig = 0
 ## 5. Citation 
 When using this package please cite:
 
-Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz. 2021. lsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data. https://github.com/logan-berner/lsatTS.
+Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and Scott J. Goetz. 2021. LandsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data. https://github.com/logan-berner/LandsatTS.
 
 
 Also please consider citing the peer-reviewed publication for which much of this code was developed:
@@ -358,7 +358,7 @@ Email Jakob at: [j.assmann@bio.au.dk](mailto:j.assmann@bio.au.dk)
 
 Logan T. Berner wrote the analysis functions (Sections 3 and 4). Jakob J. Assmann facilitated package development and wrote the extraction and preparation functions (Section 2). Richard Massey wrote the original Python code for the `lsat_export_ts()` function, later refined and translated first to JavaScript and then rgee code by Jakob J. Assmann. Singe Normand and Scott Goetz provided funding and mentorship for this project. Logan T. Berner and Jakob J. Assmann prepared the code for publication and wrote the documentation. 
 
-Thank you to all the testers: Tester A, Tester B and Tester C.
+Thank you to all the testers: Jeff Kerby, Adrianna Foster, Sarah Elmendorf, Russell Wong, and others!
 
 [\[to top\]](#content)
 
@@ -369,7 +369,7 @@ Thank you to all the testers: Tester A, Tester B and Tester C.
 Aybar C, Wu Q, Bautista L, Yali R and Barja A (2020) rgee: An R package for interacting with Google Earth Engine, Journal of Open Source Software,  https://github.com/r-spatial/rgee/.
 
   
-**Peer-reviewed publications that have used `lsatTS` functions:**
+**Peer-reviewed publications that have used `LandsatTS` functions:**
 
 1)  Berner, L.T., Massey, R., Jantz, P., Forbes, B.C., Macias-Fauria, M., Myers-Smith, I.H., Kumpula, T., Gauthier, G., Andreu-Hayles, L., Gaglioti, B., Burns, P.J., Zetterberg, P., D'Arrigo, R., Goetz, S.J., 2020. Summer warming explains widespread but not uniform greening in the Arctic tundra biome. Nature Communications 11, 4621.
 
