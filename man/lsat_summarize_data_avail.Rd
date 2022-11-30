@@ -22,7 +22,7 @@ of observations at each sample site.
 }
 \examples{
 data(lsat.example.dt)
-lsat.dt <- lsat_general_prep(lsat.example.dt)
+lsat.dt <- lsat_format_data(lsat.example.dt)
 lsat.dt <- lsat_clean_data(lsat.dt)
 lsat_summarize_data_avail(lsat.dt)
 }

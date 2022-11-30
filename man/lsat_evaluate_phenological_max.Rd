@@ -52,7 +52,7 @@ greenness are impacted by the number of available measurements.
 }
 \examples{
 data(lsat.example.dt)
-lsat.dt <- lsat_general_prep(lsat.example.dt)
+lsat.dt <- lsat_format_data(lsat.example.dt)
 lsat.dt <- lsat_clean_data(lsat.dt)
 lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
 # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = FALSE)
