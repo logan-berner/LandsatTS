@@ -25,7 +25,7 @@
 #'
 #' @examples 
 #' data(lsat.example.dt)
-#' lsat.dt <- lsat_general_prep(lsat.example.dt)
+#' lsat.dt <- lsat_format_data(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
 #' lsat.dt
 
