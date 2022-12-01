@@ -151,7 +151,7 @@ lsat_calibrate_poly <- function(dt,
                                    lower, set train.with.highlat.data = T if working in the Arctic
                                    or Boreal biome, or extract Landsat data from more sample sites... 
                                    The function will now stop!'),
-                            prefix = ' ', uncalial = '')
+                            prefix = ' ', initial = '')
         
         dt
         stop(stop.msg )
