@@ -153,7 +153,7 @@ lsat_calibrate_rf <- function(dt,
                             prefix = ' ', initial = '')
         
         dt
-        stop(stop.msg )
+        stop(stop.msg)
       }
     }
     

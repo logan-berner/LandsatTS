@@ -154,7 +154,7 @@ lsat_calibrate_poly <- function(dt,
                             prefix = ' ', initial = '')
         
         dt
-        stop(stop.msg )
+        stop(stop.msg)
       }
     }
     
