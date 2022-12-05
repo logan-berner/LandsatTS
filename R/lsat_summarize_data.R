@@ -9,16 +9,16 @@
 #'    median (2.5 and 97.5 percentiles) number of observations per sample site across years 
 #'    for each Landsat satellite. 
 #' @import data.table
-#' @export lsat_summarize_data_avail
+#' @export lsat_summarize_data
 #'
 #' @examples
 #' data(lsat.example.dt)
 #' lsat.dt <- lsat_format_data(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
-#' lsat_summarize_data_avail(lsat.dt)
+#' lsat_summarize_data(lsat.dt)
 
 
-lsat_summarize_data_avail <- function(dt){
+lsat_summarize_data <- function(dt){
   dt <- data.table::data.table(dt)
 
   # summarize data availability for each site

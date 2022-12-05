@@ -76,7 +76,7 @@
 #' data(lsat.example.dt)
 #' lsat.dt <- lsat_format_data(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
-#' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+#' lsat.dt <- lsat_calc_spectral_index(lsat.dt, 'ndvi')
 #' lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', 
 #'                              train.with.highlat.data = TRUE, 
 #'                              write.output = FALSE)
@@ -201,7 +201,7 @@ lsat_calibrate_rf <- function(dt,
     # then derive the required spectral index
     if (train.with.highlat.data == T){
       if (band.or.si %in% c('blue','green','red','nir','swir1','swir2') == F){
-        xcal.dt <- lsat_calc_spec_index(xcal.dt, band.or.si)
+        xcal.dt <- lsat_calc_spectral_index(xcal.dt, band.or.si)
       } 
     }
     

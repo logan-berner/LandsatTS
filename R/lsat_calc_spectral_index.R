@@ -23,16 +23,16 @@
 #'
 #' @return The input data.table with an appended column containing the spectral index.
 #' @import data.table
-#' @export lsat_calc_spec_index
+#' @export lsat_calc_spectral_index
 #'
 #' @examples
 #' data(lsat.example.dt)
 #' lsat.dt <- lsat_format_data(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
-#' lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+#' lsat.dt <- lsat_calc_spectral_index(lsat.dt, 'ndvi')
 #' lsat.dt
 
-lsat_calc_spec_index <- function(dt, 
+lsat_calc_spectral_index <- function(dt, 
                                  si){
   dt <- data.table::data.table(dt)
   si <- tolower(si)
