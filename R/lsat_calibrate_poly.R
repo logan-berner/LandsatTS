@@ -339,7 +339,7 @@ lsat_calibrate_poly <- function(dt,
     pred <- paste('LANDSAT_7',band.or.si,'pred',sep='.')
     
     # raw figure
-    fig.raw <- ggplot2::ggplot(eval.dt, ggplot2::aes(x = band.or.si, y = obs)) + 
+    fig.raw <- ggplot2::ggplot(eval.dt, ggplot2::aes_string(x = band.or.si, y = obs)) + 
       ggplot2::geom_bin2d(binwidth=c(0.005,0.005)) + 
       ggplot2::geom_abline(color='orange', size=1.5, alpha=0.5) + 
       ggplot2::scale_fill_viridis_c() + 
@@ -354,7 +354,7 @@ lsat_calibrate_poly <- function(dt,
     
     
     # cal figure
-    fig.cal <- ggplot2::ggplot(eval.dt, ggplot2::aes(x = pred, y = obs)) + 
+    fig.cal <- ggplot2::ggplot(eval.dt, ggplot2::aes_string(x = pred, y = obs)) + 
       ggplot2::geom_bin2d(binwidth=c(0.005,0.005)) + 
       ggplot2::geom_abline(color='orange', size=1.5, alpha=0.5) + 
       ggplot2::scale_fill_viridis_c() + 

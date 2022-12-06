@@ -141,20 +141,34 @@ lsat_calibrate_rf <- function(dt,
       
       xcal.dt <- xcal.dt[sample.yr.dt, on = c('sample.id','year','satellite')]
       
-      # check whether there are an adequate number of samples; if not, then stop.
+      # check whether there are an adequate number of samples; if not, then stop or warn.
       n.sites <- length(unique(xcal.dt$sample.id))
-      if (n.sites < 100){
-        stop.msg <- strwrap(paste0('Your dataset has ', n.sites, ' sample sites with temporally 
-                                   overlapping measurements from LANDSAT_7 and ', i,'. This is not 
-                                   enough data to cross-calibrate the sensors. Either set min.obs 
-                                   lower, set train.with.highlat.data = T if working in the Arctic
-                                   or Boreal biome, or extract Landsat data from more sample sites... 
-                                   The function will now stop!'),
+      if (n.sites == 0){
+        stop.msg <- strwrap(paste0('Your dataset does not have any sample sites with enough temporally 
+                             overlapping measurements from LANDSAT_7 and ', i,'. Therefore, there 
+                             is not enough data to cross-calibrate the sensors. Either set min.obs 
+                             lower, set train.with.highlat.data = T if working in the Arctic
+                             or Boreal biome, or extract Landsat data from more sample sites... 
+                             The function will now stop.'),
                             prefix = ' ', initial = '')
         
         dt
         stop(stop.msg)
       }
+      
+      if (n.sites < 100){
+        warning.msg <- strwrap(paste0('Your dataset has ', n.sites, ' sample sites with enough temporally 
+                             overlapping measurements from LANDSAT_7 and ', i,'. This might not be
+                             enough data to rigorously train and evaluate the model. Please carefully 
+                             inspect the model evaluation output to ensure it is adequate. If not
+                             adequate, then set min.obs lower, set train.with.highlat.data = T if 
+                             working in the Arctic or Boreal biome, or extract Landsat data from 
+                             more sample sites...'),
+                               prefix = ' ', initial = '')
+        
+        warning(warning.msg)
+      }
+      
     }
     
     # identify and subset random 15-day seasonal windows for which obs are available 
@@ -317,7 +331,7 @@ lsat_calibrate_rf <- function(dt,
     obs <- paste('LANDSAT_7',band.or.si,'pred',sep='.')
     
     # raw figure
-    fig.raw <- ggplot2::ggplot(rf.eval.dt, ggplot2::aes(x = band.or.si, y = obs)) + 
+    fig.raw <- ggplot2::ggplot(rf.eval.dt, ggplot2::aes_string(x = band.or.si, y = obs)) + 
       ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + 
       ggplot2::geom_abline(color='orange', size=1.5, alpha=0.5) + 
       ggplot2::scale_fill_viridis_c() + 
@@ -332,7 +346,7 @@ lsat_calibrate_rf <- function(dt,
     
     
     # cal figure
-    fig.cal <- ggplot2::ggplot(rf.eval.dt, ggplot2::aes(x = pred, y = obs)) + 
+    fig.cal <- ggplot2::ggplot(rf.eval.dt, ggplot2::aes_string(x = pred, y = obs)) + 
       ggplot2::geom_bin2d(binwidth=c(0.01,0.01)) + 
       ggplot2::geom_abline(color='orange', size=1.5, alpha=0.5) + 
       ggplot2::scale_fill_viridis_c() + 
