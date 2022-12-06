@@ -95,7 +95,7 @@ lsat_calc_trend <- function(dt,
   trend.dt[pval > sig, trend.cat := 'no_trend']
   
   # histogram of vegetation greenness trends
-  fig1 <- ggplot2::ggplot(trend.dt, ggplot2::aes(total.change.pcnt, fill=..x..)) +
+  fig1 <- ggplot2::ggplot(trend.dt, ggplot2::aes(total.change.pcnt, fill=after_stat(x))) +
     ggplot2::geom_histogram(bins = 50, size = 0.25, color = 'gray20') +
     ggplot2::scale_fill_gradient2(low="darkgoldenrod4", mid='white', high="darkgreen", 
                                   limits = c(-50,50), midpoint = 0) +
@@ -132,7 +132,7 @@ lsat_calc_trend <- function(dt,
     ggplot2::labs(y=paste0('Mean Landsat ', gsub('.MAX', 'max', toupper(si))), x='Year') + 
     ggplot2::geom_ribbon(ggplot2::aes(ymin = si.avg-si.se, ymax = si.avg + si.se, fill=trend.cat), 
                          alpha=0.3, linetype=0)+
-    ggplot2::geom_line(ggplot2::aes(color = trend.cat), alpha = 1, size=1) + 
+    ggplot2::geom_line(ggplot2::aes(color = trend.cat), alpha = 1, linewidth=1) + 
     ggplot2::scale_fill_manual(values = trend.cols$cols, name = 'Trend class') + 
     ggplot2::scale_color_manual(values = trend.cols$cols, name = 'Trend class')+
     ggplot2::theme_bw() +
