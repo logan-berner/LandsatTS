@@ -1,92 +1,48 @@
-# # DESCRIPTION ================================================================
-# # This R script extracts Landsat data for ITEX tundra phenology sites
-# # Data set: https://www.polardata.ca/pdcsearch/PDCSearch.jsp?doi_id=13215
-
+# DESCRIPTION ================================================================
+# This R script extracts Landsat data for ITEX tundra phenology sites
+# Data set: https://www.polardata.ca/pdcsearch/PDCSearch.jsp?doi_id=13215
+# CSV files: https://www.polardata.ca/pdcsearch/PDC_Metadata_Data_Download.ccin?action=downloadPDCData&ccin_ref_number=13215&fileLoc=/pdc/ipy/13215/CCIN13215_20220120_tundra_phenology_database.csv
 # SET UP =======================================================================
 rm(list=ls())
-library(lsatTS)
+library(LandsatTS)
 library(sf)
 library(dplyr)
 library(rgee)
-library(data.table)
-library(R.utils)
-library(tidyverse)
 library(rnaturalearth) # For the country boundaries
 
 # COORDINATES FOR ITEX SITES ===================================================
-# # DESCRIPTION ========================================================================
-# # This R script extracts Landsat data for several Arctic research stations to use for example
-#
-# SET UP =============================================================================
-rm(list=ls())
-library(lsatTS)
-library(sf)
-library(dplyr)
-library(rgee)
-library(data.table)
-library(R.utils)
+itex.dt <- fread("data-raw/itex_tundra_phenology_database.csv")
 
-# GENERATE TEST POINTS ===============================================================
-itex.sites.sf <- st_sfc(st_point(c(-80.00, 73.13)),
-                         st_point(c(-150.00, 69.00)),
-                         st_point(c(-50.72, 67.02)),
-                         st_point(c(-76.00, 79.00)),
-                         st_point(c(-139.08, 69.58)), crs = 4326) %>%
-  st_sf() %>%
-  mutate(sample_id = c("Bylot Island",
-                       "Toolik Lake",
-                       "Kangerlussuaq",
-                       "Alexandra Fiord",
-                       "Qikiqtaruk"))
-
-# EXPORT TIME SERIES ==============================================================
-ee_Initialize()
-task_list <- lsat_export_ts(test_points_sf)
-
-# GRAB DATA FROM GOOGLE DRIVE AND MOVE TO LOCAL DIRECTORY =========================
-mkdirs('data')
-lsat.example.dt <- fread('C:/tmp/lsatTS_export_chunk_1.csv')
-save(lsat.example.dt, file="data/lsat.example.dt.RData")
-
-
-
-itex.sites.df <- read_csv("data-raw/itex_tundra_phenology_database.csv")
-
-itex.sites.df <- itex.sites.df %>% rename(sample_id = study_area) %>%
-  select(sample_id, lat, long, year) %>%
-  distinct() %>%
-  group_by(sample_id, lat, long) %>%
-  top_n(n = 1) %>%
-  arrange(year)
-
-itex.sites.sf <- itex.sites.df %>% st_as_sf(coords = c("long", "lat"), crs = 4326)
-
-
-itex.sites.sf <- read_csv("data-raw/itex_tundra_phenology_database.csv") %>%
-  rename(sample_id = study_area) %>%
-  select(sample_id, lat, long, year) %>%
-  distinct() %>%
-  st_as_sf(coords = c("long", "lat"), crs = 4326)
-
-
-
-
-itex.sites.sf <- read_csv("data-raw/itex_tundra_phenology_database.csv") %>%
-  rename(sample_id = study_area) %>%
+itex.sites.dt <- itex.dt %>% rename(sample_id = study_area) %>%
   select(sample_id, lat, long) %>%
   distinct() %>%
-  st_as_sf(coords = c("long", "lat"), crs = 4326)
+  group_by(sample_id) %>%
+  top_n(n = 1) %>% as.data.table()
 
-plot(st_geometry(ne_countries(returnclass = "sf")))
-plot(st_geometry(itex.sites.sf), col = "red", add = T)
+itex.sites.dt
+save(itex.sites.dt, file="data/itex.sites.dt.RData")
 
+itex.sites.sf <- itex.sites.dt %>% as.data.frame() %>% st_as_sf(coords = c("long", "lat"), crs = 4326)
 save(itex.sites.sf, file="data/itex.sites.sf.RData")
+
+jpeg('man/manuscript/figures/itex_site_map.jpg', width = 7, height = 5, units = 'in', res = 300)
+plot(st_geometry(ne_countries(returnclass = "sf")))
+plot(st_geometry(itex.sites.sf), col = "black", bg = 'red', add = T, pch = 21)
+dev.off()
+
 
 
 # EXPORT TIME SERIES ==============================================================
 ee_Initialize()
-task_list <- lsat_export_ts(itex.sites.sf)
+task_list <- lsat_export_ts(pixel_coords_sf = itex.sites.sf, 
+               start_date = "1985-06-01", 
+               end_date = "2021-09-30",
+               startJulian = 152, 
+               endJulian = 273, 
+               file_prefix = 'itex_sites', 
+               drive_export_dir = 'gee_export')
+
 
 # GRAB DATA FROM GOOGLE DRIVE AND MOVE TO LOCAL DIRECTORY =========================
-lsat.example.dt <- fread('C:/tmp/lsatTS_export_chunk_1.csv')
-save(lsat.example.dt, file="data/lsat.example.dt.RData")
+itex.lsat.dt <- fread('C:/Users/Logan/My Drive/gee_export/itex_sites_chunk_1.csv')
+save(itex.lsat.dt, file="data/itex.lsat.dt.RData")
