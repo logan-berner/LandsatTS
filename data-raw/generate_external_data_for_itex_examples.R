@@ -19,17 +19,17 @@ itex.sites.dt <- itex.dt %>% rename(sample_id = study_area) %>%
   group_by(sample_id) %>%
   top_n(n = 1) %>% as.data.table()
 
-itex.sites.dt
+# exclude the Bogong site located in Australia
+itex.sites.dt <- itex.sites.dt[sample_id != 'Bogong']
 save(itex.sites.dt, file="data/itex.sites.dt.RData")
 
-itex.sites.sf <- itex.sites.dt %>% as.data.frame() %>% st_as_sf(coords = c("long", "lat"), crs = 4326)
-save(itex.sites.sf, file="data/itex.sites.sf.RData")
+# itex.sites.sf <- itex.sites.dt %>% as.data.frame() %>% st_as_sf(coords = c("long", "lat"), crs = 4326)
+# save(itex.sites.sf, file="data/itex.sites.sf.RData")
 
-jpeg('man/manuscript/figures/itex_site_map.jpg', width = 7, height = 5, units = 'in', res = 300)
-plot(st_geometry(ne_countries(returnclass = "sf")))
-plot(st_geometry(itex.sites.sf), col = "black", bg = 'red', add = T, pch = 21)
-dev.off()
-
+# jpeg('man/manuscript/figures/itex_site_map.jpg', width = 7, height = 5, units = 'in', res = 300)
+# plot(st_geometry(ne_countries(returnclass = "sf")))
+# plot(st_geometry(itex.sites.sf), col = "black", bg = 'red', add = T, pch = 21)
+# dev.off()
 
 
 # EXPORT TIME SERIES ==============================================================
@@ -44,5 +44,6 @@ task_list <- lsat_export_ts(pixel_coords_sf = itex.sites.sf,
 
 
 # GRAB DATA FROM GOOGLE DRIVE AND MOVE TO LOCAL DIRECTORY =========================
-itex.lsat.dt <- fread('C:/Users/Logan/My Drive/gee_export/itex_sites_chunk_1.csv')
+itex.lsat.dt <- fread('C:/Users/Logan/My Drive/gee_export/itex_sites__chunk_1.csv')
+itex.lsat.dt <- itex.lsat.dt[sample_id != "Bogong"]
 save(itex.lsat.dt, file="data/itex.lsat.dt.RData")

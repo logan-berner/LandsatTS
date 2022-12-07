@@ -7,11 +7,11 @@
 lsat_fit_phenological_curves(
   dt,
   si,
-  window.yrs = 11,
+  window.yrs = 7,
   window.min.obs = 20,
   si.min = 0.15,
-  spar = 0.75,
-  pcnt.dif.thresh = 30,
+  spar = 0.78,
+  pcnt.dif.thresh = c(-20, 20),
   weight = T,
   spl.fit.outfile = F,
   progress = T,
@@ -37,11 +37,13 @@ are present. Note that si.min must be >= 0 because the underlying spline fitting
 function will error out if provided negative values.}
 
 \item{spar}{Smoothing parameter typically around 0.70 - 0.80 for this application.
-A higher value means a less flexible spline.}
+A higher value means a less flexible spline. Defaults to 0.78.}
 
-\item{pcnt.dif.thresh}{Allowable percent difference (0-100) between individual
+\item{pcnt.dif.thresh}{Vector with two numbers that specifcy the allowable
+negative and positive percent difference between individual
 observations and fitted cubic spline. Observations that differ by more than
-this threshold are filtered out and the cubic spline is iteratively refit.}
+these thresholds are filtered out and the cubic spline is iteratively refit.
+Defaults to -20\% and 20\%.}
 
 \item{weight}{When fitting the cubic splines, should individual observations be
 weighted by their year of acquisition relative to the focal year?
@@ -82,8 +84,8 @@ your index after running the lsat_summarize_growing_seasons() function.
 data(lsat.example.dt)
 lsat.dt <- lsat_format_data(lsat.example.dt)
 lsat.dt <- lsat_clean_data(lsat.dt)
-lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
-# lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
-lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi') 
+lsat.dt <- lsat_calc_spectral_index(lsat.dt, 'ndvi')
+lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F, train.with.highlat.data = T)
+lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi')
 lsat.pheno.dt
 }

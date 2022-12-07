@@ -107,7 +107,7 @@ See Berner et al. (2020) for a full description of the approach.
 data(lsat.example.dt)
 lsat.dt <- lsat_format_data(lsat.example.dt)
 lsat.dt <- lsat_clean_data(lsat.dt)
-lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+lsat.dt <- lsat_calc_spectral_index(lsat.dt, 'ndvi')
 lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', 
                              train.with.highlat.data = TRUE, 
                              write.output = FALSE)

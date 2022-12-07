@@ -1,12 +1,11 @@
 MIT License
 
-Copyright (c) 2021 by
-    Authors:  Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand
-              and Scott Goetz
-    Citation: Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand
-              and Scott J. Goetz. 2021. lsatTS - an R package for deriving
-              vegetation greenness time series using Landsat satellite data.
-              https://github.com/logan-berner/lsatTS
+Copyright (c) 2022 by
+    Authors:  Logan T. Berner, Jakob J. Assmann, Signe Normand, and Scott Goetz
+    Citation: Logan T. Berner, Jakob J. Assmann, Signe Normand, and Scott J. Goetz. 
+    2022. LandsatTS: an R package to facilitate retrieval, cleaning, cross-calibration, 
+    and phenological modeling of Landsat time-series data. 
+    https://github.com/logan-berner/LandsatTS
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

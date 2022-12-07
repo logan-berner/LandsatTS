@@ -4,16 +4,7 @@
 \alias{lsat_calc_trend}
 \title{Calculate non-parametric vegetation greenness trends}
 \usage{
-lsat_calc_trend(
-  dt,
-  si,
-  yrs,
-  yr.tolerance = 1,
-  nyr.min.frac = 0.66,
-  sig = 0.1,
-  legend.position = c(0.8, 0.2),
-  legend.direction = "horizontal"
-)
+lsat_calc_trend(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, sig = 0.1)
 }
 \arguments{
 \item{dt}{Data.table with columns including site, year, and the vegetation index of interest.}
@@ -30,21 +21,17 @@ time period ('yrs') for a trend to be computed.}
 must be available if a trend is to be computed.}
 
 \item{sig}{A p-value significance cutoff used to categories trends (e.g., 0.10)}
-
-\item{legend.position}{Legend position for output plot, specified as a vector with x and y values
-ranging from 0 to 1.}
-
-\item{legend.direction}{Legend direction for output plot, either "horizontal" or "vertical"}
 }
 \value{
-Data.table with summary of temporal trends by site and a multi-panel figure with:
-(1) a histogram of relative changes in vegetation greenness among sample sites and
-(2) a time-series plot of mean vegetation greenness for sample sites grouped
-by trend category.
+A list that includes:
+(1) a summary message about the mean relative change across sample sites;
+(2) a data.table summarizing the number and percentage of sites that
+fall into each trend category;
+(3) a data.table with trend statistics for each sample site.
 }
 \description{
 This function evaluates and summarizes interannual trends in
-vegetation greenness for sample sites over a user-specificed time period.
+vegetation greenness for sample sites over a user-specified time period.
 Potential interannual trends in vegetation greenness are assessed using
 Mann-Kendall trend tests and Theil-Sen slope indicators after prewhitening
 each time series. This trend assessment relies on the zyp.yuepilon() function
@@ -54,7 +41,7 @@ from the zyp package, which provides further details.
 data(lsat.example.dt)
 lsat.dt <- lsat_format_data(lsat.example.dt)
 lsat.dt <- lsat_clean_data(lsat.dt)
-lsat.dt <- lsat_calc_spec_index(lsat.dt, 'ndvi')
+lsat.dt <- lsat_calc_spectral_index(lsat.dt, 'ndvi')
 # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
 lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi') 
 lsat.gs.dt <- lsat_summarize_growing_seasons(lsat.pheno.dt, si = 'ndvi')
