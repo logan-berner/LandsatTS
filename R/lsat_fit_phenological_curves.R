@@ -28,10 +28,12 @@
 #'     are present. Note that si.min must be >= 0 because the underlying spline fitting
 #'     function will error out if provided negative values.
 #' @param spar Smoothing parameter typically around 0.70 - 0.80 for this application.
-#'     A higher value means a less flexible spline.
-#' @param pcnt.dif.thresh Allowable percent difference (0-100) between individual 
+#'     A higher value means a less flexible spline. Defaults to 0.78. 
+#' @param pcnt.dif.thresh Vector with two numbers that specifcy the allowable 
+#'     negative and positive percent difference between individual 
 #'     observations and fitted cubic spline. Observations that differ by more than 
-#'     this threshold are filtered out and the cubic spline is iteratively refit.
+#'     these thresholds are filtered out and the cubic spline is iteratively refit.
+#'     Defaults to -20% and 20%.     
 #' @param weight When fitting the cubic splines, should individual observations be 
 #'     weighted by their year of acquisition relative to the focal year? 
 #'     If so, each observation is weighted by exp(-0.25*n.yrs.from.focal) when fitting the cubic splines. 
@@ -54,22 +56,24 @@
 #' lsat.dt <- lsat_format_data(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
 #' lsat.dt <- lsat_calc_spectral_index(lsat.dt, 'ndvi')
-#' # lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F)
-#' lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi') 
+#' lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F, train.with.highlat.data = T)
+#' lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi')
 #' lsat.pheno.dt
 
 lsat_fit_phenological_curves = function(dt, 
                                         si, 
-                                        window.yrs=11, 
+                                        window.yrs=7, 
                                         window.min.obs=20, 
                                         si.min=0.15, 
-                                        spar=0.75,
-                                        pcnt.dif.thresh=30, 
+                                        spar=0.78,
+                                        pcnt.dif.thresh=c(-20,20), 
                                         weight=T, 
                                         spl.fit.outfile=F, 
                                         progress=T, 
                                         test.run=F){
   dt <- data.table::data.table(dt)
+  dt[, obs.id := 1:nrow(dt)]
+  obs.filtered <- c()
   
   # (OPTIONAL) SUBSAMPLE SITES IF RUNNING IN TEST MODE
   n.sites <- length(unique(dt$sample.id))
@@ -82,12 +86,28 @@ lsat_fit_phenological_curves = function(dt,
   }
   
   # GET SAMPLE ID, DOY, YEAR, AND SPECTRAL INDEX FROM INPUT DATA TABLE
-  dt <- dt[, eval(c('sample.id','latitude','longitude','year','doy',si)), with=F]
+  dt <- dt[, eval(c('sample.id','obs.id','latitude','longitude','year','doy',si)), with=F]
   dt <- data.table::setnames(dt, si, 'si')
   dt <- dt[order(sample.id,doy)]
   
   # FILTER OUT LOW VALUES
   dt <- dt[si >= si.min]
+  
+  # INITIAL OUTLIER EXCLUSION BY FITTING SPLINE ACROSS ALL YEARS 
+  dt[, n.obs := .N, by = 'sample.id']
+  dt <- dt[n.obs > window.min.obs * 2]
+  dt <- dt[, n.obs := NULL]
+  rough.splines.dt <- dt[, .(spl.fit = list(stats::smooth.spline(doy, si, spar = spar))), by = 'sample.id']
+  doy.rng <- min(dt$doy):max(dt$doy)
+  rough.spline.fits.dt <- rough.splines.dt[, .(spl.fit = unlist(Map(function(mod,doy){stats::predict(mod, data.frame(doy=doy.rng))$y}, spl.fit))), by = 'sample.id']
+  rough.spline.fits.dt <- rough.spline.fits.dt[, doy := doy.rng, by = 'sample.id']
+  
+  dt <- rough.spline.fits.dt[dt, on = c('sample.id','doy')]
+  dt <- dt[, pcnt.dif := (si - spl.fit)/((si+spl.fit)/2)*100]
+  dt <- dt[pcnt.dif > -75 & pcnt.dif < 75]
+  dt <- dt[, c('spl.fit', 'pcnt.dif'):= NULL]
+  rm(rough.spline.fits.dt)
+  rm(rough.splines.dt)
   
   # IDENTIFY TIME PERIODS
   all.yrs <- sort(unique(dt$year))
@@ -146,10 +166,13 @@ lsat_fit_phenological_curves = function(dt,
     # ii=1
     while(refitting == 1){
       focal.dt <- spline.fits.dt[focal.dt, on = c('sample.id','doy')]
-      focal.dt <- focal.dt[, abs.pcnt.dif := abs((si - spl.fit)/((si+spl.fit)/2)*100)] # calc abs % dif
-      refit.sites <- unique(focal.dt[abs.pcnt.dif > pcnt.dif.thresh]$sample.id)
-      focal.dt <- focal.dt[abs.pcnt.dif <= pcnt.dif.thresh]
-      focal.dt <- focal.dt[, c('spl.fit', 'abs.pcnt.dif'):= NULL]
+      focal.dt <- focal.dt[, pcnt.dif := (si - spl.fit)/((si+spl.fit)/2)*100] # calc abs % dif
+      
+      refit.sites <- unique(focal.dt[pcnt.dif < pcnt.dif.thresh[1] | pcnt.dif > pcnt.dif.thresh[2]]$sample.id)
+      obs.filtered <- unique(c(obs.filtered, unique(focal.dt[pcnt.dif < pcnt.dif.thresh[1] | pcnt.dif > pcnt.dif.thresh[2]]$obs.id)))
+      
+      focal.dt <- focal.dt[pcnt.dif > pcnt.dif.thresh[1] & pcnt.dif < pcnt.dif.thresh[2]]
+      focal.dt <- focal.dt[, c('spl.fit', 'pcnt.dif'):= NULL]
       refit.dt <- focal.dt[sample.id %in% refit.sites]
       
       # REFIT SPLINES AT SITES THAT HAD LARGE DIFFS BETWEEN OBS AND FITTED VALUES
@@ -191,9 +214,9 @@ lsat_fit_phenological_curves = function(dt,
     spline.fits.dt <- spline.fits.dt[sample.doy.smry, on = 'sample.id']
     spline.fits.dt <- spline.fits.dt[doy >= min.doy][doy <= max.doy] # limit spline fit to DOY range at each site
     spline.fits.dt <- spline.fits.dt[, spl.fit.max := max(spl.fit), by = 'sample.id'] # compute max si typically observed at a site
-    spline.fits.dt <- spline.fits.dt[, spl.fit.max.doy := doy[which.max(spl.fit)], by = 'sample.id'] # calculate typcial day of peak greenness
+    spline.fits.dt <- spline.fits.dt[, spl.fit.max.doy := doy[which.max(spl.fit)], by = 'sample.id'] # calculate typical day of peak greenness
     spline.fits.dt <- spline.fits.dt[, spl.frac.max := spl.fit / spl.fit.max]
-    spline.fits.dt <- spline.fits.dt[, si.adjustment := abs(spl.fit - spl.fit.max)] # compute adjustment factor
+    spline.fits.dt <- spline.fits.dt[, si.adjustment := spl.fit.max - spl.fit] # compute adjustment factor
     spline.fits.dt <- spline.fits.dt[, focal.yr := focal.yr]
     spline.fits.dt <- spline.fits.dt[, c('min.doy','max.doy'):= NULL]
     splines.list[[i]] <- spline.fits.dt
@@ -217,6 +240,14 @@ lsat_fit_phenological_curves = function(dt,
   if (spl.fit.outfile != F){
     data.table::fwrite(spline.dt, spl.fit.outfile)
   }
+  
+  # CREATE OUTPUT DATA TABLE BY COMBINING FOCAL YEAR DATA
+  dt <- data.table::data.table(rbindlist(data.list))
+  dt <- dt[order(sample.id,year,doy)]
+  data.table::setcolorder(dt, c('sample.id','latitude','longitude','year','doy',
+                                'si','spl.n.obs','spl.fit','spl.frac.max',
+                                'spl.fit.max','spl.fit.max.doy','si.adjustment',
+                                'si.max.pred'))
   
   # OUTPUT FIGURE
   if (n.sites > 9){
@@ -247,11 +278,7 @@ lsat_fit_phenological_curves = function(dt,
   
   # OUTPUT DATA TABLE
   if (test.run == F){
-    dt <- data.table::data.table(rbindlist(data.list))
-    dt <- dt[order(sample.id,year,doy)]
-    data.table::setcolorder(dt, c('sample.id','latitude','longitude','year','doy','si','spl.n.obs','spl.fit','spl.frac.max','spl.fit.max','spl.fit.max.doy','si.adjustment','si.max.pred'))
     colnames(dt) <- gsub('si',si,colnames(dt))
     dt
   }
-  
 }
