@@ -14,7 +14,7 @@ lsat_calibrate_rf(
   frac.train = 0.75,
   trim = T,
   overwrite.col = F,
-  write.output = T,
+  write.output = F,
   outfile.id = band.or.si,
   outdir = NA
 )

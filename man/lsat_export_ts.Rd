@@ -12,13 +12,13 @@ lsat_export_ts(
   max_chunk_size = 250,
   drive_export_dir = "lsatTS_export",
   file_prefix = "lsatTS_export",
-  startJulian = 152,
-  endJulian = 243,
+  start_doy = 152,
+  end_doy = 243,
   start_date = "1984-01-01",
   end_date = "today",
-  BUFFER_DIST = 0,
-  SCALE = 30,
-  MASK_VALUE = 0
+  buffer_dist = 0,
+  scale = 30,
+  mask_value = 0
 )
 }
 \arguments{
@@ -43,9 +43,9 @@ records to. Defaults to "lsatTS_export".}
 
 \item{file_prefix}{Optional file_prefix for the exported files.}
 
-\item{startJulian}{Optional first day of year to extract for. Defaults to 152.}
+\item{start_doy}{Optional first day of year to extract for. Defaults to 152.}
 
-\item{endJulian}{Optional last day of year to extract for. Defaults to 243.}
+\item{end_doy}{Optional last day of year to extract for. Defaults to 243.}
 
 \item{start_date}{Optional extraction start date (as string,
 format YYYY-MM-DD). Defaults to "1984-01-01".}
@@ -53,15 +53,15 @@ format YYYY-MM-DD). Defaults to "1984-01-01".}
 \item{end_date}{Optional extraction end date (as string, format YYYY-MM-DD).
 Defaults to today's date.}
 
-\item{BUFFER_DIST}{Buffer distance around sample coordinates. Wrapper for
+\item{buffer_dist}{Buffer distance around sample coordinates. Wrapper for
 lsat_get_pixel_centers() to find all Landsat pixel centers around each
 point in pixel_coords_sf within the specified buffer distance (square)).
 Can be slow if the number of points is large. Defaults to 0 m.}
 
-\item{SCALE}{Scale for extraction. Defaults to 30 m nominal Landsat pixel
+\item{scale}{scale for extraction. Defaults to 30 m nominal Landsat pixel
 size.}
 
-\item{MASK_VALUE}{Optional masking value for global surface water mask.
+\item{mask_value}{Optional masking value for global surface water mask.
 Defaults to 0.}
 }
 \value{
