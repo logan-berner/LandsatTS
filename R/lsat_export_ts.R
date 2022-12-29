@@ -32,19 +32,19 @@
 #' @param drive_export_dir Folder on the user's Google Drive to export the
 #'   records to. Defaults to "lsatTS_export".
 #' @param file_prefix Optional file_prefix for the exported files.
-#' @param startJulian Optional first day of year to extract for. Defaults to 152.
-#' @param endJulian Optional last day of year to extract for. Defaults to 243.
+#' @param start_doy Optional first day of year to extract for. Defaults to 152.
+#' @param end_doy Optional last day of year to extract for. Defaults to 243.
 #' @param start_date Optional extraction start date (as string,
 #'   format YYYY-MM-DD). Defaults to "1984-01-01".
 #' @param end_date Optional extraction end date (as string, format YYYY-MM-DD).
 #'   Defaults to today's date.
-#' @param BUFFER_DIST Buffer distance around sample coordinates. Wrapper for
+#' @param buffer_dist Buffer distance around sample coordinates. Wrapper for
 #'   lsat_get_pixel_centers() to find all Landsat pixel centers around each
 #'   point in pixel_coords_sf within the specified buffer distance (square)).
 #'   Can be slow if the number of points is large. Defaults to 0 m.
-#' @param SCALE Scale for extraction. Defaults to 30 m nominal Landsat pixel
+#' @param scale scale for extraction. Defaults to 30 m nominal Landsat pixel
 #'   size.
-#' @param MASK_VALUE Optional masking value for global surface water mask.
+#' @param mask_value Optional masking value for global surface water mask.
 #'   Defaults to 0.
 #'
 #' @return List of initiated rgee tasks.
@@ -95,13 +95,13 @@ lsat_export_ts <- function(pixel_coords_sf,
                              max_chunk_size = 250,
                              drive_export_dir = "lsatTS_export",
                              file_prefix = "lsatTS_export",
-                             startJulian = 152,
-                             endJulian = 243,
+                             start_doy = 152,
+                             end_doy = 243,
                              start_date = "1984-01-01",
                              end_date = "today",
-                             BUFFER_DIST = 0,
-                             SCALE = 30,
-                             MASK_VALUE = 0
+                             buffer_dist = 0,
+                             scale = 30,
+                             mask_value = 0
                              ){
 
   # confirm rgee is initialized
@@ -157,7 +157,7 @@ lsat_export_ts <- function(pixel_coords_sf,
 
   # addon assets and bands
   ADDON <- rgee::ee$Image('JRC/GSW1_0/GlobalSurfaceWater')$
-    float()$unmask(MASK_VALUE)
+    float()$unmask(mask_value)
   ADDON_BANDLIST <- rgee::ee$List(list("max_extent"));
 
   # Blank image for "SR_B6" to replace in collections earlier than LS8
@@ -193,8 +193,8 @@ lsat_export_ts <- function(pixel_coords_sf,
                        merge(ls7_2$
                               merge(ls8_2)))))$
     filterDate(start_date, end_date)$
-    filter(rgee::ee$Filter$calendarRange(startJulian,
-                                         endJulian,
+    filter(rgee::ee$Filter$calendarRange(start_doy,
+                                         end_doy,
                                          "day_of_year"))$
     #.filterBounds(table)
     map(function(image){
@@ -207,13 +207,13 @@ lsat_export_ts <- function(pixel_coords_sf,
     select(ALL_BANDS)$
     map(function(image){ return(image$float())} )
 
-  # Check if BUFFER_DIST was specified if yes, retrieve points in buffer using
+  # Check if buffer_dist was specified if yes, retrieve points in buffer using
   # lsat_get_pixel_centers
-  if(BUFFER_DIST > 0){
+  if(buffer_dist > 0){
     pixel_coords_sf_buffered <- pixel_coords_sf %>%
       split(st_drop_geometry(pixel_coords_sf)[,sample_id_from]) %>%
       purrr::map(lsat_get_pixel_centers,
-                 buffer = BUFFER_DIST + 15,
+                 buffer = buffer_dist + 15,
                  pixel_prefix_from = sample_id_from) %>%
       bind_rows()
     # re-add chunks_from column to data frame
@@ -299,10 +299,10 @@ lsat_export_ts <- function(pixel_coords_sf,
                   # Create a feature
                 return(rgee::ee$Feature(feature$geometry(),
                                   # fill it with the point value extracted with
-                                  # reduceRegion with first() reducer at SCALE
+                                  # reduceRegion with first() reducer at scale
                                   image$reduceRegion(rgee::ee$Reducer$first(),
                                                      feature$geometry(),
-                                                     SCALE))$
+                                                     scale))$
                          # copy the image properties to the feature
                          # (incl. date and image metadata) as specified above
                          copyProperties(image, PROPERTIES)$
