@@ -9,9 +9,9 @@
 #' @return A data.table with average surface reflectance
 #' @import data.table
 #' @export lsat_neighborhood_mean
-
 lsat_neighborhood_mean <- function(dt){
   dt <- data.table::data.table(dt)
+  dt[, sample.id := unlist(data.table::transpose(strsplit(sample.id, split = '_'))[[1]])]
   dt <- dt[, .(latitude = mean(latitude, na.rm=T),
                longitude = mean(longitude, na.rm=T),
                blue = mean(blue, na.rm=T),
