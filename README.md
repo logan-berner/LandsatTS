@@ -10,8 +10,8 @@
 
 The **LandsatTS** package helps you to:
 
--   Export whole Landsat record time series based on point coordinates
-    (“sites”).
+-   Export whole Landsat 5, 7, and 8 record time series based on point
+    coordinates (“sites”).
 -   Quality screen surface reflectance measurements from Landsat.
 -   Cross-calibrate surface reflectance measurements and vegetation
     indices among Landsat sensors.
