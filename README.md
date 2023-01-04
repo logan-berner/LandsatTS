@@ -277,8 +277,10 @@ temp_files <- map(task_list, ee_drive_to_local)
 
 ## 3. Clean and cross-calibrate Landsat data
 
-![](man/figures/fig_2_cross_calibration.jpg) **Prepare the exported
-Landsat data for analysis using lsat_format_data()**
+![](man/figures/fig_2_cross_calibration.jpg)
+
+**Prepare the exported Landsat data for analysis using
+lsat_format_data()**
 
 After exporting Landsat data from Earth Engine, it is then necessary
 prepare the data for analysis. First, read the exported data into R
