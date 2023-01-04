@@ -251,22 +251,22 @@ lsat.dt <- lsat_neighborhood_mean(lsat.dt)
 ```
 
 
-**Optional: Summarize the availability of Landsat data for each site using lsat_summarize_data_avail()**
+**Optional: Summarize the availability of Landsat data for each site using lsat_summarize_data()**
 
-The function `lsat_summarize_data_avail()` creates a summary table that provides information on the time period of observations and number of observations available for each site. It also generates a figure showing the density of observations across years, which combines data across all sites. 
+The function `lsat_summarize_data()` creates a summary table that provides information on the time period of observations and number of observations available for each site. It also generates a figure showing the density of observations across years, which combines data across all sites. 
 
 ``` {r eval = FALSE}
-data.summary.dt <- lsat_summarize_data_avail(lsat.dt)
+data.summary.dt <- lsat_summarize_data(lsat.dt)
 data.summary.dt
 ```
 
 
-**Calculate spectral indices using lsat_calc_spec_index()**
+**Calculate spectral indices using lsat_calc_spectral_index()**
 
-The function `lsat_calc_spec_index()` allows users to easily calculate some widely used spectral indices. These include NDVI, EVI, and currently nine other spectral indices (EVI2, kNDVI, MSI, NBR, NIRv, NDII, NDWI, PSRI, SATVI). Note that only one index can be computed at a time.
+The function `lsat_calc_spectral_index()` allows users to easily calculate some widely used spectral indices. These include NDVI, EVI, and currently nine other spectral indices (EVI2, kNDVI, MSI, NBR, NIRv, NDII, NDWI, PSRI, SATVI). Note that only one index can be computed at a time.
 ``` {r eval = FALSE}
 # Compute NDVI or other vegetation index
-lsat.dt <- lsat_calc_spec_index(lsat.dt, si = 'ndvi')
+lsat.dt <- lsat_calc_spectral_index(lsat.dt, si = 'ndvi')
 ```
 
 
@@ -277,7 +277,13 @@ There are systematic differences in surface reflectance and spectral indices amo
 *Note: If you use the default setting that adds a new column with the cross-calibrated data, then you'll either want to use those data in the subsequent functions (e.g., ndvi.xcal) or, once satisfied, manually overwrite the uncalibrated data to simplify subsuquent column names.*
 ``` {r eval = FALSE}
 # Cross-calibrate NDVI among sensors using an approach based on Random Forest machine learning
-lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', doy.rng = 151:242, min.obs = 5, frac.train = 0.75, overwrite.col = T, write.output = F)
+lsat.dt <- lsat_calibrate_rf(lsat.dt, 
+                             band.or.si = 'ndvi', 
+                             doy.rng = 151:242, 
+                             min.obs = 5, 
+                             frac.train = 0.75, 
+                             overwrite.col = T, 
+                             write.output = F)
 
 # If needed, then manually overwrite the uncalibrated data with the calibrated data, then drop the duplicate column 
 # lsat.dt <- lsat.dt[, ndvi := ndvi.xcal]
