@@ -54,7 +54,7 @@ lsat_calc_spectral_index <- function(dt,
     if (si == 'nirv'){dt[, nirv := (nir * (nir - red)) / (nir + red)]}
     if (si == 'psri'){dt[, psri := (red - blue) / nir]}
     if (si == 'satvi'){dt[, satvi := 1.5 * ((swir1 - red) / (swir1 + red + 0.5)) - swir2/2]}
-    if (si == 'savi'){dt[, sati := (1.5 * (nir - red)) / (nir + red + 0.5)]}
+    if (si == 'savi'){dt[, savi := (1.5 * (nir - red)) / (nir + red + 0.5)]}
     if (si == 'wdrvi'){dt[, wdrvi := (0.2*nir - red) / (0.2*nir + red)]}
     dt
   } else {
