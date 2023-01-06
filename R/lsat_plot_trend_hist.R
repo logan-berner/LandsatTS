@@ -30,7 +30,7 @@ lsat_plot_trend_hist <- function(dt, xlim = c(-30,30)){
   hist <- ggplot2::ggplot(dt, ggplot2::aes(total.change.pcnt, fill=after_stat(x))) +
   ggplot2::geom_histogram(bins = 50, size = 0.25, color = 'gray20') +
   ggplot2::scale_fill_gradient2(low="darkgoldenrod4", mid='white', high="darkgreen", 
-                                limits = c(-50,50), midpoint = 0) +
+                                limits = xlim, midpoint = 0) +
   ggplot2::labs(y = 'Number of sample sites', 
                 x = paste0("Relative change in Landsat ", 
                            gsub('.MAX', 'max', toupper(si)),
