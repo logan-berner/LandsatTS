@@ -90,6 +90,9 @@ lsat_calc_trend <- function(dt,
   trend.dt[pval <= sig & slope < 0, trend.cat := 'browning']
   trend.dt[pval > sig, trend.cat := 'no_trend']
   
+  # sort by sample id
+  setorder(trend.dt, 'sample.id')
+  
   # create output message about average relative change 
   avg <- round(mean(trend.dt$total.change.pcnt),2)
   std <- round(sd(trend.dt$total.change.pcnt),2)
