@@ -11,7 +11,7 @@ lsat_fit_phenological_curves(
   window.min.obs = 20,
   si.min = 0.15,
   spar = 0.78,
-  pcnt.dif.thresh = c(-20, 20),
+  pcnt.dif.thresh = c(-30, 30),
   weight = T,
   spl.fit.outfile = F,
   progress = T,
@@ -43,7 +43,7 @@ A higher value means a less flexible spline. Defaults to 0.78.}
 negative and positive percent difference between individual
 observations and fitted cubic spline. Observations that differ by more than
 these thresholds are filtered out and the cubic spline is iteratively refit.
-Defaults to -20\% and 20\%.}
+Defaults to -30\% and 30\%.}
 
 \item{weight}{When fitting the cubic splines, should individual observations be
 weighted by their year of acquisition relative to the focal year?
