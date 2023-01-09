@@ -81,8 +81,8 @@ lsat_calc_trend <- function(dt,
   trend.dt <- site.smry[trend.dt, on = 'sample.id']
   
   # compute total change (absolute and percent change)
-  trend.dt[, total.change := slope * length(yrs)]
-  trend.dt[, total.change.pcnt := total.change / intercept * 100]
+  trend.dt[, total.change := round(slope * length(yrs),3)]
+  trend.dt[, total.change.pcnt := round(total.change / intercept * 100,1)]
   
   # categorize trends
   trend.dt[, trend.cat := character()]
@@ -118,7 +118,7 @@ lsat_calc_trend <- function(dt,
 calc.trends <- function(x,y){
   xx <- zyp::zyp.yuepilon(y,x) ## note the order of x and y are switched in this call!!!
   return(data.table(slope=round(xx['trend'],5), 
-                    intercept=round(xx['intercept'],5), 
+                    intercept=round(xx['intercept'],4), 
                     tau=round(xx['tau'],3), 
                     pval=round(xx['sig'],4)))
 }
