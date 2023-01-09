@@ -33,7 +33,7 @@
 #'     negative and positive percent difference between individual 
 #'     observations and fitted cubic spline. Observations that differ by more than 
 #'     these thresholds are filtered out and the cubic spline is iteratively refit.
-#'     Defaults to -20% and 20%.     
+#'     Defaults to -30% and 30%.     
 #' @param weight When fitting the cubic splines, should individual observations be 
 #'     weighted by their year of acquisition relative to the focal year? 
 #'     If so, each observation is weighted by exp(-0.25*n.yrs.from.focal) when fitting the cubic splines. 
@@ -66,7 +66,7 @@ lsat_fit_phenological_curves = function(dt,
                                         window.min.obs=20, 
                                         si.min=0.15, 
                                         spar=0.78,
-                                        pcnt.dif.thresh=c(-20,20), 
+                                        pcnt.dif.thresh=c(-30,30), 
                                         weight=T, 
                                         spl.fit.outfile=F, 
                                         progress=T, 
@@ -104,7 +104,7 @@ lsat_fit_phenological_curves = function(dt,
   
   dt <- rough.spline.fits.dt[dt, on = c('sample.id','doy')]
   dt <- dt[, pcnt.dif := (si - spl.fit)/((si+spl.fit)/2)*100]
-  dt <- dt[pcnt.dif > -75 & pcnt.dif < 75]
+  dt <- dt[pcnt.dif > -100 & pcnt.dif < 100]
   dt <- dt[, c('spl.fit', 'pcnt.dif'):= NULL]
   rm(rough.spline.fits.dt)
   rm(rough.splines.dt)
