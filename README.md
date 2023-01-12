@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# LandsatTS - an R package for deriving vegetation greenness time series using Landsat satellite data
+# LandsatTS: an R package to facilitate retrieval, cleaning, cross-calibration, and phenological modeling of Landsat time-series data
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -492,9 +492,9 @@ lsat.trnds.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', 2000:2020, sig = 0
 When using this package please cite:
 
 Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and
-Scott J. Goetz. 2021. LandsatTS - an R package for deriving vegetation
-greenness time series using Landsat satellite data.
-<https://github.com/logan-berner/LandsatTS>.
+Scott J. Goetz. 2021. LandsatTS: an R package to facilitate retrieval,
+cleaning, cross-calibration, and phenological modeling of Landsat
+time-series data. <https://github.com/logan-berner/LandsatTS>.
 
 Also please consider citing the peer-reviewed publication for which much
 of this code was developed:
