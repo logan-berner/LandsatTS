@@ -23,8 +23,9 @@ lsat_plot_trend_hist <- function(dt, xlim = c(-30,30)){
   
   dt <- data.table::data.table(dt)
   si <- first(dt$si)
-  first.yr <- first(dt$first.yr)
-  last.yr <-  first(dt$last.yr)
+  period <- unlist(strsplit(dt$trend.period, split = 'to')[1])
+  first.yr <- period[1]
+  last.yr <-  period[2]
   
   # histogram of vegetation greenness trends
   hist <- ggplot2::ggplot(dt, ggplot2::aes(total.change.pcnt, fill=after_stat(x))) +
