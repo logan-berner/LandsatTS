@@ -12,10 +12,10 @@ lsat_fit_phenological_curves(
   si.min = 0.15,
   spar = 0.78,
   pcnt.dif.thresh = c(-30, 30),
-  weight = T,
-  spl.fit.outfile = F,
-  progress = T,
-  test.run = F
+  weight = TRUE,
+  spl.fit.outfile = FALSE,
+  progress = TRUE,
+  test.run = FALSE
 )
 }
 \arguments{
@@ -85,7 +85,8 @@ data(lsat.example.dt)
 lsat.dt <- lsat_format_data(lsat.example.dt)
 lsat.dt <- lsat_clean_data(lsat.dt)
 lsat.dt <- lsat_calc_spectral_index(lsat.dt, 'ndvi')
-lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F, train.with.highlat.data = T)
+lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', 
+write.output = FALSE, train.with.highlat.data = TRUE)
 lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi')
 lsat.pheno.dt
 }

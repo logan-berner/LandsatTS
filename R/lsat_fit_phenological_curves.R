@@ -56,7 +56,8 @@
 #' lsat.dt <- lsat_format_data(lsat.example.dt)
 #' lsat.dt <- lsat_clean_data(lsat.dt)
 #' lsat.dt <- lsat_calc_spectral_index(lsat.dt, 'ndvi')
-#' lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', write.output = F, train.with.highlat.data = T)
+#' lsat.dt <- lsat_calibrate_rf(lsat.dt, band.or.si = 'ndvi', 
+#' write.output = FALSE, train.with.highlat.data = TRUE)
 #' lsat.pheno.dt <- lsat_fit_phenological_curves(lsat.dt, si = 'ndvi')
 #' lsat.pheno.dt
 
@@ -67,17 +68,17 @@ lsat_fit_phenological_curves = function(dt,
                                         si.min=0.15, 
                                         spar=0.78,
                                         pcnt.dif.thresh=c(-30,30), 
-                                        weight=T, 
-                                        spl.fit.outfile=F, 
-                                        progress=T, 
-                                        test.run=F){
+                                        weight=TRUE, 
+                                        spl.fit.outfile=FALSE, 
+                                        progress=TRUE, 
+                                        test.run=FALSE){
   dt <- data.table::data.table(dt)
   dt[, obs.id := 1:nrow(dt)]
   obs.filtered <- c()
   
   # (OPTIONAL) SUBSAMPLE SITES IF RUNNING IN TEST MODE
   n.sites <- length(unique(dt$sample.id))
-  if (test.run == T){
+  if (test.run == TRUE){
     if (n.sites < 9){
       stop(paste0('Your data set only has ', n.sites, ' sample sites, so do not run in test mode'))
     } else {
@@ -231,13 +232,13 @@ lsat_fit_phenological_curves = function(dt,
     data.list[[i]] <- focal.dt
     
     # PRINT STATUS (if requested)
-    if (progress == T){print(paste0('finished ', focal.yr))}
+    if (progress == TRUE){print(paste0('finished ', focal.yr))}
     
   } # end focal year loop
   
   # WRITE OUT FILE WITH SPLINE FITS (OPTIONAL)
   spline.dt <- data.table::data.table(data.table::rbindlist(splines.list))
-  if (spl.fit.outfile != F){
+  if (spl.fit.outfile != FALSE){
     data.table::fwrite(spline.dt, spl.fit.outfile)
   }
   
@@ -277,7 +278,7 @@ lsat_fit_phenological_curves = function(dt,
   print(fig)
   
   # OUTPUT DATA TABLE
-  if (test.run == F){
+  if (test.run == FALSE){
     colnames(dt) <- gsub('si',si,colnames(dt))
     dt
   }
