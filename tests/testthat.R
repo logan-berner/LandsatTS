@@ -1,4 +1,4 @@
 library(testthat)
-library(lsatTS)
+library(LandsatTS)
 
-test_check("lsatTS")
+test_check("LandsatTS")
