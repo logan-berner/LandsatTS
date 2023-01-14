@@ -34,9 +34,9 @@ noatak.dt <- lsat_calc_spectral_index(noatak.dt, si = 'ndvi')
 
 # Cross-calibrate NDVI among sensors using polynomial regression
 noatak.dt <- lsat_calibrate_poly(noatak.dt, 
-                             band.or.si = 'ndvi', 
-                             train.with.highlat.data = T, 
-                             overwrite.col = T)
+                                 band.or.si = 'ndvi', 
+                                 train.with.highlat.data = T, 
+                                 overwrite.col = T)
 
 ggsave('man/manuscript/figures/figure_4_noatak_landsat_calibration.jpg',
        width = 8.0, height = 7.5, units = 'in', dpi = 400)
@@ -69,7 +69,7 @@ lsat_plot_trend_hist(noatak.trend.dt, xlim = c(-21,21))
 
 # Create an interactive map showing NDVI trends
 colors.dt <- data.table(trend.cat = c("greening","no_trend","browning"), 
-                     trend.color = c("green","white","brown"))
+                        trend.color = c("springgreen","white","tomato"))
 
 noatak.trend.dt <- noatak.trend.dt[colors.dt, on = 'trend.cat']
 
@@ -79,9 +79,9 @@ noatak.trend.sf <- st_as_sf(noatak.trend.dt,
 
 leaflet() %>% 
   addProviderTiles('Esri.WorldImagery') %>%
-  addPolylines(data = noatak.sf, color = 'black', weight = 3) %>% 
+  addPolylines(data = noatak.sf, color = 'white', weight = 3) %>% 
   addCircleMarkers(data = noatak.trend.sf, 
-                   color = 'black',
+                   color = 'white',
                    weight = 1,
                    opacity = 0.9,
                    fillColor = ~trend.color,
@@ -92,27 +92,33 @@ leaflet() %>%
             colors = colors.dt$trend.color, 
             labels = colors.dt$trend.cat,
             title = 'NDVImax trend',
-            opacity = 1)
+            opacity = 1) %>% 
+  addScaleBar(options = scaleBarOptions(imperial = F))
 
-# END SCRIPT ===================================================================
+
+# END OF CODE EXAMPLES =========================================================
 
 noatak.trend.map <- leaflet() %>% 
   addProviderTiles('Esri.WorldImagery') %>%
-  addPolylines(data = noatak.sf, color = 'black', weight = 3) %>% 
-  setView(-160, 68, zoom = 7.35) %>%
+  addPolylines(data = noatak.sf, color = 'white', weight = 3) %>% 
   addCircleMarkers(data = noatak.trend.sf, 
-                   color = 'black',
+                   color = 'white',
                    weight = 1,
                    opacity = 0.9,
                    fillColor = ~trend.color,
                    fillOpacity = 0.5,
                    radius = ~sqrt(abs(total.change.pcnt))*3) %>%
+  setView(-160, 68, zoom = 7.40) %>%
   addLegend('bottomright', 
-            colors = c('green','white','brown'), 
-            labels = c('greening','no change','browning'),
+            colors = colors.dt$trend.color, 
+            labels = colors.dt$trend.cat,
             title = 'NDVImax trend',
-            opacity = 1)
+            opacity = 1) %>%
+  addScaleBar(options = scaleBarOptions(imperial = F))
+
 
 noatak.trend.map
 
-mapshot(noatak.trend.map, file = 'man/manuscript/figures/figure_8_noatak_trend_map.jpeg')
+mapshot(noatak.trend.map, 
+        file = 'man/manuscript/figures/figure_8_noatak_trend_map.jpeg', 
+        remove_controls = NULL)
