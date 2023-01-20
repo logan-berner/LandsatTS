@@ -8,7 +8,7 @@
 A data.table with 5296 rows and 23 variables
 }
 \source{
-Generated using example code provided in lsatTS::lsat_export_ts()
+Generated using example code provided in LandsatTS::lsat_export_ts()
 }
 \usage{
 lsat.example.dt
@@ -16,6 +16,6 @@ lsat.example.dt
 \description{
 A dataset containing Landsat surface reflectance measurements and ancillary
 data for six sample sites in the Arctic. These data are used for the examples
-included with lsatTS.
+included with LandsatTS.
 }
 \keyword{datasets}
