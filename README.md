@@ -1,6 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+# LandsatTS <img src="man/figures/logo.png" align="right" height="138" />
+
 # LandsatTS: an R package to facilitate retrieval, cleaning, cross-calibration, and phenological modeling of Landsat time-series data
 
 <!-- badges: start -->
