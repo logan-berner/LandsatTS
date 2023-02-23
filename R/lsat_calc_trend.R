@@ -48,8 +48,9 @@ lsat_calc_trend <- function(dt,
   dt <- dt[year %in% yrs]
   
   # summarize spatial and temporal data by site
-  site.smry <- dt[, .(first.yr = min(year), last.yr = max(year), n.yr.obs = .N), 
-                  by = c('sample.id','latitude','longitude')]
+  site.smry <- dt[, .(latitude = mean(latitude), longitude = mean(longitude),
+                      first.yr = min(year), last.yr = max(year), n.yr.obs = .N), 
+                  by = 'sample.id']
   
   site.smry[, trend.period := paste0(min(yrs),'to',max(yrs))]
   
