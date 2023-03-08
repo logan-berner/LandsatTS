@@ -69,7 +69,10 @@ lsat_plot_trend_hist(noatak.trend.dt, xlim = c(-21,21))
 
 # Create an interactive map showing NDVI trends
 colors.dt <- data.table(trend.cat = c("greening","no_trend","browning"), 
-                        trend.color = c("springgreen","white","tomato"))
+                        trend.color = c("springgreen","white","orange"))
+#                        trend.color = c("#5ab4ac","white","#d8b365"))
+#trend.color = c("darkgreen","white","darkgoldenrod"))
+                        # trend.color = c("springgreen","white","darkgoldenrod"))
 
 noatak.trend.dt <- noatak.trend.dt[colors.dt, on = 'trend.cat']
 
@@ -108,14 +111,13 @@ noatak.trend.map <- leaflet() %>%
                    fillColor = ~trend.color,
                    fillOpacity = 0.5,
                    radius = ~sqrt(abs(total.change.pcnt))*3) %>%
-  setView(-160, 68, zoom = 7.40) %>%
+  setView(-160, 68, zoom = 7) %>%
   addLegend('bottomright', 
             colors = colors.dt$trend.color, 
             labels = colors.dt$trend.cat,
             title = 'NDVImax trend',
             opacity = 1) %>%
   addScaleBar(options = scaleBarOptions(imperial = F))
-
 
 noatak.trend.map
 
