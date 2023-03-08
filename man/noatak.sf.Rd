@@ -8,27 +8,8 @@
 }
 \usage{data("noatak.sf")}
 \format{
-  A simple feature data frame with 1 observations on the following 20 variables.
+  A simple feature data frame with 1 observations on the following 1 variable.
   \describe{
-    \item{\code{OBJECTID}}{a numeric vector}
-    \item{\code{UNIT_CODE}}{a character vector}
-    \item{\code{GIS_Notes}}{a character vector}
-    \item{\code{UNIT_NAME}}{a character vector}
-    \item{\code{DATE_EDIT}}{a character vector}
-    \item{\code{STATE}}{a character vector}
-    \item{\code{REGION}}{a character vector}
-    \item{\code{GNIS_ID}}{a character vector}
-    \item{\code{UNIT_TYPE}}{a character vector}
-    \item{\code{CREATED_BY}}{a character vector}
-    \item{\code{METADATA}}{a character vector}
-    \item{\code{PARKNAME}}{a character vector}
-    \item{\code{CreationDa}}{a character vector}
-    \item{\code{Creator}}{a character vector}
-    \item{\code{EditDate}}{a character vector}
-    \item{\code{Editor}}{a character vector}
-    \item{\code{GlobalID}}{a character vector}
-    \item{\code{Shape_Leng}}{a numeric vector}
-    \item{\code{Shape_Area}}{a numeric vector}
     \item{\code{geometry}}{a sfc_MULTIPOLYGON}
   }
 }

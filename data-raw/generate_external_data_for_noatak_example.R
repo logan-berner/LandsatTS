@@ -22,6 +22,7 @@ unzip(zipfile = 'data-raw/tmp/nps_boundary.zip', exdir = 'data-raw/tmp/')
 parks.sf <- st_read('data-raw/tmp/nps_boundary.shp')
 noatak.sf <- parks.sf %>% filter(UNIT_NAME == 'Noatak National Preserve')
 noatak.sf <- noatak.sf %>% st_transform(crs = 4326)
+noatak.sf <- noatak.sf %>% select()
 
 # Save shapefile so it's accessible within package
 save(noatak.sf, file="data/noatak.sf.RData")
