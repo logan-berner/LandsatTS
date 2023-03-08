@@ -13,18 +13,18 @@
 #' season site using Landsat 7 and Landsat 5/8 data that were collected the same years. 
 #' Polynomial regression models from first to third order are trained to predict Landsat 7 reflectance 
 #' from Landsat 5/8 reflectance, the most parsimonious model is selected
-#' using BIC, and then that model is used to cross-calbirate the data.  
+#' using BIC, and then that model is used to cross-calibrate the data.  
 #' This approach is most suitable when working with data from 100s to preferably 1000s
-#' of sample samples.
+#' of samples.
 #'
 #' The specific steps to cross-calibrating sensors include:
 #' (1) Identify the years when both Landsat 7 and Landsat 5/8 measured surface reflectance
-#'       at a sample sample.
+#'       at a sample.
 #' (2) Pool the reflectance measurements across those years and compute 15-day moving median
 #'       reflectance over the course of the growing season for each sensor and sampling sample.
 #' (3) Exclude 15-day periods with fewer than a specified number of measurements from both
 #'       sets of sensors and then randomly select one remaining 15-day period from each 
-#'       sample sample.
+#'       sample.
 #' (4) Split the data into sets for model training and evaluation.
 #' (5) Train polynomial regression models that predict Landsat 7 reflectance based on Landsat 5/8 
 #'       reflectance. Model order (1st to 3rd) is selected using BIC.  

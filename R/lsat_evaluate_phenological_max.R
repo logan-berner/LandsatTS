@@ -3,7 +3,7 @@
 #' @description Assess how the number of annual Landsat measurements impacts 
 #' estimates of annual maximum vegetation greenness derived from raw measurements and
 #' phenological modeling. The algorithm computes annual maximum vegetation greenness 
-#' using site x years with a user-specific number of measurements and then compares 
+#' for each site using years with at least a user-specific number of measurements and then compares 
 #' these with estimates derived when using progressively smaller subsets of measurements. 
 #' This lets the user determine the degree to which annual estimates of maximum vegetation 
 #' greenness are impacted by the number of available measurements.
@@ -14,16 +14,16 @@
 #'  fraction of the maximum SI. In other words, an observation is considered to be from 
 #'  the "growing season" when the SI is within a user-specified fraction of the curve-fit 
 #'  growing season maximum SI.
-#' @param min.obs Minimum number of measurements needed for a site x year to be included 
+#' @param min.obs Minimum number of site-level measurements needed each year to be included 
 #'     in the evaluation (Default = 10).
 #' @param reps Number of times to bootstrap the assessment (Default = 10).
 #' @param zscore.thresh Numeric threshold specifying the Z-score value beyond which individual 
 #'     measurements are filtered before computing the maximum SI.
 #' @param outdir If desired, specify the output directory where evaluation data and figure 
-#'     should be written. If left as NA, then no output is only displayed in the console 
+#'     should be written. If left as NA, then output is only displayed in the console 
 #'     and not written to disk.
 #'
-#' @return A data.table and a figure summarizing how estimates of annnual maximum SI
+#' @return A data.table and a figure summarizing how estimates of annual maximum SI
 #'     vary with the number of Landsat measurements made during each growing season.  
 #' @import data.table
 #' @export lsat_evaluate_phenological_max
@@ -50,12 +50,12 @@ lsat_evaluate_phenological_max <- function(dt,
   # if desired, only use measurements from the growing season
   dt <- dt[spl.frac.max >= min.frac.of.max]
 
-  # get site x years with atleast the min number of measurements specificed
+  # for each site, get the years with at least the min number of measurements specified
   dt <- dt[, n.obs.gs := .N, by = c('sample.id','year')]
   dt <- dt[n.obs.gs > min.obs]
 
   # identify and filter out obs-level predictions of max si that are 
-  # anomalously high or low relative to other obs from that site x year
+  # anomalously high or low relative to other obs from that site and year
   dt <- dt[, ':='(avg = mean(si.max.pred), 
                   sd = stats::sd(si.max.pred), 
                   n=.N), 

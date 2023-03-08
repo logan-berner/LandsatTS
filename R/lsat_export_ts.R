@@ -2,20 +2,20 @@
 #'
 #' This function exports surface reflectance time series for a set of
 #' point-coordinates from the whole Landsat Collection 2 record using the Google
-#' Earth Engine. The resulting time-series can then be processed
-#' using the remainder of the lsatTS workflow.\cr\cr
+#' Earth Engine (GEE). The resulting time-series can then be processed
+#' using the remainder of the LandsatTS workflow.\cr\cr
 #' For polygon geometries consider using lsat_get_pixel_centers() to generate
 #' pixel center coordinates for all pixels within a given polygon first. \cr\cr
 #' Please note: Unlike other functions in this package, this function does
-#' NOT return the time-series as an object, instead it returns a list of the
-#' EE tasks issued for the export. The actual time-series are exported as CSV
-#' objects via the EE to the user's Google Drive. This way of exporting allows
+#' NOT return the time-series as an object, instead it returns a list of GEE
+#' tasks issued for the export. The actual time-series are exported as CSV
+#' objects via  GEE to the user's Google Drive. This way of exporting allows
 #' for a more efficient scheduling, larger exports, and does not require the R
 #' session to continue to run in the background while the requests are processed
-#' on the EE. \cr\cr
+#' on the GEE. \cr\cr
 #' The progress of the exports can be monitored using the list of tasks returned
 #' in combination with ee_monitoring() from the rgee package, or simply by
-#' using the task overview in the web code-editor of the EE
+#' using the task overview in the GEE web code-editor
 #' (https://code.earthengine.google.com).
 #'
 #' @param pixel_coords_sf Simple feature object of point coordinates for the
@@ -58,7 +58,7 @@
 #' library(dplyr)
 #' library(rgee)
 #'
-#' # Initialize EE
+#' # Initialize GEE
 #' ee_Initialize()
 #'
 #' # Generate test points
