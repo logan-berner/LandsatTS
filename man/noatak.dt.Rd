@@ -13,12 +13,12 @@ Earth Engine using the lsat_export_ts() function.
   \describe{
     \item{\samp{system:index}}{GEE index}
     \item{\code{CLOUD_COVER}}{Percent cloud cover of scene}
-    \item{\code{COLLECTION_NUMBER}}{a numeric vector}
+    \item{\code{COLLECTION_NUMBER}}{Landsat collection number}
     \item{\code{DATE_ACQUIRED}}{Acquisition date in yyyy-mm-dd format}
-    \item{\code{GEOMETRIC_RMSE_MODEL}}{a numeric vector}
+    \item{\code{GEOMETRIC_RMSE_MODEL}}{RMSE of geometric residuals in meters}
     \item{\code{LANDSAT_PRODUCT_ID}}{Landsat product identifier}
     \item{\code{LANDSAT_SCENE_ID}}{Landsat scene identifier}
-    \item{\code{PROCESSING_LEVEL}}{Processing level}
+    \item{\code{PROCESSING_LEVEL}}{Landsat processing level}
     \item{\code{QA_PIXEL}}{CFMASK pixel quality attribute bitmask}
     \item{\code{QA_RADSAT}}{Radiometric saturation bitmask}
     \item{\code{SPACECRAFT_ID}}{Name of the spacecraft}
