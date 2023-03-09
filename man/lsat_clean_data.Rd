@@ -27,7 +27,7 @@ lsat_clean_data(
 
 \item{filter.cfmask.water}{(TRUE/FALSE) Remove measurements with CFmask flag = water.}
 
-\item{filter.jrc.water}{(TRUE/FALSE) Remove sample sites that were ever innundated
+\item{filter.jrc.water}{(TRUE/FALSE) Remove sample sites that were ever inundated
 based on the maximum surface water extent variable from the
 JRC Global Surface Water Dataset.}
 }
@@ -39,10 +39,10 @@ This function enables users to filter out surface reflectance
 measurements that exhibit:
 (1) clouds, cloud shadows, snow, or water flagged by the CFMask algorithm;
 (2) surface water over the Landsat record;
-(2) impossibly high reflectance (>1.0) and abnormally low reflectance (<0.005);
-(3) scene cloud cover above a user-defined threshold;
-(4) geometric uncertainty above a user-defined threshold;
-(5) solar zenith angle above a user-defined threshold.
+(3) impossibly high reflectance (>1.0) and abnormally low reflectance (<0.005);
+(4) scene cloud cover above a user-defined threshold;
+(5) geometric uncertainty above a user-defined threshold;
+(6) solar zenith angle above a user-defined threshold.
 }
 \examples{
 data(lsat.example.dt)

@@ -18,7 +18,7 @@ The input data.table with an appended column containing the spectral index.
 This function computes some widely used spectral vegetation indices.
 Only one index can be computed at a time. Current indices include the:
 Normalized Difference Vegetation Index (NDVI; Rouse et al. 1974),
-kernel NDVI (kNDVI; Camp-Valls et al. 2020),
+kernel NDVI (kNDVI; Camps-Valls et al. 2020),
 Green NDVI (gNDVI; Gitelson and Merzlyak 1998),
 Soil Adjusted Vegetation Index (SAVI; Huete 1998),
 Wide Dynamic Range Vegetation Index (WDRVI; Gitelson 2004),

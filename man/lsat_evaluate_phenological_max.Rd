@@ -28,24 +28,24 @@ growing season maximum SI.}
 \item{zscore.thresh}{Numeric threshold specifying the Z-score value beyond which individual
 measurements are filtered before computing the maximum SI.}
 
-\item{min.obs}{Minimum number of measurements needed for a site x year to be included
+\item{min.obs}{Minimum number of site-level measurements needed each year to be included
 in the evaluation (Default = 10).}
 
 \item{reps}{Number of times to bootstrap the assessment (Default = 10).}
 
 \item{outdir}{If desired, specify the output directory where evaluation data and figure
-should be written. If left as NA, then no output is only displayed in the console
+should be written. If left as NA, then output is only displayed in the console
 and not written to disk.}
 }
 \value{
-A data.table and a figure summarizing how estimates of annnual maximum SI
+A data.table and a figure summarizing how estimates of annual maximum SI
 vary with the number of Landsat measurements made during each growing season.
 }
 \description{
 Assess how the number of annual Landsat measurements impacts
 estimates of annual maximum vegetation greenness derived from raw measurements and
 phenological modeling. The algorithm computes annual maximum vegetation greenness
-using site x years with a user-specific number of measurements and then compares
+for each site using years with at least a user-specific number of measurements and then compares
 these with estimates derived when using progressively smaller subsets of measurements.
 This lets the user determine the degree to which annual estimates of maximum vegetation
 greenness are impacted by the number of available measurements.
