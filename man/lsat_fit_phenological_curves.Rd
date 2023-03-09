@@ -39,7 +39,7 @@ function will error out if provided negative values.}
 \item{spar}{Smoothing parameter typically around 0.70 - 0.80 for this application.
 A higher value means a less flexible spline. Defaults to 0.78.}
 
-\item{pcnt.dif.thresh}{Vector with two numbers that specifcy the allowable
+\item{pcnt.dif.thresh}{Vector with two numbers that specify the allowable
 negative and positive percent difference between individual
 observations and fitted cubic spline. Observations that differ by more than
 these thresholds are filtered out and the cubic spline is iteratively refit.
