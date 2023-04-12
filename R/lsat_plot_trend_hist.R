@@ -28,7 +28,7 @@ lsat_plot_trend_hist <- function(dt, xlim = c(-30,30)){
   last.yr <-  period[2]
   
   # histogram of vegetation greenness trends
-  hist <- ggplot2::ggplot(dt, ggplot2::aes(total.change.pcnt, fill=after_stat(x))) +
+  hist <- ggplot2::ggplot(dt, ggplot2::aes(total.change.pcnt, fill=ggplot2::after_stat(x))) +
   ggplot2::geom_histogram(bins = 50, size = 0.25, color = 'gray20') +
   ggplot2::scale_fill_gradient2(low="darkgoldenrod4", mid='white', high="darkgreen", 
                                 limits = xlim, midpoint = 0) +
