@@ -88,7 +88,7 @@ lsat_get_pixels_in_buffer <- function(point_coord_sf,
   point_list <- point_coord_sf %>%
     split(pull(point_coord_sf, sample_id_from))
   pixel_coords_sf_buffered <-  parallel::parLapply(point_list,
-                      lsatTS::lsat_get_pixel_centers,
+                      lsat_get_pixel_centers,
                       buffer = buffer_dist + 15,
                       pixel_prefix_from = sample_id_from,
                       cl = cl) %>%
