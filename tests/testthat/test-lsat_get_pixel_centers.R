@@ -19,8 +19,8 @@ test_that("lsat_get_pixel_centers basic functionality works", {
     sf::st_sfc(crs = 4326) %>%
     sf::st_sf()
 
-  # Get pixel coordinates
-  test_pixels_poly <- lsat_get_pixel_centers(test_poly_sf)
+  # Get pixel coordinates, suppressing first warning that the WRS2 grid file was not supplied
+  suppressWarnings(test_pixels_poly <- lsat_get_pixel_centers(test_poly_sf))
   test_pixels_point_buffered <- lsat_get_pixel_centers(test_point_sf, buffer = 45)
 
   # # Cache control data
