@@ -211,24 +211,24 @@ lsat_export_ts <- function(pixel_coords_sf,
   # lsat_get_pixel_centers
   if(buffer_dist > 0){
     pixel_coords_sf_buffered <- pixel_coords_sf %>%
-      split(st_drop_geometry(pixel_coords_sf)[,sample_id_from]) %>%
+      split(sf::st_drop_geometry(pixel_coords_sf)[,sample_id_from]) %>%
       purrr::map(lsat_get_pixel_centers,
                  buffer = buffer_dist + 15,
                  pixel_prefix_from = sample_id_from) %>%
-      bind_rows()
+      dplyr::bind_rows()
     # re-add chunks_from column to data frame
     pixel_coords_sf_buffered$sample_id_original <-
       gsub("(.*)_[0-9]*$",
            "\\1",
-           st_drop_geometry(pixel_coords_sf_buffered)[,"sample_id"])
+           sf::st_drop_geometry(pixel_coords_sf_buffered)[,"sample_id"])
     names(pixel_coords_sf_buffered)[
       names(pixel_coords_sf_buffered) == "sample_id_original"] <-
       paste0(sample_id_from, "_original")
     names(pixel_coords_sf)[names(pixel_coords_sf) == sample_id_from] <-
       paste0(sample_id_from, "_original")
     pixel_coords_sf_buffered <- pixel_coords_sf %>%
-      st_drop_geometry() %>%
-      full_join(pixel_coords_sf_buffered, .)
+      sf::st_drop_geometry() %>%
+      dplyr::full_join(pixel_coords_sf_buffered, .)
     pixel_coords_sf <- pixel_coords_sf_buffered
   }
 
