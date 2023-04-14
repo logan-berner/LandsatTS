@@ -25,7 +25,7 @@ Authors@R:
            comment = c(ORCID = "0000-0002-6326-4308"))
            )
 Description: This software package facilitates sample-based time series analysis of surface reflectance and spectral indices derived from sensors on the Landsat satellites. The package includes functions that enable extraction of the full Landsat record for point sample locations or small study regions using Google Earth Engine directly accessed from R. Moreover, the package includes functions for (1) data cleaning, (2) cross-sensor calibration, (3) phenological modeling, and (4) time series analysis.
-License: Modified MIT
+License: Modified MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
