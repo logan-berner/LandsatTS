@@ -75,7 +75,7 @@ lsat_get_pixels_in_buffer <- function(point_coord_sf,
     cl <- parallel::makeCluster(n_threads)
     parallel::clusterEvalQ(cl, {
       library(rgee)
-      ee_Initialize()
+      rgee::ee_Initialize()
     })
     cat(" cluster prepared.\n")
   } else { # If no parallel processing was requested set cluster to NULL
