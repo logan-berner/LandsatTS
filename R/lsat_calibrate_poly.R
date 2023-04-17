@@ -87,8 +87,6 @@ lsat_calibrate_poly <- function(dt,
                                 outfile.id=band.or.si,
                                 outdir = NA){
   
-  library(broom)
-  
   # IDENTIFY SATELLITES, BUILD OUTPUT LISTS AND DATA FRAMES, ETC ==============
   dt <- data.table::data.table(dt)
   sats <- dt[,unique(satellite)] # which satellites are in the data set?
@@ -266,7 +264,7 @@ lsat_calibrate_poly <- function(dt,
       poly.lm.lst[[ii]] <- poly.lm
     }
     poly.lm <- poly.lm.lst[[which.min(aic.lst)]]
-    poly.coef <- tidy(poly.lm)
+    poly.coef <- broom::tidy(poly.lm)
     poly.coef[,2:3] <- round(poly.coef[,2:3],4)
     
     # store model coefficients
