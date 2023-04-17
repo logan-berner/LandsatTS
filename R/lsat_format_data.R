@@ -27,7 +27,7 @@ lsat_format_data <- function(dt){
   colnames(dt) <- gsub("_", ".", colnames(dt))
 
   # identify satellite
-  setnames(dt, 'spacecraft.id','satellite')
+  data.table::setnames(dt, 'spacecraft.id','satellite')
 
   # parse year and day of year
   dt[, date.acquired := data.table::as.IDate(date.acquired)] # incase file read using read.csv

@@ -96,7 +96,7 @@ lsat_calc_trend <- function(dt,
   
   # create output message about average relative change 
   avg <- round(mean(trend.dt$total.change.pcnt),2)
-  std <- round(sd(trend.dt$total.change.pcnt),2)
+  std <- round(stats::sd(trend.dt$total.change.pcnt),2)
   print.avg.msg <- paste0("Mean (SD) relative change of ", avg,
                           " (", std, ") % across the ", nrow(trend.dt), 
                           ' sample sites')

@@ -132,7 +132,7 @@ lsat_calibrate_rf <- function(dt,
       sample.yr.dt <- data.table::dcast.data.table(sample.yr.dt, 
                                                    sample.id + year ~ satellite, 
                                                    value.var = 'year')
-      sample.yr.dt <- na.omit(sample.yr.dt)
+      sample.yr.dt <- stats::na.omit(sample.yr.dt)
       sample.yr.dt <- data.table::melt.data.table(sample.yr.dt, 
                                                   id = "sample.id", 
                                                   measure = c("LANDSAT_7",i),
@@ -220,7 +220,7 @@ lsat_calibrate_rf <- function(dt,
     }
     
     # compute median band.or.si / VI value for the 15-day seasonal window at each sample
-    rf.data.dt <- xcal.dt[, .(mov.med=median(get(band.or.si), na.rm=T)),
+    rf.data.dt <- xcal.dt[, .(mov.med=stats::median(get(band.or.si), na.rm=T)),
                           by = c('sample.id','satellite','focal.doy')]
     rf.data.dt <- data.table::setnames(rf.data.dt, 'focal.doy','doy')
     rf.data.dt <- data.table::dcast.data.table(rf.data.dt,
@@ -286,16 +286,16 @@ lsat_calibrate_rf <- function(dt,
     orig.vals <- rf.eval.dt[[band.or.si]]
     xcal.vals <- rf.eval.dt[[paste('LANDSAT_7.', band.or.si, '.pred', sep='')]]
     
-    uncal.bias <- round(median(orig.vals - target.vals), 3)
-    uncal.bias.pcnt <- round(median((orig.vals - target.vals) / target.vals * 100), 1)
+    uncal.bias <- round(stats::median(orig.vals - target.vals), 3)
+    uncal.bias.pcnt <- round(stats::median((orig.vals - target.vals) / target.vals * 100), 1)
     
     lm.form <- stats::formula(paste("LANDSAT_7.", band.or.si, ' ~ LANDSAT_7.',
                                     band.or.si,'.pred', sep=''))
     xval.lm.smry <- summary(stats::lm(lm.form, rf.eval.dt))
     
     xval.rmse <- round(sqrt(mean((target.vals - xcal.vals)^2)),3)
-    xval.bias <- round(median(xcal.vals - target.vals), 3)
-    xval.bias.pcnt <- round(median((xcal.vals - target.vals) / target.vals * 100), 1)
+    xval.bias <- round(stats::median(xcal.vals - target.vals), 3)
+    xval.bias.pcnt <- round(stats::median((xcal.vals - target.vals) / target.vals * 100), 1)
     
     model.eval.df$band.or.si <- band.or.si
     model.eval.df$uncal.bias[model.eval.df$sat == i] <- uncal.bias

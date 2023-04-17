@@ -23,7 +23,7 @@ lsat_summarize_data <- function(dt){
 
   # summarize data availability for each site
   yr.dt <- dt[, .(n.obs = .N), by = c('sample.id','year')]
-  full.fac <- data.table(expand.grid(sample.id = unique(yr.dt$sample.id), year = min(yr.dt$year):max(yr.dt$year)))
+  full.fac <- data.table::data.table(expand.grid(sample.id = unique(yr.dt$sample.id), year = min(yr.dt$year):max(yr.dt$year)))
   yr.dt <- yr.dt[full.fac, on = c('sample.id','year')]
   yr.dt <- yr.dt[is.na(n.obs), n.obs := 0]
   
@@ -40,13 +40,13 @@ lsat_summarize_data <- function(dt){
   
   # summarize number of observations by sample site, year, and satellite  
   yr.sat.dt <- dt[, .(n.obs = .N), by = c('sample.id','year','satellite')]
-  full.fac <- data.table(expand.grid(sample.id = unique(yr.sat.dt$sample.id), year = min(yr.sat.dt$year):max(yr.sat.dt$year), satellite = unique(yr.sat.dt$satellite)))
+  full.fac <- data.table::data.table(expand.grid(sample.id = unique(yr.sat.dt$sample.id), year = min(yr.sat.dt$year):max(yr.sat.dt$year), satellite = unique(yr.sat.dt$satellite)))
   yr.sat.dt <- yr.sat.dt[full.fac, on = c('sample.id','year','satellite')]
   yr.sat.dt <- yr.sat.dt[is.na(n.obs), n.obs := 0]
   
-  yr.sat.smry.dt <- yr.sat.dt[, .(n.q025 = quantile(n.obs, 0.025),
-                                  n.q500 = quantile(n.obs, 0.500),
-                                  n.q975 = quantile(n.obs, 0.975)),
+  yr.sat.smry.dt <- yr.sat.dt[, .(n.q025 = stats::quantile(n.obs, 0.025),
+                                  n.q500 = stats::quantile(n.obs, 0.500),
+                                  n.q975 = stats::quantile(n.obs, 0.975)),
                               by = c('year','satellite')]
   
   yr.sat.smry.dt <- rbind(yr.sat.smry.dt[satellite == 'LANDSAT_5' & year <= 2013],

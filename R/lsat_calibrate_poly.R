@@ -131,7 +131,7 @@ lsat_calibrate_poly <- function(dt,
       sample.yr.dt <- data.table::dcast.data.table(sample.yr.dt, 
                                                    sample.id + year ~ satellite, 
                                                    value.var = 'year')
-      sample.yr.dt <- na.omit(sample.yr.dt)
+      sample.yr.dt <- stats::na.omit(sample.yr.dt)
       sample.yr.dt <- data.table::melt.data.table(sample.yr.dt, 
                                                   id = "sample.id", 
                                                   measure = c("LANDSAT_7",i),
@@ -222,7 +222,7 @@ lsat_calibrate_poly <- function(dt,
     }
     
     # compute median band.or.si / VI value for the 15-day seasonal window at each sample
-    nlm.data.dt <- xcal.dt[, .(mov.med=median(get(band.or.si), na.rm=T)),
+    nlm.data.dt <- xcal.dt[, .(mov.med=stats::median(get(band.or.si), na.rm=T)),
                            by = c('sample.id','satellite','focal.doy')]
     nlm.data.dt <- data.table::setnames(nlm.data.dt, 'focal.doy','doy')
     nlm.data.dt <- data.table::dcast.data.table(nlm.data.dt,
@@ -259,8 +259,8 @@ lsat_calibrate_poly <- function(dt,
       # form.rhs <- paste('poly(',eval(band.or.si),',', ii,')', sep = '')
       form.rhs <- paste('poly(',eval(band.or.si),',', ii,', raw = T)', sep = '')
       model.form <- stats::formula(paste(form.lhs, form.rhs, sep=''))
-      poly.lm <- lm(model.form, data = train.dt)
-      aic.lst[[ii]] <- BIC(poly.lm)
+      poly.lm <- stats::lm(model.form, data = train.dt)
+      aic.lst[[ii]] <- stats::BIC(poly.lm)
       poly.lm.lst[[ii]] <- poly.lm
     }
     poly.lm <- poly.lm.lst[[which.min(aic.lst)]]
@@ -292,16 +292,16 @@ lsat_calibrate_poly <- function(dt,
     xcal.vals <- eval.dt[[paste('LANDSAT_7.', band.or.si, '.pred', sep='')]]
     
     uncal.rmse <- round(sqrt(mean((target.vals - uncal.vals)^2)),3)
-    uncal.bias <- round(median(uncal.vals - target.vals), 3)
-    uncal.bias.pcnt <- round(median((uncal.vals - target.vals) / target.vals * 100), 1)
+    uncal.bias <- round(stats::median(uncal.vals - target.vals), 3)
+    uncal.bias.pcnt <- round(stats::median((uncal.vals - target.vals) / target.vals * 100), 1)
     
     lm.form <- stats::formula(paste("LANDSAT_7.", band.or.si, ' ~ LANDSAT_7.',
                                     band.or.si,'.pred', sep=''))
     xcal.lm.smry <- summary(stats::lm(lm.form, eval.dt))
     
     xcal.rmse <- round(sqrt(mean((target.vals - xcal.vals)^2)),3)
-    xcal.bias <- round(median(xcal.vals - target.vals), 3)
-    xcal.bias.pcnt <- round(median((xcal.vals - target.vals) / target.vals * 100), 1)
+    xcal.bias <- round(stats::median(xcal.vals - target.vals), 3)
+    xcal.bias.pcnt <- round(stats::median((xcal.vals - target.vals) / target.vals * 100), 1)
     
     model.eval.df$band.or.si[model.eval.df$satellite == i] <- band.or.si
     model.eval.df$train.n.sites[model.eval.df$satellite == i] <- nrow(train.dt)
