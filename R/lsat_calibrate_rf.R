@@ -243,7 +243,7 @@ lsat_calibrate_rf <- function(dt,
     add.predictors <- c(add.predictors, 'latitude','longitude')
     add.preds.dt <- xcal.dt[, lapply(.SD, first), by = sample.id, .SDcols = add.predictors]
     rf.data.dt <- rf.data.dt[add.preds.dt, on = 'sample.id']
-    rf.data.dt <- na.omit(rf.data.dt)
+    rf.data.dt <- stats::na.omit(rf.data.dt)
     
     # subset samples for training and evaluation data
     samples <- unique(rf.data.dt$sample.id)

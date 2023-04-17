@@ -57,10 +57,10 @@ lsat_evaluate_phenological_max <- function(dt,
   # identify and filter out obs-level predictions of max si that are 
   # anomalously high or low relative to other obs from that site and year
   dt <- dt[, ':='(avg = mean(si.max.pred), 
-                  sd = stats::sd(si.max.pred), 
+                  std = stats::sd(si.max.pred), 
                   n=.N), 
            by = c('sample.id','year')]
-  dt <- dt[, abs.zscore := abs((si.max.pred - avg )/sd)]
+  dt <- dt[, abs.zscore := abs((si.max.pred - avg )/std)]
   dt <- dt[abs.zscore <= zscore.thresh]
 
   # compute max observed si (actually 90% percentile to avoid spuriously high values)
@@ -86,7 +86,7 @@ lsat_evaluate_phenological_max <- function(dt,
   }
 
   eval.dt <- data.table::rbindlist(out.list)
-  eval.dt <- na.omit(eval.dt)
+  eval.dt <- stats::na.omit(eval.dt)
 
   # summarize across iterations
   eval.smry.dt <- eval.dt[,.(si.uncor.pcntdif.med = stats::median(si.uncor.pcntdif, na.rm=T), 

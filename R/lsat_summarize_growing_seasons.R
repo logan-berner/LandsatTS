@@ -36,8 +36,8 @@ lsat_summarize_growing_seasons = function(dt, si, min.frac.of.max = 0.75, zscore
   dt <- dt[spl.frac.max >= min.frac.of.max]
 
   # identify and filter out obs-level predictions of max si that are anomalously high or low relative to other obs from that site x year
-  dt <- dt[, ':='(avg = mean(si.max.pred), sd = stats::sd(si.max.pred), n=.N), by = c('sample.id','year')]
-  dt <- dt[, abs.zscore := abs((si.max.pred - avg )/sd)]
+  dt <- dt[, ':='(avg = mean(si.max.pred), std = stats::sd(si.max.pred), n=.N), by = c('sample.id','year')]
+  dt <- dt[, abs.zscore := abs((si.max.pred - avg )/std)]
   dt <- dt[abs.zscore <= zscore.thresh]
 
   #  estimate max summer si
