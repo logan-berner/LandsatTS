@@ -389,7 +389,7 @@ lsat_calibrate_rf <- function(dt,
   # (optional) save model evaluation summary table
   if (write.output == T){
     outfile <- paste(outdir, '/', outfile.id, '_xcal_rf_eval.csv', sep='')
-    write.table(model.eval.df, outfile, sep = ',', row.names = F, col.names = T)
+    utils::write.table(model.eval.df, outfile, sep = ',', row.names = F, col.names = T)
   }
   
   # fill in xcal column values for Landsat 7 using original values

@@ -395,10 +395,10 @@ lsat_calibrate_poly <- function(dt,
   # (optional) save model coefficients and evaluation summary tables
   if (write.output == T){
     outfile <- paste(outdir, '/', outfile.id, '_xcal_regression_coefs.csv', sep='')
-    write.table(model.coef.df, outfile, sep = ',', row.names = F, col.names = T)
+    utils::write.table(model.coef.df, outfile, sep = ',', row.names = F, col.names = T)
     
     outfile <- paste(outdir, '/', outfile.id, '_xcal_evaluation.csv', sep='')
-    write.table(model.eval.df, outfile, sep = ',', row.names = F, col.names = T)
+    utils::write.table(model.eval.df, outfile, sep = ',', row.names = F, col.names = T)
   }
   
   # fill in xcal column values for Landsat 7 using uncalibrated values
