@@ -1,6 +1,6 @@
 Package: LandsatTS
 Title: An R package to facilitate retrieval, cleaning, cross-calibration, and phenological modeling of Landsat time-series data
-Version: 1.1.0
+Version: 1.1.1
 Authors@R:
     c(
     person(given = "Logan T.",
@@ -33,7 +33,5 @@ RoxygenNote: 7.2.3
 Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Imports:
-    magrittr, dplyr, rgee, sf, geojsonio, crayon, mapview, purrr, data.table, ggplot2, R.utils, stats, stringr, ggpubr, ranger, zoo, zyp, broom
-Depends:
-    R (>= 3.50)
+Imports: magrittr, dplyr, rgee, sf, geojsonio, crayon, mapview, purrr, data.table, ggplot2, R.utils, stats, stringr, ggpubr, ranger, zoo, zyp, broom
+Depends: R (>= 3.50)
