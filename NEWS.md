@@ -1,5 +1,11 @@
 # LandsatTS changelog
 
+## 1.1.1 (released: 2023-04-18)
+- Fixed NAMESPACE issues
+- Compressed RDA files to reduce package size
+- Made more function calls explicit
+- Defined a set of global variables
+
 ## 1.1.0 (released: 2022-12-07)
 - Changed package name from lsatTS to LandsatTS
 - Added function lsat_calibrate_poly()
