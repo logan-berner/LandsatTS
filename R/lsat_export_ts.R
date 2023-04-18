@@ -46,7 +46,7 @@
 #'   size.
 #' @param mask_value Optional masking value for global surface water mask.
 #'   Defaults to 0.
-#'
+#' @import geojsonio
 #' @return List of initiated rgee tasks.
 #'
 #' @author Jakob J. Assmann and Richard Massey
