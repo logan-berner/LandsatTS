@@ -31,7 +31,10 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests:
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: magrittr, dplyr, rgee, sf, geojsonio, crayon, mapview, purrr, data.table, ggplot2, R.utils, stats, stringr, ggpubr, ranger, zoo, zyp, broom
 Depends: R (>= 3.50)
+VignetteBuilder: knitr

@@ -7,3 +7,6 @@
 data-raw/earth_engine_export/
 man/manuscript/output/
 man/manuscript/obsolete/
+inst/doc
+/doc/
+/Meta/
