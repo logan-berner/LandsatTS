@@ -1,8 +1,8 @@
 ---
 title: "LandsatTS vignette"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: rmarkdown::html_vignette
-# output: pdf_document
+# output: rmarkdown::html_vignette
+output: pdf_document
 vignette: >
   %\VignetteIndexEntry{LandsatTS}
   %\VignetteEngine{knitr::rmarkdown}
@@ -47,7 +47,7 @@ You can install the package using `devtools` as follows:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("logan-berner/LandsatTS")
+devtools::install_github("logan-berner/LandsatTS", build_vignettes = TRUE)
 ```
 
 For the preparation and extractions scripts you will also have to make sure you have the `rgee` package installed, fully  configured and the Earth Engine initialized for the current R session. You can find out how to do that on the [rgee website](https://r-spatial.github.io/rgee/).   
