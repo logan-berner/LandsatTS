@@ -42,7 +42,7 @@ You can install the package using `devtools` as follows:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("logan-berner/LandsatTS")
+devtools::install_github("logan-berner/LandsatTS", build_vignettes = TRUE)
 ```
 
 For the preparation and extractions scripts you will also have to make
