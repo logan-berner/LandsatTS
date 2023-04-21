@@ -69,6 +69,9 @@ a warning by the sf package that the coordinates are assumed to be planar.
 This can be ignored.
 }
 \examples{
+# Only run example if "rgee" is installed
+if (requireNamespace("rgee", quietly = TRUE)) { 
+
 # Using sf, dplyr, rgee and purr
 library(sf)
 library(dplyr)
@@ -124,6 +127,8 @@ pixel_list <- test_regions_sf \%>\%
        pixel_prefix_from = "region") \%>\%
    bind_rows()
 
+# Closing bracket for the "rgee" check   
+}
 }
 \author{
 Jakob J. Assmann

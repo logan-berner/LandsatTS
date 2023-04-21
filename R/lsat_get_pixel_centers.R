@@ -52,6 +52,9 @@
 #' @export lsat_get_pixel_centers
 #'
 #' @examples
+#' # Only run example if "rgee" is installed
+#' if (requireNamespace("rgee", quietly = TRUE)) { 
+#' 
 #' # Using sf, dplyr, rgee and purr
 #' library(sf)
 #' library(dplyr)
@@ -106,7 +109,9 @@
 #'    map(lsat_get_pixel_centers,
 #'        pixel_prefix_from = "region") %>%
 #'    bind_rows()
-#'
+#' 
+#' # Closing bracket for the "rgee" check   
+#' }
 lsat_get_pixel_centers <- function(polygon_sf,
                                    pixel_prefix = "pixel",
                                    pixel_prefix_from = NULL,

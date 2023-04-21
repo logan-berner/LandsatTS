@@ -1,4 +1,7 @@
 test_that("lsat_export_ts basic functionality works", {
+  # Skip test if rgee is not installed (requested by reviewer)
+  skip_if_not_installed("rgee")
+  
   # Initialize rgee
   rgee::ee_Initialize()
 

@@ -53,6 +53,9 @@
 #' @export lsat_export_ts
 #'
 #' @examples
+#' # Only run example if "rgee" is installed
+#' if (requireNamespace("rgee", quietly = TRUE)) { 
+#' 
 #' # Using sf, dplyr and rgee
 #' library(sf)
 #' library(dplyr)
@@ -87,6 +90,9 @@
 #'
 #' # Export time-series in chunks by column
 #' task_list <- lsat_export_ts(test_points_sf, chunks_from = "region")
+#' 
+#' # Closing bracket for the "rgee" check   
+#' }
 
 lsat_export_ts <- function(pixel_coords_sf,
                              sample_id_from = "sample_id",

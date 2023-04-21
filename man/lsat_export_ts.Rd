@@ -87,6 +87,9 @@ using the task overview in the GEE web code-editor
 (https://code.earthengine.google.com).
 }
 \examples{
+# Only run example if "rgee" is installed
+if (requireNamespace("rgee", quietly = TRUE)) { 
+
 # Using sf, dplyr and rgee
 library(sf)
 library(dplyr)
@@ -121,6 +124,9 @@ task_list <- lsat_export_ts(test_points_sf, max_chunk_size = 2)
 
 # Export time-series in chunks by column
 task_list <- lsat_export_ts(test_points_sf, chunks_from = "region")
+
+# Closing bracket for the "rgee" check   
+}
 }
 \author{
 Jakob J. Assmann and Richard Massey
