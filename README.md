@@ -12,13 +12,13 @@
 
 The **LandsatTS** package helps you to:
 
--   Export whole Landsat 5, 7, and 8 time series records based on point
-    coordinates (“sites”).
--   Quality screen surface reflectance measurements from Landsat.
--   Cross-calibrate surface reflectance measurements and vegetation
-    indices among Landsat sensors.
--   Quantify growing season characteristics using Landsat time series
-    (e.g., annual maximum NDVI).
+- Export whole Landsat 5, 7, and 8 time series records based on point
+  coordinates (“sites”).
+- Quality screen surface reflectance measurements from Landsat.
+- Cross-calibrate surface reflectance measurements and vegetation
+  indices among Landsat sensors.
+- Quantify growing season characteristics using Landsat time series
+  (e.g., annual maximum NDVI).
 
 ## Content
 
@@ -377,7 +377,7 @@ the same years. A Random Forest model is then trained to predict Landsat
 Landsat 5 and 8, then the function will train a Random Forest model for
 each sensor. Please note that for analyses focused on Arctic or boreal
 regions, there in an option to train the Random Forest models use an
-internal dataset of reflectance measurements from \~6,000 random sample
+internal dataset of reflectance measurements from ~6,000 random sample
 sites. This is accomplished by setting train.with.highlat.data = T. By
 default, `lsat_calibrate_rf()` will add a new column with the
 cross-calibrated data (\[band\].xcal); however, the function will
@@ -493,17 +493,11 @@ lsat.trnds.dt <- lsat_calc_trend(lsat.gs.dt, si = 'ndvi.max', 2000:2020, sig = 0
 
 When using this package please cite:
 
-Logan T. Berner, Jakob J. Assmann, Richard Massey, Signe Normand and
-Scott J. Goetz. 2021. LandsatTS: an R package to facilitate retrieval,
-cleaning, cross-calibration, and phenological modeling of Landsat
-time-series data. <https://github.com/logan-berner/LandsatTS>.
-
-Also please consider citing the peer-reviewed publication for which much
-of this code was developed:
-
-Berner, L.T., et al. 2020. Summer Warming Explains Widespread but Not
-Uniform Greening in the Arctic Tundra Biome. Nature Communications 11,
-no. 1: 4621. <https://doi.org/10.1038/s41467-020-18479-5>.
+Berner, L.T., Assmann, J.J., Normand, S. and Goetz, S.J. 2023.
+LandsatTS: an R package to facilitate retrieval, cleaning,
+cross-calibration, and phenological modeling of Landsat time-series
+data. Ecography, e06768, <a href="https://doi.org:10.1111/ecog.06768"
+class="uri">https://doi.org:10.1111/ecog.06768</a>.
 
 [$$to top$$](#content)
 
