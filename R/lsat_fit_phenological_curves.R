@@ -251,6 +251,7 @@ lsat_fit_phenological_curves = function(dt,
                                 'si.max.pred'))
   
   # OUTPUT FIGURE
+  n.sites <- length(unique(dt$sample.id))
   if (n.sites > 9){
     example.ids <- sample(unique(dt$sample.id), 9, replace = F)
   } else {
