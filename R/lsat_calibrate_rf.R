@@ -366,7 +366,7 @@ lsat_calibrate_rf <- function(dt,
   
   # write out fig or save to list to write later if calibrating more than one satellite
   if (length(sats) == 1){
-    fig <- fig.list[[1]]
+    fig <- fig.lst[[1]]
     if (write.output == T){
       fig.name <- paste(outdir, '/', outfile.id, '_', i, '_xval_pred_vs_obs.jpg', sep='')
       grDevices::jpeg(fig.name, 4, 4, units = 'in', res=400)
