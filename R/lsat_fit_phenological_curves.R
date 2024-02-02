@@ -42,6 +42,7 @@
 #' @param progress (TRUE/FALSE) Print a progress report?
 #' @param test.run (TRUE/FALSE) If TRUE, then algorithm is run using a small random 
 #'     subset of data and only a figure is output. This is used for model parameterization.
+#' @param plot.title (Optional) Custom title for output figure.
 #' @return Data.table that provides, for each observation, information on the phenological 
 #'     conditions for that specific day of year during the focal period. 
 #'     These data can then be used to estimate annual maximum spectral index 
@@ -71,7 +72,8 @@ lsat_fit_phenological_curves = function(dt,
                                         weight=TRUE, 
                                         spl.fit.outfile=FALSE, 
                                         progress=TRUE, 
-                                        test.run=FALSE){
+                                        test.run=FALSE,
+                                        plot.title=NA){
   dt <- data.table::data.table(dt)
   dt[, obs.id := 1:nrow(dt)]
   obs.filtered <- c()
@@ -260,9 +262,15 @@ lsat_fit_phenological_curves = function(dt,
   example.obs.dt <- dt[sample.id %in% example.ids]
   example.curves.dt <- spline.dt[sample.id %in% example.ids]
   
+  if(is.na(plot.title) & n.sites > 9){
+    plot.title <- 'Phenological curve fits for nine random sample locations'
+  } else if (is.na(plot.title) & n.sites <= 9) {
+    plot.title = 'Phenological curve fits'
+  }
+  
   fig <- ggplot2::ggplot(example.obs.dt, ggplot2::aes(doy, si)) + 
     ggplot2::labs(y=paste0('Landsat ', toupper(si)), x='Day of Year') + 
-    ggplot2::ggtitle('Nine random sample locations') + 
+    ggplot2::ggtitle(plot.title) + 
     ggplot2::facet_wrap(~sample.id, nrow = 3, ncol = 3, scales = 'free_y') + 
     ggplot2::geom_point(ggplot2::aes(fill = year), pch=21, color = 'black', size = 2) + 
     ggplot2::scale_fill_gradientn(name = 'Observation', colours = c('blue','red','gold')) + 
