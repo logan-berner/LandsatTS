@@ -15,7 +15,8 @@ lsat_fit_phenological_curves(
   weight = TRUE,
   spl.fit.outfile = FALSE,
   progress = TRUE,
-  test.run = FALSE
+  test.run = FALSE,
+  plot.title = NA
 )
 }
 \arguments{
@@ -56,6 +57,8 @@ cubic splines for each sample site. Useful for subsequent visualization.}
 
 \item{test.run}{(TRUE/FALSE) If TRUE, then algorithm is run using a small random
 subset of data and only a figure is output. This is used for model parameterization.}
+
+\item{plot.title}{(Optional) Custom title for output figure.}
 }
 \value{
 Data.table that provides, for each observation, information on the phenological
