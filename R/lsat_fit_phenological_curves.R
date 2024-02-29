@@ -228,6 +228,7 @@ lsat_fit_phenological_curves = function(dt,
     focal.dt <- spline.fits.dt[focal.dt, on = c('sample.id','doy')]
     focal.dt <- focal.dt[, si.max.pred := si + si.adjustment]
     focal.dt <- focal.dt[, c('focal.yr') := NULL]
+    focal.dt <- focal.dt[year == focal.yr]
     setnames(focal.dt, c('n.obs.focal.win'),c('spl.n.obs'))
     
     # ADD PHENOLOGY DATA TO MAIN DATA TABLE
