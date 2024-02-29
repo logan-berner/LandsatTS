@@ -1,5 +1,9 @@
 # LandsatTS changelog
 
+## 1.2.1 (released: 2024-02-28)
+- Fixed error in lsat_fit_phenological_curves() that caused all observations from a focal period to be returned instead of only observations from a specific focal year. Subsequent testing showed strong correlation (mean r = 0.95, n = 100) between NDVImax time series before and after the fix.
+- Updated help file for lsat_calibrate_poly() 
+
 ## 1.1.1 (released: 2023-04-18)
 - Fixed NAMESPACE issues
 - Compressed RDA files to reduce package size
