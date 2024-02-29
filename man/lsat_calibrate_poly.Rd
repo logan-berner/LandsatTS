@@ -33,7 +33,7 @@ from Landsat 7 and Landsat 5/8 required to include a sampling sample.}
 \item{train.with.highlat.data}{(True/False) Should the RF models be trained using an
 internal high-latitude dataset that sampled the Arctic and Boreal biomes?}
 
-\item{frac.train}{Fraction of samples to use for training the random forest models.
+\item{frac.train}{Fraction of samples to use for training the regression models.
 The remaining samples are used for model cross-validation.}
 
 \item{trim}{(True/False) If true, then for each sample site the percent difference
@@ -52,8 +52,7 @@ but can be specified if needed such as when performing Monte Carlo simulations.}
 
 \item{outdir}{Output directory (created if necessary) to which multiple files will be written.
 The files include:
-(1) fitted random forest models as R objects,
-(2) evaluation data in a csv file,
+(2) regression model coefficients in a csv file,
 (3) summary of model cross-validation in a csv file, and
 (4) multi-panel scatter plot comparing sensors pre- and post-calibration in jpeg format.
 If cross-calibrating both Landsat 5 and 8, then the function returns files for both sensors.}
