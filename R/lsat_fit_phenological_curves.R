@@ -98,7 +98,7 @@ lsat_fit_phenological_curves = function(dt,
   
   # INITIAL OUTLIER EXCLUSION BY FITTING SPLINE ACROSS ALL YEARS 
   dt[, n.obs := .N, by = 'sample.id']
-  dt <- dt[n.obs > window.min.obs * 2]
+  dt <- dt[n.obs >= window.min.obs]
   dt <- dt[, n.obs := NULL]
   rough.splines.dt <- dt[, .(spl.fit = list(stats::smooth.spline(doy, si, spar = spar))), by = 'sample.id']
   doy.rng <- min(dt$doy):max(dt$doy)
