@@ -3,9 +3,10 @@
 #' @description This function evaluates and summarizes interannual trends in 
 #' vegetation greenness for sample sites over a user-specified time period. 
 #' Potential interannual trends in vegetation greenness are assessed using 
-#' Mann-Kendall trend tests and Theil-Sen slope indicators after prewhitening
-#' each time series. This trend assessment relies on the zyp.yuepilon() function 
-#' from the zyp package, which provides further details. 
+#' either (1; default) Mann-Kendall trend tests and Theil-Sen slope indicators 
+#' after prewhitening each time series or (2) linear regression. The default 
+#' trend assessment method relies on the zyp.yuepilon() function from the zyp 
+#' package, which provides further details. 
 #' @param dt Data.table with columns including site, year, and the vegetation index of interest.
 #' @param si Spectral index for which to assess trend (e.g., NDVI).
 #' @param yrs A sequence of years over which to assess trends (e.g., 2000:2020).
@@ -15,6 +16,8 @@
 #' @param nyr.min.frac Fraction of years within the time period for which observations 
 #'     must be available if a trend is to be computed.
 #' @param sig A p-value significance cutoff used to categories trends (e.g., 0.10)
+#' @param method Specify whether trends should be computed using Mann-Kendall 
+#'    tests ("mk"; default) or linear regression ("lm")
 #' @return A list that includes: 
 #'     (1) a summary message about the mean relative change across sample sites;
 #'     (2) a data.table summarizing the number and percentage of sites that
@@ -39,7 +42,8 @@ lsat_calc_trend <- function(dt,
                             yrs, 
                             yr.tolerance = 1, 
                             nyr.min.frac = 0.66, 
-                            sig = 0.10){
+                            sig = 0.10,
+                            method = 'mk'){
   
   dt <- data.table::data.table(dt)
   data.table::setnames(dt, si, 'si')
@@ -75,8 +79,15 @@ lsat_calc_trend <- function(dt,
   # first year of the analysis time period
   dt[, year.rescale := year - min(yrs), by = sample.id]
   
-  # fit regression models
-  trend.dt <- dt[, as.list(calc.trends(year.rescale, si)), by = sample.id]
+  # calculate trends
+  if (method == 'mk'){
+    trend.dt <- dt[, as.list(calc.trends.mk(year.rescale, si)), by = sample.id]
+  } else if (method == 'lm'){
+    trend.dt <- dt[, as.list(calc.trends.lm(year.rescale, si)), by = sample.id]
+  } else {
+    print('Specify method as mk for Mann-Kendall (default) or lm for linear regression')
+    stop()
+  }
   
   # combine spatial / temporal and trend details into one data table
   trend.dt <- site.smry[trend.dt, on = 'sample.id']
@@ -95,8 +106,8 @@ lsat_calc_trend <- function(dt,
   setorder(trend.dt, 'sample.id')
   
   # create output message about average relative change 
-  avg <- round(mean(trend.dt$total.change.pcnt),2)
-  std <- round(stats::sd(trend.dt$total.change.pcnt),2)
+  avg <- round(mean(trend.dt$total.change.pcnt, na.rm=T),2)
+  std <- round(stats::sd(trend.dt$total.change.pcnt, na.rm=T),2)
   print.avg.msg <- paste0("Mean (SD) relative change of ", avg,
                           " (", std, ") % across the ", nrow(trend.dt), 
                           ' sample sites')
@@ -116,10 +127,19 @@ lsat_calc_trend <- function(dt,
 }
 
 
-calc.trends <- function(x,y){
+calc.trends.mk <- function(x,y){
   xx <- zyp::zyp.yuepilon(y,x) ## note the order of x and y are switched in this call!!!
   return(data.table(slope=round(xx['trend'],5), 
                     intercept=round(xx['intercept'],4), 
                     tau=round(xx['tau'],3), 
                     pval=round(xx['sig'],4)))
+}
+
+calc.trends.lm <- function(x,y){
+  xx <- stats::lm(y~x) ## note the order of x and y are switched in this call!!!
+  smry <- summary(xx)
+  return(data.table(slope=round(smry$coefficients[2,1],5), 
+                    intercept=round(smry$coefficients[1,1],4), 
+                    r2=round(smry$r.squared,3), 
+                    pval=round(smry$coefficients[2,4],4)))
 }

@@ -4,7 +4,15 @@
 \alias{lsat_calc_trend}
 \title{Calculate non-parametric vegetation greenness trends}
 \usage{
-lsat_calc_trend(dt, si, yrs, yr.tolerance = 1, nyr.min.frac = 0.66, sig = 0.1)
+lsat_calc_trend(
+  dt,
+  si,
+  yrs,
+  yr.tolerance = 1,
+  nyr.min.frac = 0.66,
+  sig = 0.1,
+  method = "mk"
+)
 }
 \arguments{
 \item{dt}{Data.table with columns including site, year, and the vegetation index of interest.}
@@ -21,6 +29,9 @@ time period ('yrs') for a trend to be computed.}
 must be available if a trend is to be computed.}
 
 \item{sig}{A p-value significance cutoff used to categories trends (e.g., 0.10)}
+
+\item{method}{Specify whether trends should be computed using Mann-Kendall
+tests ("mk"; default) or linear regression ("lm")}
 }
 \value{
 A list that includes:
@@ -33,9 +44,10 @@ fall into each trend category;
 This function evaluates and summarizes interannual trends in
 vegetation greenness for sample sites over a user-specified time period.
 Potential interannual trends in vegetation greenness are assessed using
-Mann-Kendall trend tests and Theil-Sen slope indicators after prewhitening
-each time series. This trend assessment relies on the zyp.yuepilon() function
-from the zyp package, which provides further details.
+either (1; default) Mann-Kendall trend tests and Theil-Sen slope indicators
+after prewhitening each time series or (2) linear regression. The default
+trend assessment method relies on the zyp.yuepilon() function from the zyp
+package, which provides further details.
 }
 \examples{
 data(lsat.example.dt)

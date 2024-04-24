@@ -1,5 +1,8 @@
 # LandsatTS changelog
 
+## 1.2.2 (released 2024-04-23)
+- lsat_calc_trend(): Added option to calculate trends using linear regression, in addition to the default method that uses Mann-Kendall tests and Theil-Sen slopes.  
+
 ## 1.2.1 (released 2024-04-10)
 - lsat_summarize_growing_seasons(): Removed z-score based outlier filtering that caused years with one observation to be accidentally removed since a standard deviation can not be computed. Outlier detection and removal is less important in this function now that lsat_fit_phenological_curves() includes enhanced outlier detection and filtering as of v. 1.1.0. 
 
