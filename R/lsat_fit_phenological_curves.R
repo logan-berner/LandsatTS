@@ -134,7 +134,7 @@ lsat_fit_phenological_curves = function(dt,
     } else if (i + half.win.yrs > max(all.yrs)){ # end of record
       focal.win <- (max(all.yrs)-window.yrs+1):max(all.yrs)
     } else{ # middle of record
-      focal.win <- (i - half.win.yrs+1):(i + half.win.yrs-1)
+      focal.win <- (i - half.win.yrs):(i + half.win.yrs)
     }
     
     # SUBSET OBS FROM FOCAL PERIOD
