@@ -227,7 +227,7 @@ lsat_get_pixel_centers <- function(polygon_sf,
   wrs_row <- as.numeric(gsub("[0-9]*_([0-9]*)", "\\1", wrs_tile_id))
 
   # Access landsat8 image collection
-  ls8IC <- rgee::ee$ImageCollection("LANDSAT/LC08/C01/T1_SR")
+  ls8IC <- rgee::ee$ImageCollection("LANDSAT/LC08/C02/T1_L2")
 
   # Retrieve tile crs from GEE
   lsat_tile_crs <- ls8IC$
@@ -308,7 +308,7 @@ lsat_get_pixel_centers <- function(polygon_sf,
     rgee::Map$centerObject(rgee::sf_as_ee(polygon_sf_utm))
 
     # make map
-    region_map <- rgee::Map$addLayer(ls8_image$select("B4")) +
+    region_map <- rgee::Map$addLayer(ls8_image$select("SR_B4")) +
       rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_buffered),
                          list(color = "blue")) +
       rgee::Map$addLayer(rgee::sf_as_ee(polygon_sf_utm),
