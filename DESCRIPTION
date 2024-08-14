@@ -1,6 +1,6 @@
 Package: LandsatTS
 Title: An R package to facilitate retrieval, cleaning, cross-calibration, and phenological modeling of Landsat time-series data
-Version: 1.2.2
+Version: 1.2.3
 Authors@R:
     c(
     person(given = "Logan T.",

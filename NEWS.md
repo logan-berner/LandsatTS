@@ -1,5 +1,8 @@
 # LandsatTS changelog
 
+## 1.2.3 (released 2024-08-14)
+- lsat_get_pixel_centers(): Updated to work with Landsat Collection 2 now that Collection 1 has been deprecated.
+
 ## 1.2.2 (released 2024-04-23)
 - lsat_calc_trend(): Added option to calculate trends using linear regression, in addition to the default method that uses Mann-Kendall tests and Theil-Sen slopes.  
 
