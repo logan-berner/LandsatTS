@@ -20,6 +20,8 @@ The **LandsatTS** package helps you to:
 - Quantify growing season characteristics using Landsat time series
   (e.g., annual maximum NDVI).
 
+:exclamation: **Important:** See [Changelog](NEWS.md) for updates. **Current version: 1.2.3** - **Using the most recent version is highly recommeneded.** :exclamation:
+
 ## Content
 
 1.  [Installation](#1-installation)
