@@ -26,7 +26,7 @@ The **LandsatTS** package helps you to:
 - Cross-calibrate surface reflectance measurements and vegetation indices among Landsat sensors.
 - Quantify growing season characteristics using Landsat time series (e.g., annual maximum NDVI).
 
-:exclamation: **Important:** See [Changelog](NEWS.md) for updates. **Current version: 1.2.3** - **Using the most recent version is highly recommeneded.** :exclamation:
+:exclamation: **Important:** See [Changelog](NEWS.md) for updates. **Current version: 1.2.3** - **Using the most recent version is highly recommended.** :exclamation:
 
 ## Content
 1. [Installation](#1-installation)
@@ -375,6 +375,15 @@ Aybar C, Wu Q, Bautista L, Yali R and Barja A (2020) rgee: An R package for inte
 
   
 **Peer-reviewed publications that have used `LandsatTS` functions:**
+
+***2024***
+Burrell, A.L., Cooperdock, S., Potter, S., Berner, L.T., Hember, R., Macander, M.J., Walker, X.J., 
+Massey, R., Foster, A.C., Mack, M. C., Goetz, S.J., & Rogers, B., 2024, The predictability of near
+term forest biomass change in boreal North America. Ecosphere, 15(1), e4737.
+
+Wong, R. E., Berner, L. T., Sullivan, P. F., Potter, C. S., & Dial, R. J., 2024, Pixel walking along
+the boreal forest–Arctic tundra ecotone: Large scale ground-truthing of satellite-derived greenness
+(NDVI). Global Change Biology, 30, e17374.
 
 ***2022***
 
