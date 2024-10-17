@@ -510,7 +510,7 @@ Logan T. Berner and Jakob J. Assmann
 
 Email Logan at: <Logan.Berner@nau.edu>
 
-Email Jakob at: <j.assmann@bio.au.dk>
+Email Jakob at: <jakob.assmann@uzh.ch>
 
 [$$to top$$](#content)
 
