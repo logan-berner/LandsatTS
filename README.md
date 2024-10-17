@@ -39,6 +39,7 @@ recommended.** :exclamation:
 8.  [References](#8-references)
 9.  [License](#9-license)
 10. [Funding](#10-funding)
+11. [Known issues](#11-known-issues)
 
 ## 1. Installation
 
@@ -620,3 +621,26 @@ No. 80NSSC21K1364). Further support was provided by the National Science
 Foundation Navigating the New Arctic Big Idea (Grant No. 2127273), the
 Independent Research Fund of Denmark (Grant No. 7027-00133B), and the EU
 Horizon 2020 CHARTER project (Grant No. 869471).
+
+[$$to top$$](#content)
+
+## 11. Known issues
+
+1)  LandsatTS relies on the rgee package to call the Google Earth Engine
+    (EE) API from within R. Unfortunately, some users have reported
+    problems with initializing EE using rgee. If you encounter problems
+    with initializing EE, please consult the rgee website, where several
+    temporary solutions have been proposed
+    (<https://github.com/r-spatial/rgee/issues/355>).
+
+2)  LandsatTS version 1.1 had small bugs in
+    lsat_fit_phenological_curves() and lsat_summarize_growing_seasons()
+    that affected estimates of annual maximum vegetation greenness.
+    Extensive testing showed the effects of these bugs were typically
+    quite small. These bugs have been fixed in version 1.2.
+    Nevertheless, be aware that the worked example in Berner et
+    al. (2023) was based on version 1.1 and thus the results differ
+    slightly from those obtained using version 1.2. Please use the most
+    recent version of LandsatTS for the most accurate results.
+
+[$$to top$$](#content)
